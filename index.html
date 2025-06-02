@@ -241,11 +241,8 @@
       }
 
       /* AR Placement & Interaction Prompts */
-      .ar-prompt {
-        position: fixed;
-        bottom: calc(var(--spacing-unit) * 12); /* Position above bottom nav or other elements */
-        left: 50%;
-        transform: translateX(-50%);
+      .ar-prompt { /* General styling for AR prompts */
+        position: fixed; /* Will be updated by JS */
         background-color: var(--surface-dark);
         color: var(--text-primary);
         padding: var(--spacing-unit) calc(var(--spacing-unit) * 2);
@@ -253,14 +250,27 @@
         font-size: 0.9rem;
         font-weight: 500;
         z-index: 1100;
-        display: none; /* Hidden by default */
+        display: none; 
         text-align: center;
         box-shadow: 0 4px 12px rgba(0,0,0,0.2);
         animation: fadeInPrompt 0.3s ease-out;
+        white-space: nowrap; /* Prevent text wrapping for short prompts */
       }
+
+      #ar-placement-prompt {
+        /* Specific styling if needed, but general .ar-prompt should cover it */
+        /* transform is set by JS */
+      }
+
+      #ar-interaction-info { /* This one stays at the bottom for now */
+        bottom: calc(var(--spacing-unit) * 12); 
+        left: 50%;
+        transform: translateX(-50%);
+      }
+
       @keyframes fadeInPrompt {
-        from { opacity: 0; transform: translateX(-50%) translateY(10px); }
-        to { opacity: 1; transform: translateX(-50%) translateY(0); }
+        from { opacity: 0; transform: translate(-50%, calc(-50% + 10px)); } /* Adjust transform for dynamic positioning */
+        to { opacity: 1; transform: translate(-50%, -50%); }
       }
       .ar-prompt .material-icons-round {
         vertical-align: middle;
@@ -915,7 +925,6 @@
       const appVersionMainText = document.getElementById("app-version-main");
       const modelNameDisplayText = document.getElementById("model-name-display");
       
-      // Instruction Elements
       const initialInstructionsOverlay = document.getElementById("initial-instructions-overlay");
       const closeInitialInstructionsButton = document.getElementById("close-initial-instructions");
       const desktopInstructionsBlock = document.getElementById("desktop-instructions-block");
@@ -1014,7 +1023,7 @@
       }
 
       function showInitialInstructions() {
-        if (localStorage.getItem('hasSeenModelViewerInstructions_v1')) { // Added version to key
+        if (localStorage.getItem('hasSeenModelViewerInstructions_v1')) { 
             return;
         }
         const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
@@ -1030,20 +1039,45 @@
 
       function hideInitialInstructions() {
         if(initialInstructionsOverlay) initialInstructionsOverlay.classList.remove('visible');
-        localStorage.setItem('hasSeenModelViewerInstructions_v1', 'true'); // Added version to key
+        localStorage.setItem('hasSeenModelViewerInstructions_v1', 'true'); 
       }
 
-      function showARPlacementPrompt(show) {
-        if (arPlacementPrompt) arPlacementPrompt.style.display = show ? 'block' : 'none';
+      function updateElementPositionRelativeTo3DObject(element, object3D, offsetX = 0, offsetY = -60) {
+        if (!element || !object3D || !object3D.visible || !camera) {
+            if(element) element.style.display = 'none';
+            return;
+        }
+
+        const vector = new THREE.Vector3();
+        object3D.getWorldPosition(vector); // Get world position of the 3D object
+        vector.project(camera); // Project to Normalized Device Coordinates (NDC)
+
+        // Check if the object is behind the camera (z > 1 in NDC after projection)
+        if (vector.z > 1) {
+            element.style.display = 'none';
+            return;
+        }
+        
+        // Convert NDC to screen coordinates
+        const x = (vector.x * 0.5 + 0.5) * renderer.domElement.clientWidth;
+        const y = (vector.y * -0.5 + 0.5) * renderer.domElement.clientHeight;
+
+        element.style.left = `${x + offsetX}px`;
+        element.style.top = `${y + offsetY}px`;
+        // Adjust transform to center the prompt based on its own dimensions, if needed
+        // For simplicity, using a fixed offset for now. A more robust solution would measure the prompt.
+        element.style.transform = `translate(-50%, -50%)`; 
+        element.style.display = 'block';
       }
+
 
       function showARInteractionInfo() {
         if (arInteractionInfo) {
-            arInteractionInfo.style.display = 'block';
-            clearTimeout(arInteractionInfoTimeout); // Clear previous timeout if any
+            arInteractionInfo.style.display = 'block'; // This prompt stays at bottom
+            clearTimeout(arInteractionInfoTimeout); 
             arInteractionInfoTimeout = setTimeout(() => {
-                arInteractionInfo.style.display = 'none';
-            }, 7000); // Hide after 7 seconds
+                if(arInteractionInfo) arInteractionInfo.style.display = 'none';
+            }, 7000); 
         }
       }
       
@@ -1151,7 +1185,7 @@
         renderer.setAnimationLoop(animate);
         
         updateAppVersionAndModelName(); 
-        showInitialInstructions(); // Show instructions on first load
+        showInitialInstructions(); 
       }
       
       function onARButtonClick() {
@@ -1202,8 +1236,8 @@
         xrRefSpace = null;
         xrHitTestSource = null;
         modelPlaced = false;
-        showARPlacementPrompt(false); // Hide placement prompt
-        if (arInteractionInfo) arInteractionInfo.style.display = 'none'; // Hide interaction info
+        if (arPlacementPrompt) arPlacementPrompt.style.display = 'none';
+        if (arInteractionInfo) arInteractionInfo.style.display = 'none'; 
 
         if (modelContainerGroup) {
           modelContainerGroup.visible = false; 
@@ -1213,7 +1247,7 @@
           logToScreen(`Model disembunyikan, skala AR diatur ke: ${params.arModelScale}`);
         }
         reticleMesh.visible = false; 
-        arInstructionsPanel.style.display = "block"; // Show "Start Scan" panel
+        arInstructionsPanel.style.display = "block"; 
         onScreenLogContainer.style.display = "block"; 
         if (appVersionDisplay) {
             appVersionDisplay.style.display = "block"; 
@@ -1244,19 +1278,19 @@
             .then((source) => {
               xrHitTestSource = source; 
               reticleMesh.visible = true; 
-              showARPlacementPrompt(true); // Show tap to place prompt
+              // Placement prompt will be handled by animate loop
               logToScreen("Hit test source berhasil didapatkan. Reticle aktif.");
             })
             .catch((err) => {
               logToScreen(`Error mendapatkan hit test source: ${err.message}`, "error");
               logToScreen("Tidak bisa memulai pemindaian permukaan. Coba lagi atau restart sesi AR.", "error");
               reticleMesh.visible = false;
-              showARPlacementPrompt(false);
+              if (arPlacementPrompt) arPlacementPrompt.style.display = 'none';
             });
         } else if (xrHitTestSource) {
           logToScreen("Hit test source sudah ada. Reticle seharusnya sudah aktif.");
           reticleMesh.visible = true;
-          showARPlacementPrompt(true);
+          // Placement prompt will be handled by animate loop
         } else if (!xrSession) {
           logToScreen("Sesi AR tidak aktif saat mencoba memulai pemindaian.", "warn");
         }
@@ -1282,7 +1316,7 @@
         const guiToggleButtonIcon = guiToggleButton.querySelector('.material-icons-round');
         if (guiToggleButtonIcon) guiToggleButtonIcon.textContent = 'menu';
 
-        showARPlacementPrompt(false); // Hide AR prompts
+        if (arPlacementPrompt) arPlacementPrompt.style.display = 'none';
         if (arInteractionInfo) arInteractionInfo.style.display = 'none';
         clearTimeout(arInteractionInfoTimeout);
 
@@ -1334,8 +1368,8 @@
             modelContainerGroup.visible = true; 
             modelPlaced = true; 
             reticleMesh.visible = false; 
-            showARPlacementPrompt(false); // Hide placement prompt
-            showARInteractionInfo(); // Show interaction info
+            if (arPlacementPrompt) arPlacementPrompt.style.display = 'none';
+            showARInteractionInfo(); 
 
             logToScreen(`Model AR ditempatkan. Pos: ${modelContainerGroup.position.toArray().map((n) => n.toFixed(2))}, Skala: ${params.arModelScale}`);
             
@@ -1949,7 +1983,7 @@
             skyboxObject.position.copy(camera.position);
           }
           composer.render(); 
-        } else { 
+        } else { // AR Mode
           if (frame) { 
             const currentRefSpace = renderer.xr.getReferenceSpace(); 
             if (xrHitTestSource && !modelPlaced && reticleMesh && currentRefSpace) {
@@ -1960,20 +1994,20 @@
                 if (pose) {
                   reticleMesh.matrix.fromArray(pose.transform.matrix); 
                   reticleMesh.visible = true;
-                  showARPlacementPrompt(true);
+                  updateElementPositionRelativeTo3DObject(arPlacementPrompt, reticleMesh, 0, -70); // Offset Y to be above reticle
                 } else { 
                     reticleMesh.visible = false; 
-                    showARPlacementPrompt(false);
+                    if(arPlacementPrompt) arPlacementPrompt.style.display = 'none';
                 }
               } else { 
                 reticleMesh.visible = false; 
-                showARPlacementPrompt(false);
+                if(arPlacementPrompt) arPlacementPrompt.style.display = 'none';
               } 
-            } else if (!modelPlaced && !xrHitTestSource && arInstructionsPanel.style.display === "none" && reticleMesh) {
-              // This fallback might not be needed if Start Scan always precedes reticle visibility
-            } else if (modelPlaced) { 
+            } else if (modelPlaced) { // If model is placed, hide placement prompt
               if (reticleMesh) reticleMesh.visible = false;
-              showARPlacementPrompt(false);
+              if (arPlacementPrompt) arPlacementPrompt.style.display = 'none';
+            } else { // If no hit test or model not placed, hide prompt
+                 if(arPlacementPrompt) arPlacementPrompt.style.display = 'none';
             }
           }
           renderer.render(scene, camera); 
