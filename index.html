@@ -533,13 +533,13 @@
     <div id="ar-button-container">
       <button id="arButton">
         <span class="material-icons-round">view_in_ar</span>
-        AR Mode
-      </button>
+        <span id="arButtonText">AR Mode</span> </button>
     </div>
     
     <div id="gui-toggle-container">
         <button id="guiToggleButton">
-            <span class="material-icons-round">menu</span> </button>
+            <span class="material-icons-round">menu</span> 
+        </button>
     </div>
 
     <div id="ar-instructions">
@@ -847,6 +847,8 @@
         
         // Setup AR button based on WebXR availability
         const arButtonElement = document.getElementById("arButton");
+        const arButtonTextElement = document.getElementById("arButtonText"); // Get the text span
+
         if (navigator.xr) {
           navigator.xr
             .isSessionSupported("immersive-ar")
@@ -855,34 +857,23 @@
               if (supported) {
                 arButtonElement.addEventListener("click", onARButtonClick);
                 arButtonElement.disabled = false;
+                if (arButtonTextElement) arButtonTextElement.textContent = "AR Mode"; // Initial text
                 logToScreen("AR didukung oleh perangkat/browser ini.");
               } else {
-                if(arButtonElement.childNodes.length > 1 && arButtonElement.childNodes[1].nodeType === Node.TEXT_NODE) {
-                    arButtonElement.childNodes[1].textContent = " No AR";
-                } else {
-                    arButtonElement.insertAdjacentText('beforeend', ' No AR'); // Fallback
-                }
+                if (arButtonTextElement) arButtonTextElement.textContent = " No AR";
                 arButtonElement.disabled = true;
                 logToScreen("AR tidak didukung oleh perangkat/browser ini.", "warn");
               }
             })
             .catch((err) => {
               logToScreen(`Error saat memeriksa dukungan AR: ${err.message}`, "error");
-              if(arButtonElement.childNodes.length > 1 && arButtonElement.childNodes[1].nodeType === Node.TEXT_NODE) {
-                  arButtonElement.childNodes[1].textContent = " Err AR";
-              } else {
-                  arButtonElement.insertAdjacentText('beforeend', ' Err AR');
-              }
+              if (arButtonTextElement) arButtonTextElement.textContent = " Err AR";
               arButtonElement.disabled = true;
               arButtonElement.style.display = "flex";
             });
         } else {
           arButtonElement.style.display = "flex";
-          if(arButtonElement.childNodes.length > 1 && arButtonElement.childNodes[1].nodeType === Node.TEXT_NODE) {
-              arButtonElement.childNodes[1].textContent = " No XR";
-          } else {
-              arButtonElement.insertAdjacentText('beforeend', ' No XR');
-          }
+          if (arButtonTextElement) arButtonTextElement.textContent = " No XR";
           arButtonElement.disabled = true;
           logToScreen("WebXR API tidak tersedia di browser ini.", "warn");
         }
@@ -932,7 +923,7 @@
       // Handles AR button click to start or end an AR session
       function onARButtonClick() {
         const arButtonElement = document.getElementById("arButton");
-        const arButtonTextNode = arButtonElement.childNodes.length > 1 && arButtonElement.childNodes[1].nodeType === Node.TEXT_NODE ? arButtonElement.childNodes[1] : arButtonElement.querySelector("span + span") || arButtonElement.appendChild(document.createTextNode("")).previousSibling;  
+        const arButtonTextElement = document.getElementById("arButtonText");
       
         if (!xrSession) {
           logToScreen("Mencoba memulai sesi AR...");
@@ -945,7 +936,7 @@
             .catch((err) => {
               logToScreen(`Gagal memulai sesi AR: ${err.message}`, "error");
               logToScreen("Pastikan perangkat & browser mendukung AR, dan izin kamera diberikan.", "error");
-              if (arButtonTextNode) arButtonTextNode.textContent = " AR Fail";
+              if (arButtonTextElement) arButtonTextElement.textContent = " AR Fail";
               arButtonElement.classList.remove("ar-active");
             });
         } else {
@@ -959,9 +950,9 @@
         logToScreen(`Sesi AR dimulai.`);
         xrSession = session;
         const arButtonElement = document.getElementById("arButton");
-        const arButtonTextNode = arButtonElement.childNodes.length > 1 && arButtonElement.childNodes[1].nodeType === Node.TEXT_NODE ? arButtonElement.childNodes[1] : arButtonElement.querySelector("span + span") || arButtonElement.appendChild(document.createTextNode("")).previousSibling;  
+        const arButtonTextElement = document.getElementById("arButtonText");
       
-        if (arButtonTextNode) arButtonTextNode.textContent = " Stop AR";
+        if (arButtonTextElement) arButtonTextElement.textContent = " Stop AR";
         arButtonElement.classList.add("ar-active");
       
         // Hide non-AR UI elements
@@ -1049,17 +1040,15 @@
         }
         
         const arButtonElement = document.getElementById("arButton");
-        const arButtonTextNode = arButtonElement.childNodes.length > 1 && arButtonElement.childNodes[1].nodeType === Node.TEXT_NODE ? arButtonElement.childNodes[1] : arButtonElement.querySelector("span + span") || arButtonElement.appendChild(document.createTextNode("")).previousSibling;  
+        const arButtonTextElement = document.getElementById("arButtonText");
       
-        if (arButtonTextNode) arButtonTextNode.textContent = " AR Mode";
+        if (arButtonTextElement) arButtonTextElement.textContent = " AR Mode";
         arButtonElement.classList.remove("ar-active");
       
         // Restore non-AR UI
         document.querySelector(".bottom-nav").style.display = "flex";
-        // The custom panel remains hidden unless explicitly opened by the user via its toggle.
-        // The icon on the toggle button should be 'menu' as the panel is closed.
         const customPanel = document.getElementById('custom-controls-panel');
-        if (customPanel) customPanel.classList.remove('visible'); // Ensure it's hidden
+        if (customPanel) customPanel.classList.remove('visible'); 
         const guiToggleButton = document.getElementById('guiToggleButton');
         const guiToggleButtonIcon = guiToggleButton.querySelector('.material-icons-round');
         if (guiToggleButtonIcon) guiToggleButtonIcon.textContent = 'menu';
@@ -1075,7 +1064,6 @@
             xrHitTestSource = null;
         }
       
-        // Remove AR-specific touch listeners
         renderer.domElement.removeEventListener("touchstart", handleARtouchstart);
         renderer.domElement.removeEventListener("touchmove", handleARtouchmove);
         renderer.domElement.removeEventListener("touchend", handleARtouchend);
@@ -1083,7 +1071,6 @@
         arIsDragging = false;
         logToScreen("Listener interaksi AR dihapus.");
       
-        // Restore model visibility and scale for non-AR mode
         if (modelContainerGroup) {
           modelContainerGroup.visible = true;
           if (modelContainerGroup.userData.originalScale) {
@@ -1112,8 +1099,6 @@
             modelContainerGroup.visible = true; 
             modelPlaced = true; 
             reticleMesh.visible = false; 
-            // if (xrHitTestSource) { // Optionally cancel hit test
-            // }
             logToScreen(`Model AR ditempatkan. Pos: ${modelContainerGroup.position.toArray().map((n) => n.toFixed(2))}, Skala: ${params.arModelScale}`);
             
             renderer.domElement.addEventListener("touchstart", handleARtouchstart, { passive: false });
