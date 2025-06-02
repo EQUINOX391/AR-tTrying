@@ -241,7 +241,7 @@
         display: flex;
         justify-content: center; /* Center buttons in the row */
         align-items: center; /* Align items if they wrap */
-        gap: var(--spacing-unit); /* Reduced gap for compactness */
+        gap: calc(var(--spacing-unit) * 0.75); /* Reduced gap for compactness */
         z-index: 1000;
         border-top-left-radius: 16px; /* Softer radius */
         border-top-right-radius: 16px;
@@ -253,17 +253,17 @@
         flex-direction: column;
         align-items: center;
         gap: 3px; /* Reduced gap between icon and text */
-        padding: calc(var(--spacing-unit) * 1) calc(var(--spacing-unit) * 1.25); /* More compact padding */
+        padding: calc(var(--spacing-unit) * 0.75) calc(var(--spacing-unit)); /* More compact padding */
         border-radius: 10px; /* Slightly smaller radius */
         border: none;
         background: var(--surface-light);
         color: var(--text-primary);
         font-family: inherit;
         font-weight: 500;
-        font-size: 0.7rem; /* Smaller font for compact buttons */
+        font-size: 0.65rem; /* Smaller font for compact buttons */
         cursor: pointer;
         transition: all 0.2s ease;
-        min-width: 50px; /* Ensure a minimum tap width */
+        min-width: 45px; /* Ensure a minimum tap width */
         text-align: center;
       }
       .view-btn:hover {
@@ -271,7 +271,17 @@
         transform: translateY(-1px);
       }
       .view-btn .material-icons-round {
-        font-size: 1.25rem; /* Smaller icons */
+        font-size: 1.1rem; /* Smaller icons */
+      }
+
+      /* Active state for view buttons */
+      .view-btn.active {
+        background: var(--primary-color);
+        color: #000; /* Black text for active state */
+        box-shadow: 0 4px 12px rgba(255, 215, 0, 0.5); /* Stronger yellow shadow */
+      }
+      .view-btn.active .material-icons-round {
+        color: #000; /* Ensure icon is black */
       }
     
       /* On-Screen Log (Positioned above bottom nav) */
@@ -370,7 +380,7 @@
     
     <div class="bottom-nav">
       <button class="view-btn" data-view="Default">
-        <span class="material-icons-round">auto_awesome</span> Default
+        <span class="material-icons-round">restore</span> Default
       </button>
       <button class="view-btn" data-view="Front">
         <span class="material-icons-round">flip_to_front</span> Front
@@ -387,10 +397,10 @@
         Bottom
       </button>
       <button class="view-btn" data-view="Left">
-        <span class="material-icons-round">align_horizontal_left</span> Left
+        <span class="material-icons-round">arrow_back</span> Left
       </button>
       <button class="view-btn" data-view="Right">
-        <span class="material-icons-round">align_horizontal_right</span> Right
+        <span class="material-icons-round">arrow_forward</span> Right
       </button>
     </div>
     
@@ -399,7 +409,7 @@
       import { OrbitControls } from "three/addons/controls/OrbitControls.js";
       import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
       import { EffectComposer } from "three/addons/postprocessing/EffectComposer.js";
-      import { RenderPass } from "three/addons/postprocessing/RenderPass.js"; /* Corrected import */
+      import { RenderPass } from "three/addons/postprocessing/RenderPass.js";
       import { OutputPass } from "three/addons/postprocessing/OutputPass.js";
       import GUI from "lil-gui";
     
@@ -485,7 +495,6 @@
     
       // Initializes the 3D scene, camera, renderer, and loads initial assets
       function init() {
-        // Removed the 10-second setTimeout here.
         clock = new THREE.Clock(); // For animation timing
         scene = new THREE.Scene();
         scene.background = new THREE.Color(params.backgroundColor);
@@ -539,10 +548,8 @@
               if (supported) {
                 arButtonElement.addEventListener("click", onARButtonClick);
                 arButtonElement.disabled = false;
-                // AR Button text is already set in HTML, no need to change here unless dynamic
                 logToScreen("AR didukung oleh perangkat/browser ini.");
               } else {
-                arButtonElement.querySelector("span + span") // Get text node
                 if(arButtonElement.childNodes.length > 1 && arButtonElement.childNodes[1].nodeType === Node.TEXT_NODE) {
                     arButtonElement.childNodes[1].textContent = " No AR";
                 } else {
@@ -611,6 +618,7 @@
         renderer.setAnimationLoop(animate);
         
         // Set initial app version display
+
         if (appVersionDisplay) appVersionDisplay.textContent = `APP VERSI ${APP_VERSION}`;
       }
     
@@ -1080,12 +1088,7 @@
         });
       }
     
-      // Moves camera to a predefined view preset
-      // Note on view mapping: "Front" view looks AT the model's front (camera is on model's -Z if model faces +Z)
-      // The original code had a different interpretation, this is a more standard one.
-      // For this implementation: Front = camera at (0,0,D), Left = camera at (-D,0,0) etc.
-      // The user's original comment: "Front" => dari kiri, "Back" => dari kanan, "Left" => dari depan, "Right" => dari belakang.
-      // I will stick to the user's interpretation for consistency with their intent.
+      // Moves camera to a predefined view preset 
       function goToViewPreset(presetName, instant = false) {
         if (isUpdatingViewPresetGUI) return; // Prevent recursion if called from GUI change
         if (!modelContainerGroup || !camera || !controls || !model) {
@@ -1094,7 +1097,7 @@
         }
         isUpdatingViewPresetGUI = true; // Flag to prevent GUI feedback loop
     
-        const center = new THREE.Vector3(0, 0, 0); // Model is centered at origin within its group
+        const center = new THREE.Vector3(); // Model is centered at origin within its group
         // Recalculate bounding box of the *visible model parts* within the container group
         const currentBox = new THREE.Box3();
         model.traverseVisible(obj => { // Only consider visible parts of the model itself
@@ -1135,8 +1138,21 @@
             break;
           case "Default":
           default:
-            // Frame the object with a slight offset and angle
-            frameArea(modelContainerGroup, camera, controls, instant, 1.8); // Use frameArea for default
+            // Reset model's position, rotation, and scale to initial parameters
+            modelContainerGroup.position.set(0, 0, 0);
+            modelContainerGroup.rotation.set(
+              THREE.MathUtils.degToRad(params.initialRotationX_deg),
+              THREE.MathUtils.degToRad(params.initialRotationY_deg),
+              THREE.MathUtils.degToRad(params.initialRotationZ_deg)
+            );
+            modelContainerGroup.scale.set(params.modelScale, params.modelScale, params.modelScale);
+
+            // Reset camera to its initial load position and target
+            camera.position.set(0, 1.6, 3);
+            controls.target.set(0, 0, 0);
+            camera.up.set(0, 1, 0); // Ensure camera up is reset
+            controls.update(); // Update controls to reflect changes
+            
             params.selectedViewPreset = "Default";
             if (gui) {
               const presetController = gui.controllersRecursive().find((c) => c.property === "selectedViewPreset");
@@ -1147,6 +1163,8 @@
               }
             }
             isUpdatingViewPresetGUI = false;
+            // Update active button state
+            updateActiveButton(presetName);
             return;
         }
     
@@ -1175,6 +1193,8 @@
           }
         }
         isUpdatingViewPresetGUI = false;
+        // Update active button state
+        updateActiveButton(presetName);
       }
     
       // Utility to frame an object in camera view
@@ -1244,6 +1264,18 @@
           ctrl.update();
         }
       }
+
+      // Function to update the active state of view buttons
+      function updateActiveButton(activeView) {
+        const buttons = document.querySelectorAll(".view-btn");
+        buttons.forEach(button => {
+          if (button.getAttribute("data-view") === activeView) {
+            button.classList.add("active");
+          } else {
+            button.classList.remove("active");
+          }
+        });
+      }
     
       // Sets up event listeners for the preset view buttons
       function setupPresetButtons() {
@@ -1254,6 +1286,8 @@
             goToViewPreset(view, false); // Use non-instant for button clicks if smooth transition is ever added
           });
         });
+        // Set Default button as active on initial load
+        updateActiveButton(params.selectedViewPreset);
       }
     
       // Sets up the lil-gui panel for controlling parameters
