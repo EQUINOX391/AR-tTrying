@@ -107,11 +107,11 @@
 
         #reticle { 
             position: absolute;
-            width: 35px; 
-            height: 35px; 
+            width: 35px; /* Sedikit lebih besar */
+            height: 35px; /* Sedikit lebih besar */
             border-radius: 50%;
-            border: 3px solid rgba(255, 255, 255, 0.75); 
-            box-shadow: 0 0 10px rgba(255, 255, 255, 0.5); 
+            border: 3px solid rgba(255, 255, 255, 0.75); /* Lebih tebal dan sedikit transparan */
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.5); /* Tambahkan glow */
             box-sizing: border-box;
             display: none; 
             top: 50%;
@@ -130,8 +130,8 @@
             padding: 20px;
             border-radius: 10px;
             text-align: center;
-            z-index: 1002; 
-            display: none; 
+            z-index: 1002; /* Di atas segalanya kecuali loading */
+            display: none; /* Sembunyikan awal */
             font-size: 1.1em;
         }
         #ar-instructions button {
@@ -152,28 +152,30 @@
             position: absolute;
             bottom: 10px;
             left: 10px;
-            width: calc(50% - 20px); 
+            width: calc(50% - 20px); /* Setengah layar kiri */
             max-width: 400px;
-            height: 100px; 
+            height: 100px; /* Tinggi tetap */
             background-color: rgba(0,0,0,0.6);
-            color: #0f0; 
+            color: #0f0; /* Warna teks hijau seperti konsol */
             font-family: monospace;
             font-size: 0.75em;
             padding: 8px;
             border-radius: 5px;
-            overflow-y: scroll; 
+            overflow-y: scroll; /* Scroll jika log panjang */
             z-index: 1000;
-            display: none; 
+            display: none; /* Sembunyikan awal, tampilkan saat AR */
         }
         #app-version {
             position: absolute;
             bottom: 10px;
-            left: 10px; 
+            left: 10px; /* Di bawah log container */
             font-size: 0.7em;
             color: rgba(255,255,255,0.5);
             z-index: 1001;
-             display: none; 
+             display: none; /* Sembunyikan awal, tampilkan saat AR */
         }
+
+
     </style>
     <script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
     <script type="importmap">
@@ -206,7 +208,8 @@
     </div>
     <div id="reticle"></div> 
     <div id="on-screen-log-container"></div>
-    <div id="app-version">APP VERSI 0.0.5</div> 
+    <div id="app-version">APP VERSI 0.0.4</div>
+
     <script type="module">
         import * as THREE from 'three';
         import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
@@ -230,22 +233,21 @@
         const modelSize = new THREE.Vector3(); 
 
         let xrSession = null;
-        let xrViewerSpace = null; 
+        let xrRefSpace = null;
         let xrHitTestSource = null;
         let reticleMesh; 
         let modelPlaced = false; 
-        let detectedPlanes = new Map(); 
 
         let isUpdatingViewPresetGUI = false;
 
-        const APP_VERSION = "0.0.5"; 
+        const APP_VERSION = "0.0.4";
 
         const params = {
             modelPath: 'Cupang.glb', 
             skyboxGlbUrl: 'inside_galaxy_skybox_hdri_360_panorama.glb', 
             toneMappingExposure: 1.0,
-            ambientLightIntensity: 3.0, 
-            directionalLightIntensity: 4.0, 
+            ambientLightIntensity: 3.0, // Lebih terang lagi
+            directionalLightIntensity: 4.0, // Lebih terang lagi
             directionalLightColor: 0xffffff,
             initialRotationX_deg: 0.0,
             initialRotationY_deg: 0.0,
@@ -255,12 +257,10 @@
             selectedViewPreset: 'Default',
             cameraFOV: 50, 
             modelScale: 1.0, 
-            arModelScale: 0.25, 
-            arModelRotationY_deg: 0, 
+            arModelScale: 0.5, // Default skala AR dinaikkan signifikan
             skyboxBrightness: 1.0,
             backgroundColor: '#4682B4', 
             showSkybox: true,
-            showDetectedPlanes: true, 
         };
 
         function logToScreen(message, type = 'info') {
@@ -269,19 +269,20 @@
                 const timestamp = new Date().toLocaleTimeString();
                 logEntry.textContent = `[${timestamp}] ${message}`;
                 if (type === 'error') {
-                    logEntry.style.color = '#ff6666'; 
+                    logEntry.style.color = '#ff6666'; // Merah untuk error
                 } else if (type === 'warn') {
-                    logEntry.style.color = '#ffcc66'; 
+                    logEntry.style.color = '#ffcc66'; // Kuning untuk warning
                 } else {
-                    logEntry.style.color = '#99ff99'; 
+                    logEntry.style.color = '#99ff99'; // Hijau muda untuk info
                 }
                 onScreenLogContainer.appendChild(logEntry);
-                onScreenLogContainer.scrollTop = onScreenLogContainer.scrollHeight; 
+                onScreenLogContainer.scrollTop = onScreenLogContainer.scrollHeight; // Auto-scroll
             }
             if (type === 'error') console.error(message);
             else if (type === 'warn') console.warn(message);
             else console.log(message);
         }
+
 
         function init() {
             if (loadingIndicator) loadingIndicator.style.display = 'block';
@@ -359,7 +360,7 @@
             if (params.skyboxGlbUrl && params.skyboxGlbUrl !== 'SKYBOX_ANDA.glb' && !params.skyboxGlbUrl.includes('placehold.co')) {
                 loadSkyboxFromGLB();
             } else {
-                logToScreen("Path Skybox GLB tidak valid atau menggunakan placeholder, skybox tidak akan dimuat secara otomatis.", "warn");
+                logToScreen("Path Skybox GLB tidak valid atau placeholder, skybox tidak akan dimuat secara otomatis.", "warn");
             }
             updateBackgroundVisibility();
 
@@ -384,10 +385,9 @@
             const arButtonElement = document.getElementById('arButton');
             if (!xrSession) {
                 logToScreen("Mencoba memulai sesi AR...");
-                // Menyederhanakan permintaan sesi, menghapus dom-overlay dari required
                 navigator.xr.requestSession('immersive-ar', { 
-                    requiredFeatures: ['hit-test'], 
-                    optionalFeatures: ['plane-detection'] 
+                    requiredFeatures: ['hit-test', 'dom-overlay'], 
+                    domOverlay: { root: document.body } 
                 }).then(onSessionStarted)
                   .catch(err => {
                       logToScreen(`Gagal memulai sesi AR: ${err.message}`, "error");
@@ -401,7 +401,7 @@
         }
 
         function onSessionStarted(session) {
-            logToScreen(`Sesi AR dimulai.`);
+            logToScreen(`Sesi AR dimulai. ID Sesi: ${session}`);
             xrSession = session;
             const arButtonElement = document.getElementById('arButton');
             arButtonElement.textContent = 'Stop'; 
@@ -412,21 +412,22 @@
             if(skyboxObject) skyboxObject.visible = false; 
             scene.background = null; 
 
-            xrViewerSpace = null; 
+            xrRefSpace = null; 
             xrHitTestSource = null; 
             modelPlaced = false; 
             if(modelContainerGroup) {
                 modelContainerGroup.visible = false; 
                 modelContainerGroup.userData.originalScale = modelContainerGroup.scale.clone();
                 modelContainerGroup.scale.set(params.arModelScale, params.arModelScale, params.arModelScale);
-                modelContainerGroup.rotation.y = THREE.MathUtils.degToRad(params.arModelRotationY_deg); 
-                logToScreen(`Model disembunyikan, skala AR diatur ke: ${params.arModelScale}, rotasi Y: ${params.arModelRotationY_deg} deg`);
+                logToScreen(`Model disembunyikan, skala AR diatur ke: ${params.arModelScale}`);
             }
+            // Jangan tampilkan reticle dulu, tunggu tombol "Mulai Pindai"
             reticleMesh.visible = false; 
-            arInstructionsPanel.style.display = 'block'; 
-            onScreenLogContainer.style.display = 'block'; 
-            appVersionDisplay.style.display = 'block'; 
+            arInstructionsPanel.style.display = 'block'; // Tampilkan instruksi
+            onScreenLogContainer.style.display = 'block'; // Tampilkan log di layar
+            appVersionDisplay.style.display = 'block'; // Tampilkan versi app
             appVersionDisplay.textContent = `APP VERSI ${APP_VERSION}`;
+
 
             session.addEventListener('end', onSessionEnded);
             
@@ -434,27 +435,27 @@
             renderer.xr.setSession(session)
                 .then(() => {
                     logToScreen("Sesi XR berhasil diset ke renderer.");
-                    return session.requestReferenceSpace('viewer'); 
-                })
-                .then((refSpace) => {
-                    xrViewerSpace = refSpace; 
-                    logToScreen("Viewer reference space didapatkan.");
+                    // Hit test source akan diminta setelah tombol "Mulai Pindai" ditekan
                 })
                 .catch(err => {
-                    logToScreen(`Error saat set session atau mendapatkan viewer space: ${err.message}`, "error");
-                    session.end().catch(e => logToScreen(`Error mengakhiri sesi setelah setup gagal: ${e.message}`, "error"));
+                    logToScreen(`Error saat set session ke renderer: ${err.message}`, "error");
+                    session.end().catch(e => logToScreen(`Error mengakhiri sesi setelah setSession gagal: ${e.message}`, "error"));
                 });
         }
 
         function onStartScanButtonClick() {
             logToScreen("Tombol 'Mulai Pindai Permukaan' ditekan.");
-            arInstructionsPanel.style.display = 'none'; 
+            arInstructionsPanel.style.display = 'none'; // Sembunyikan instruksi
             
-            if (xrSession && !xrHitTestSource && xrViewerSpace) { 
-                xrSession.requestHitTestSource({ space: xrViewerSpace })
+            if (xrSession && !xrHitTestSource) {
+                xrSession.requestReferenceSpace('viewer')
+                    .then((refSpaceViewer) => {
+                        logToScreen("Viewer reference space didapatkan untuk hit-test.");
+                        return xrSession.requestHitTestSource({ space: refSpaceViewer });
+                    })
                     .then((source) => {
                         xrHitTestSource = source;
-                        reticleMesh.visible = true; 
+                        reticleMesh.visible = true; // Tampilkan reticle sekarang
                         logToScreen("Hit test source berhasil didapatkan. Reticle aktif.");
                     })
                     .catch(err => {
@@ -467,28 +468,24 @@
                 reticleMesh.visible = true;
             } else if (!xrSession) {
                 logToScreen("Sesi AR tidak aktif saat mencoba memulai pemindaian.", "warn");
-            } else if (!xrViewerSpace) {
-                logToScreen("Viewer reference space belum siap untuk hit-testing.", "warn");
             }
         }
+
 
         function onSessionEnded() {
             logToScreen("Sesi AR berakhir.");
             xrSession = null;
-            xrViewerSpace = null; 
             const arButtonElement = document.getElementById('arButton');
             arButtonElement.textContent = 'AR';
             arButtonElement.classList.remove('ar-active');
 
             document.getElementById('preset-buttons-container').style.display = 'flex'; 
             if(gui) gui.show(); 
-            arInstructionsPanel.style.display = 'none'; 
-            onScreenLogContainer.style.display = 'none'; 
-            appVersionDisplay.style.display = 'none'; 
+            arInstructionsPanel.style.display = 'none'; // Pastikan instruksi tersembunyi
+            onScreenLogContainer.style.display = 'none'; // Sembunyikan log
+            appVersionDisplay.style.display = 'none'; // Sembunyikan versi app
 
             reticleMesh.visible = false;
-            detectedPlanes.forEach(planeMesh => scene.remove(planeMesh));
-            detectedPlanes.clear();
 
             if(modelContainerGroup) {
                 modelContainerGroup.visible = true; 
@@ -498,7 +495,6 @@
                 } else { 
                     modelContainerGroup.scale.set(params.modelScale, params.modelScale, params.modelScale);
                 }
-                 modelContainerGroup.rotation.y = THREE.MathUtils.degToRad(params.initialRotationY_deg); 
             }
             if(model) goToViewPreset(params.selectedViewPreset, true); 
             updateBackgroundVisibility(); 
@@ -514,13 +510,12 @@
                     modelContainerGroup.matrix.decompose(modelContainerGroup.position, modelContainerGroup.quaternion, modelContainerGroup.scale); 
                     
                     modelContainerGroup.scale.set(params.arModelScale, params.arModelScale, params.arModelScale); 
-                    modelContainerGroup.rotation.y = THREE.MathUtils.degToRad(params.arModelRotationY_deg);
-
+                    
                     modelContainerGroup.visible = true;
                     modelPlaced = true;
                     reticleMesh.visible = false; 
 
-                    logToScreen(`Model AR ditempatkan. Pos: ${modelContainerGroup.position.toArray().map(n=>n.toFixed(2))}, Skala: ${params.arModelScale}, RotY: ${params.arModelRotationY_deg} deg`);
+                    logToScreen(`Model AR ditempatkan. Pos: ${modelContainerGroup.position.toArray().map(n=>n.toFixed(2))}, Skala: ${params.arModelScale}`);
 
                     if (xrHitTestSource) {
                         xrHitTestSource = null; 
@@ -882,21 +877,14 @@
                 loadMainModel(); 
             });
             modelFolder.add(params, 'modelScale', 0.01, 10, 0.01).name('Skala (Non-AR)').onChange(applyModelScale);
-            modelFolder.add(params, 'arModelScale', 0.01, 2.0, 0.005).name('Skala Model AR').onChange(value => { 
+            modelFolder.add(params, 'arModelScale', 0.01, 2.0, 0.005).name('Skala Model AR').onChange(value => { // Max skala AR dinaikkan
                 params.arModelScale = value;
                 if (xrSession && modelPlaced && modelContainerGroup) { 
                     modelContainerGroup.scale.set(value, value, value);
                     logToScreen(`Skala AR diupdate via GUI menjadi: ${value.toFixed(3)}`);
                 } else if (xrSession && !modelPlaced && modelContainerGroup) {
-                    modelContainerGroup.scale.set(value, value, value); 
+                    modelContainerGroup.scale.set(value, value, value); // Update skala pre-placement
                     logToScreen(`Skala AR pre-placement diupdate via GUI menjadi: ${value.toFixed(3)}`);
-                }
-            });
-            modelFolder.add(params, 'arModelRotationY_deg', -180, 180, 1).name('Rotasi AR Y (derajat)').onChange(value => {
-                params.arModelRotationY_deg = value;
-                if (xrSession && modelPlaced && modelContainerGroup) {
-                    modelContainerGroup.rotation.y = THREE.MathUtils.degToRad(value);
-                    logToScreen(`Rotasi AR Y diupdate menjadi: ${value} deg`);
                 }
             });
             modelFolder.add(params, 'initialRotationX_deg', -360, 360, 1).name('Rotasi Awal X').onChange(applyInitialRotation);
@@ -905,17 +893,6 @@
             modelFolder.add(params, 'animateModel').name('Animasi Putar (Non-AR)');
             modelFolder.add(params, 'rotationSpeed', 0, 1, 0.01).name('Kecepatan Putar');
             modelFolder.open();
-
-            const arFolder = gui.addFolder('Pengaturan AR');
-            arFolder.add(params, 'showDetectedPlanes').name('Tampilkan Deteksi Bidang').onChange(value => {
-                if (!value) { // Jika disembunyikan, hapus semua visualisasi plane
-                    detectedPlanes.forEach(planeMesh => scene.remove(planeMesh));
-                    detectedPlanes.clear();
-                }
-                // Jika diaktifkan, visualisasi akan muncul saat plane terdeteksi di animate loop
-            });
-            arFolder.open();
-
 
             const backgroundFolder = gui.addFolder('Latar Belakang (Non-AR)');
             backgroundFolder.add(params, 'showSkybox').name('Tampilkan Skybox').onChange(updateBackgroundVisibility);
@@ -1009,104 +986,44 @@
                 composer.render();
             } else { // Mode AR
                 if (frame) {
-                    const viewerPose = frame.getViewerPose(renderer.xr.getReferenceSpace());
-
-                    if (viewerPose) {
-                        // Handle Plane Detection
-                        if (params.showDetectedPlanes && session.updateWorldTrackingState) { // Cek apakah fitur ini ada
-                            const worldInfo = session.updateWorldTrackingState({ planeDetectionState: { enabled: true } });
-                            if (worldInfo && worldInfo.detectedPlanes) {
-                                const planes = worldInfo.detectedPlanes;
-                                // logToScreen(`Plane terdeteksi: ${planes.size}`, 'info'); // Bisa terlalu banyak log
-                                planes.forEach(plane => {
-                                    if (!detectedPlanes.has(plane)) {
-                                        logToScreen(`Plane baru terdeteksi: ${plane.orientation}, ID: ${plane.lastChangedTime}`);
-                                        
-                                        // Membuat mesh dari polygon plane
-                                        const planePolygon = plane.polygon; // Array dari XRPoint
-                                        if (planePolygon && planePolygon.length > 2) {
-                                            const shape = new THREE.Shape();
-                                            shape.moveTo(planePolygon[0].x, planePolygon[0].z);
-                                            for (let i = 1; i < planePolygon.length; i++) {
-                                                shape.lineTo(planePolygon[i].x, planePolygon[i].z);
-                                            }
-                                            const planeGeometry = new THREE.ShapeGeometry(shape);
-                                            
-                                            const planeMaterial = new THREE.MeshBasicMaterial({
-                                                color: 0x00ff00,
-                                                transparent: true,
-                                                opacity: 0.25,
-                                                side: THREE.DoubleSide,
-                                                wireframe: true
-                                            });
-                                            const planeMesh = new THREE.Mesh(planeGeometry, planeMaterial);
-                                            
-                                            // Atur posisi dan orientasi planeMesh
-                                            const planePose = frame.getPose(plane.planeSpace, renderer.xr.getReferenceSpace());
-                                            if(planePose) {
-                                                planeMesh.matrix.fromArray(planePose.transform.matrix);
-                                                planeMesh.matrix.decompose(planeMesh.position, planeMesh.quaternion, planeMesh.scale);
-                                            }
-
-                                            scene.add(planeMesh);
-                                            detectedPlanes.set(plane, planeMesh);
-                                        }
-                                    } else {
-                                        // Update plane jika perlu (misalnya jika polygon berubah)
-                                        const planeMesh = detectedPlanes.get(plane);
-                                        const planePose = frame.getPose(plane.planeSpace, renderer.xr.getReferenceSpace());
-                                        if(planePose && planeMesh) { // Pastikan planeMesh ada
-                                            planeMesh.matrix.fromArray(planePose.transform.matrix);
-                                            planeMesh.matrix.decompose(planeMesh.position, planeMesh.quaternion, planeMesh.scale);
-                                            // Update geometri jika polygon berubah (lebih kompleks)
-                                        }
-                                    }
-                                });
-                                // Hapus visualisasi untuk plane yang tidak lagi terdeteksi
-                                detectedPlanes.forEach((planeMesh, plane) => {
-                                    if (!planes.has(plane)) {
-                                        scene.remove(planeMesh);
-                                        detectedPlanes.delete(plane);
-                                    }
-                                });
-                            }
-                        }
-
-
-                        // Handle Hit-Testing dan Reticle
-                        if (xrHitTestSource && !modelPlaced) { 
-                            const hitTestResults = frame.getHitTestResults(xrHitTestSource);
-                            if (hitTestResults.length > 0) {
-                                const hit = hitTestResults[0];
-                                const currentRefSpace = renderer.xr.getReferenceSpace(); 
-                                if (currentRefSpace) {
-                                    const pose = hit.getPose(currentRefSpace);
-                                    if (pose) { 
-                                        reticleMesh.matrix.fromArray(pose.transform.matrix);
-                                        reticleMesh.visible = true; 
-                                    } else {
-                                        reticleMesh.visible = false;
-                                    }
+                    if (xrHitTestSource && !modelPlaced) { // Hanya lakukan hit-test jika source ada DAN model belum ditempatkan
+                        const hitTestResults = frame.getHitTestResults(xrHitTestSource);
+                        if (hitTestResults.length > 0) {
+                            const hit = hitTestResults[0];
+                            const currentRefSpace = renderer.xr.getReferenceSpace(); 
+                            if (currentRefSpace) {
+                                const pose = hit.getPose(currentRefSpace);
+                                if (pose) { 
+                                    reticleMesh.matrix.fromArray(pose.transform.matrix);
+                                    reticleMesh.visible = true; 
                                 } else {
-                                     reticleMesh.visible = false;
+                                    reticleMesh.visible = false;
                                 }
                             } else {
-                                reticleMesh.visible = false;
+                                 reticleMesh.visible = false;
                             }
-                        } else if (!modelPlaced && !xrHitTestSource && arInstructionsPanel.style.display === 'none') { 
-                            reticleMesh.visible = true; 
-                            const camWorldPos = new THREE.Vector3();
-                            const camWorldDir = new THREE.Vector3();
-                            camera.getWorldPosition(camWorldPos);
-                            camera.getWorldDirection(camWorldDir);
-                            reticleMesh.position.copy(camWorldPos).add(camWorldDir.multiplyScalar(0.7)); 
-                            reticleMesh.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0), new THREE.Vector3(0,1,0)); 
-                            reticleMesh.lookAt(camWorldPos); 
-                            reticleMesh.rotation.x = -Math.PI / 2; 
-                            reticleMesh.updateMatrix();
-                        } else if (modelPlaced) {
-                             reticleMesh.visible = false;
+                        } else {
+                            reticleMesh.visible = false;
                         }
+                    } else if (!modelPlaced && !xrHitTestSource && arInstructionsPanel.style.display === 'none') { 
+                        // Jika hit test belum dimulai (setelah tombol "Mulai Pindai" ditekan)
+                        // atau jika hit test source hilang tapi model belum ditempatkan
+                        // dan instruksi sudah disembunyikan (artinya user sudah klik "Mulai Pindai")
+                        // Tampilkan reticle di tengah layar sebagai fallback atau indikasi
+                        reticleMesh.visible = true; 
+                        const camWorldPos = new THREE.Vector3();
+                        const camWorldDir = new THREE.Vector3();
+                        camera.getWorldPosition(camWorldPos);
+                        camera.getWorldDirection(camWorldDir);
+                        // Proyeksikan sedikit ke depan kamera
+                        reticleMesh.position.copy(camWorldPos).add(camWorldDir.multiplyScalar(0.7)); // Jarak 0.7m
+                        // Buat reticle menghadap ke atas (sejajar lantai asumsi) relatif terhadap kamera
+                        reticleMesh.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0), new THREE.Vector3(0,1,0)); // Default menghadap atas
+                        reticleMesh.lookAt(camWorldPos); // Arahkan ke kamera agar sisi depannya terlihat
+                        reticleMesh.rotation.x = -Math.PI / 2; // Putar agar flat
+                        reticleMesh.updateMatrix();
+                    } else if (modelPlaced) {
+                         reticleMesh.visible = false;
                     }
                 }
                 renderer.render(scene, camera); 
