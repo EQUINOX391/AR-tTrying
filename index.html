@@ -24,16 +24,15 @@
     <style>
       /* Root Variables for Consistent Styling */
       :root {
-        --primary-color: #E3A857; /* Indian Yellow - Dominan */
-        --primary-hover: #D19847; /* Darker Indian Yellow for hover */
-        --secondary-color: #26619C; /* Lapis Lazuli Blue - Sekunder */
-        --secondary-hover: #1E4D7B; /* Darker Lapis Lazuli for hover */
-        --error-color: #f44336; 
-        --surface-dark: rgba(0, 0, 0, 0.85); /* Slightly more opaque */
-        --surface-light: rgba(255, 255, 255, 0.1); 
+        --primary-color: #FFC107; /* Yellow (Amber) */
+        --primary-hover: #FFA000; /* Darker Yellow (Amber) */
+        --secondary-color: #1976D2; /* Lapis Lazuli Blue (Material Blue 700) */
+        /* --error-color: #f44336; /* Red for errors - kept for specific error messages if needed */
+        /* For AR Active button, we will use secondary-color */
+        --surface-dark: rgba(0, 0, 0, 0.8); /* Dark translucent surface */
+        --surface-light: rgba(255, 255, 255, 0.1); /* Light translucent surface for buttons */
         --text-primary: #ffffff;
-        --text-secondary: rgba(255, 255, 255, 0.85);
-        --text-on-primary: #000000; /* Black text on yellow background */
+        --text-secondary: rgba(255, 255, 255, 0.8);
         --spacing-unit: 8px;
         --safe-area-inset-bottom: env(safe-area-inset-bottom, 20px);
       }
@@ -46,398 +45,285 @@
       }
       body {
         font-family: 'Plus Jakarta Sans', sans-serif;
-        background: linear-gradient(135deg, #18181a, #28292d); /* Slightly adjusted dark gradient */
+        background: linear-gradient(135deg, #1a1a1a, #2c2c2c); /* Dark gradient background */
         color: var(--text-primary);
-        overflow: hidden; 
-        height: 100vh; 
-        position: relative; 
+        overflow: hidden; /* Prevent scrollbars on the body */
+        height: 100vh; /* Full viewport height */
+        position: relative; /* For positioning fixed children */
       }
       canvas {
-        display: block; 
+        display: block; /* Remove extra space below canvas */
         width: 100%;
         height: 100%;
       }
     
-      /* Loading Overlay */
+      /* Loading Overlay with Enhanced Icon and Text */
       #loading-overlay {
         position: fixed;
-        top: 0; left: 0; right: 0; bottom: 0;
-        background: #121212; /* Darker background */
-        z-index: 2000; 
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: #111; /* Solid dark background for loading */
+        z-index: 2000; /* Highest z-index to cover everything */
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        gap: calc(var(--spacing-unit) * 3);
-        opacity: 1;
-        transition: opacity 0.7s ease-out; /* Smoother fade */
+        gap: calc(var(--spacing-unit) * 2.5); /* Space between elements */
       }
-      #loading-overlay .loading-content {
+      #loading-overlay .loading-content { /* Wrapper for icon and logo text */
         display: flex;
         flex-direction: column;
         align-items: center;
-        gap: calc(var(--spacing-unit) * 1); 
+        gap: calc(var(--spacing-unit) * 1.5); /* Space between icon and text */
       }
-      #loading-overlay .logo-icon { 
-        font-size: 4rem; /* Larger icon */
-        color: var(--primary-color);
+      #loading-overlay .logo-icon { /* Styling for the new loading icon */
+        font-size: 3.5rem;  
+        color: var(--primary-color); /* Updated to yellow */
         padding: var(--spacing-unit);
-        border: 2px solid var(--primary-color); /* Line style border */
-        border-radius: 50%;
+        background-color: rgba(255,255,255,0.05); /* Subtle background */
+        border-radius: 50%; /* Circular icon background */
         display: flex;
         align-items: center;
         justify-content: center;
-        width: 80px; 
-        height: 80px;
-        box-shadow: 0 0 15px rgba(var(--primary-color-rgb, 227, 168, 87), 0.3); /* Subtle glow */
-        animation: pulseIcon 2s infinite ease-in-out;
+        width: 70px;  
+        height: 70px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
       }
-      @keyframes pulseIcon {
-        0% { transform: scale(1); box-shadow: 0 0 15px rgba(var(--primary-color-rgb, 227, 168, 87), 0.2); }
-        50% { transform: scale(1.05); box-shadow: 0 0 25px rgba(var(--primary-color-rgb, 227, 168, 87), 0.4); }
-        100% { transform: scale(1); box-shadow: 0 0 15px rgba(var(--primary-color-rgb, 227, 168, 87), 0.2); }
+      #loading-overlay .logo-text { /* Formerly .logo, for the text part */
+        font-size: 1.4rem; /* Adjusted size */
+        font-weight: 600;
+        letter-spacing: 0.2px;
+        padding: calc(var(--spacing-unit) * 1) calc(var(--spacing-unit) * 1.5);
+        background: transparent; /* Cleaner look */
+        border-radius: 12px;
+        text-align: center;
+        color: var(--text-primary);
       }
-      #loading-overlay .logo-text-author {
+      #loading-overlay .spinner {
+        border: 5px solid rgba(255, 255, 255, 0.2); /* Slightly thinner border */
+        border-top: 5px solid var(--primary-color); /* Updated to yellow */
+        border-radius: 50%;
+        width: 45px; /* Slightly smaller spinner */
+        height: 45px;
+        animation: spin 1s linear infinite;
+      }
+      #loading-overlay .version-loading { /* Version text specific to loading screen */
         font-size: 0.9rem;
         color: var(--text-secondary);
         font-weight: 500;
-        margin-bottom: -2px; /* Bring closer to name */
-      }
-      #loading-overlay .logo-text-name { 
-        font-size: 1.5rem; 
-        font-weight: 700; /* Bolder name */
-        letter-spacing: 0.5px;
-        color: var(--text-primary);
-        padding: calc(var(--spacing-unit) * 0.5) calc(var(--spacing-unit) * 1.5);
-        border-radius: 8px;
-        text-align: center;
-      }
-      #loading-overlay .spinner {
-        border: 4px solid rgba(255, 255, 255, 0.15); 
-        border-top: 4px solid var(--primary-color);
-        border-radius: 50%;
-        width: 40px; 
-        height: 40px;
-        animation: spin 1.2s linear infinite;
-      }
-      #loading-overlay .version-loading { 
-        font-size: 0.8rem; /* Smaller version text */
-        color: var(--text-secondary);
-        font-weight: 400;
       }
       @keyframes spin {
         0% { transform: rotate(0deg); }
         100% { transform: rotate(360deg); }
       }
+    
+      /* After 10 seconds, fade out overlay */
       body.loaded #loading-overlay {
         opacity: 0;
-        pointer-events: none; 
+        transition: opacity 0.5s ease-out;
+        pointer-events: none; /* Allow interaction with elements below */
       }
     
       /* AR Button (Top Right) */
       #ar-button-container {
         position: fixed;
-        top: calc(var(--spacing-unit) * 2); 
-        right: calc(var(--spacing-unit) * 2);
-        z-index: 1010; /* Above GUI toggle */
+        top: calc(var(--spacing-unit) * 2.5); /* Adjusted spacing */
+        right: calc(var(--spacing-unit) * 2.5);
+        z-index: 1000;
       }
       #arButton {
         display: flex;
         align-items: center;
-        gap: calc(var(--spacing-unit) * 0.75);
-        padding: calc(var(--spacing-unit) * 1.2) calc(var(--spacing-unit) * 1.8); 
-        background: var(--secondary-color); /* Use secondary color */
+        gap: var(--spacing-unit);
+        padding: calc(var(--spacing-unit) * 1.25) calc(var(--spacing-unit) * 2); /* Slightly more compact */
+        background: var(--primary-color); /* Updated to yellow */
         border: none;
-        border-radius: 10px; 
-        color: var(--text-primary);
+        border-radius: 12px; /* Consistent border radius */
+        color: #000; /* Black text for better contrast on yellow */
         font-weight: 600;
-        font-size: 0.9rem; 
+        font-size: 0.95rem; /* Slightly smaller font */
         cursor: pointer;
-        transition: all 0.25s ease;
-        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.25);
+        transition: all 0.2s ease;
+        box-shadow: 0 4px 12px rgba(255, 193, 7, 0.3); /* Yellow shadow */
       }
       #arButton:hover {
-        background: var(--secondary-hover);
-        transform: translateY(-1px);
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        background: var(--primary-hover); /* Updated to darker yellow */
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(255, 160, 0, 0.4); /* Darker yellow shadow */
       }
-      #arButton.ar-active { 
-        background: var(--error-color);
-        box-shadow: 0 3px 10px rgba(244, 67, 54, 0.3);
+      #arButton.ar-active { /* When AR mode is active */
+        background: var(--secondary-color); /* Lapis Lazuli Blue */
+        box-shadow: 0 4px 12px rgba(25, 118, 210, 0.3); /* Blue shadow */
+        color: var(--text-primary); /* White text on blue */
       }
       #arButton .material-icons-round {
-        font-size: 1.2rem; 
+        font-size: 1.25rem; /* Adjusted icon size */
       }
-      #arButton-text { /* Span for AR button text */
-        transition: all 0.2s ease-in-out;
-      }
-
-      /* GUI Toggle Button (Top Left) */
-      #gui-toggle-button {
-        position: fixed;
-        top: calc(var(--spacing-unit) * 2);
-        left: calc(var(--spacing-unit) * 2);
-        z-index: 1010;
-        background: var(--surface-light);
-        border: none;
-        border-radius: 50%;
-        color: var(--text-primary);
-        font-size: 1.5rem; /* Icon size */
-        width: 40px;
-        height: 40px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        transition: all 0.25s ease;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-      }
-      #gui-toggle-button:hover {
-        background: rgba(255,255,255,0.2);
-        transform: scale(1.05);
-      }
-      #gui-toggle-button.active {
-        background: var(--primary-color);
-        color: var(--text-on-primary);
-      }
-
+    
       /* AR Instructions Panel (Center) */
       #ar-instructions {
-        position: fixed; top: 50%; left: 50%;
+        position: fixed;
+        top: 50%;
+        left: 50%;
         transform: translate(-50%, -50%);
         background: var(--surface-dark);
-        backdrop-filter: blur(8px); 
-        border-radius: 14px; 
-        padding: calc(var(--spacing-unit) * 2.5) calc(var(--spacing-unit) * 3);
-        width: calc(100% - var(--spacing-unit) * 6); 
-        max-width: 340px; 
-        box-shadow: 0 6px 25px rgba(0, 0, 0, 0.25);
-        z-index: 1200; 
-        display: none; 
+        backdrop-filter: blur(10px); /* Frosted glass effect */
+        border-radius: 16px; /* Softer radius */
+        padding: calc(var(--spacing-unit) * 2.5); /* Adjusted padding */
+        width: calc(100% - var(--spacing-unit) * 5); /* Responsive width with margins */
+        max-width: 360px; /* Max width for readability */
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        z-index: 1200; /* Above other UI elements */
+        display: none; /* Initially hidden */
         text-align: center;
       }
       #ar-instructions p {
-        font-size: 0.9rem; 
-        line-height: 1.55; 
-        margin-bottom: calc(var(--spacing-unit) * 2);
+        font-size: 0.95rem; /* Optimized for mobile */
+        line-height: 1.6; /* Improved readability */
+        margin-bottom: calc(var(--spacing-unit) * 2.5);
       }
       #start-scan-button {
         width: 100%;
-        padding: calc(var(--spacing-unit) * 1.5); 
-        background: var(--primary-color);
+        padding: calc(var(--spacing-unit) * 1.75); /* Good tap target size */
+        background: var(--primary-color); /* Updated to yellow */
         border: none;
-        border-radius: 10px;
-        color: var(--text-on-primary);
+        border-radius: 12px;
+        color: #000; /* Black text for better contrast on yellow */
         font-weight: 600;
         font-size: 0.95rem;
         cursor: pointer;
         transition: all 0.2s ease;
-        display: flex; 
+        display: flex; /* To align icon and text */
         align-items: center;
         justify-content: center;
         gap: var(--spacing-unit);
       }
       #start-scan-button:hover {
-        background: var(--primary-hover);
+        background: var(--primary-hover); /* Updated to darker yellow */
+        transform: translateY(-2px);
       }
       #start-scan-button .material-icons-round {
-        font-size: 1.25rem;
-      }
-
-      /* AR Interaction Hints */
-      .ar-interaction-hint {
-        position: fixed;
-        bottom: calc(90px + var(--safe-area-inset-bottom) + var(--spacing-unit) * 2); /* Above log and nav */
-        left: 50%;
-        transform: translateX(-50%);
-        background: rgba(0,0,0,0.75);
-        color: var(--text-primary);
-        padding: var(--spacing-unit) calc(var(--spacing-unit) * 1.5);
-        border-radius: 8px;
-        font-size: 0.8rem;
-        z-index: 1100;
-        display: none; /* Hidden by default */
-        animation: fadeInHint 0.3s ease-out;
-      }
-      @keyframes fadeInHint {
-        from { opacity: 0; transform: translate(-50%, 10px); }
-        to { opacity: 1; transform: translate(-50%, 0); }
+        font-size: 1.3rem;
       }
     
-      /* Bottom Navigation Bar */
+      /* Bottom Navigation Bar for View Presets (Edge Navbar) */
       .bottom-nav {
-        position: fixed; bottom: 0; left: 0; right: 0;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
         background: var(--surface-dark);
-        backdrop-filter: blur(8px);
-        padding: calc(var(--spacing-unit)*0.75) calc(var(--spacing-unit)*0.75) calc(var(--spacing-unit)*0.75 + var(--safe-area-inset-bottom));
+        backdrop-filter: blur(10px);
+        padding: var(--spacing-unit) var(--spacing-unit) calc(var(--spacing-unit) + var(--safe-area-inset-bottom)); /* Adjusted padding for safe area */
         display: flex;
-        justify-content: center; 
-        align-items: center; 
-        gap: calc(var(--spacing-unit) * 0.75); /* Slightly smaller gap */
+        justify-content: center; /* Center buttons in the row */
+        align-items: center; /* Align items if they wrap */
+        gap: var(--spacing-unit); /* Reduced gap for compactness */
         z-index: 1000;
-        border-top-left-radius: 14px; 
-        border-top-right-radius: 14px;
-        box-shadow: 0 -3px 15px rgba(0, 0, 0, 0.2);
-        flex-wrap: nowrap; /* Try to keep in one row */
-        overflow-x: auto; /* Allow horizontal scroll if truly needed, but aim for no-wrap */
+        border-top-left-radius: 16px; /* Softer radius */
+        border-top-right-radius: 16px;
+        box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.2);
+        flex-wrap: wrap; /* Allow buttons to wrap on small screens */
       }
       .view-btn {
         display: flex;
         flex-direction: column;
         align-items: center;
-        gap: 2px; 
-        padding: calc(var(--spacing-unit) * 0.75) var(--spacing-unit); 
-        border-radius: 8px; 
+        gap: 3px; /* Reduced gap between icon and text */
+        padding: calc(var(--spacing-unit) * 1) calc(var(--spacing-unit) * 1.25); /* More compact padding */
+        border-radius: 10px; /* Slightly smaller radius */
         border: none;
-        background: var(--surface-light);
-        color: var(--text-secondary); /* Lighter text for inactive */
+        background: var(--surface-light); /* Kept light translucent background */
+        color: var(--text-primary); /* White text for label */
         font-family: inherit;
         font-weight: 500;
-        font-size: 0.65rem; /* Even smaller font */
+        font-size: 0.7rem; /* Smaller font for compact buttons */
         cursor: pointer;
         transition: all 0.2s ease;
-        min-width: 48px; /* Adjusted min-width */
-        flex-shrink: 0; /* Prevent shrinking too much */
+        min-width: 50px; /* Ensure a minimum tap width */
         text-align: center;
       }
       .view-btn:hover {
-        background: rgba(255, 255, 255, 0.2);
-        color: var(--text-primary);
-      }
-      .view-btn.view-btn-active { /* Active state for bottom nav buttons */
-        background: var(--primary-color);
-        color: var(--text-on-primary);
-        font-weight: 600;
+        background: rgba(255, 255, 255, 0.2); /* Slightly more opaque on hover */
+        transform: translateY(-1px);
       }
       .view-btn .material-icons-round {
-        font-size: 1.1rem; /* Smaller icons */
+        font-size: 1.25rem; /* Smaller icons */
+        color: var(--secondary-color); /* Lapis Lazuli Blue for icons */
       }
     
-      /* On-Screen Log & Toggle */
-      #log-controls-container {
-        position: fixed;
-        bottom: calc(75px + var(--safe-area-inset-bottom)); /* Adjust based on nav height */
-        left: calc(var(--spacing-unit) * 1.5);
-        z-index: 1005;
-      }
-      #log-toggle-button {
-        background: var(--surface-light);
-        border: none;
-        border-radius: 50%;
-        color: var(--text-primary);
-        font-size: 1.2rem; /* Icon size */
-        width: 36px;
-        height: 36px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        box-shadow: 0 1px 5px rgba(0,0,0,0.2);
-      }
-      #log-toggle-button:hover {
-        background: rgba(255,255,255,0.25);
-      }
-      #log-toggle-button.active {
-        background: var(--secondary-color);
-      }
-
+      /* On-Screen Log (Positioned above bottom nav) */
       #on-screen-log-container {
         position: fixed;
-        bottom: calc(75px + var(--safe-area-inset-bottom) + var(--spacing-unit)); 
-        left: calc(var(--spacing-unit) * 1.5 + 36px + var(--spacing-unit)); /* Next to toggle button */
-        right: calc(var(--spacing-unit) * 1.5); 
-        width: auto; 
-        max-width: calc(100vw - 80px - var(--spacing-unit) * 4); /* Adjust width considering toggle button */
-        max-height: 75px; 
-        background: rgba(0, 0, 0, 0.75); 
-        color: #a0ffa0; /* Softer green */
+        bottom: calc(80px + var(--safe-area-inset-bottom) + var(--spacing-unit));  
+        left: calc(var(--spacing-unit) * 1.5);
+        right: calc(var(--spacing-unit) * 1.5); /* Span more of the width */
+        width: auto; /* Let left/right define width */
+        max-width: 400px; /* Max width on larger screens if desired */
+        margin-left: auto; /* Centering if max-width is hit */
+        margin-right: auto; /* Centering if max-width is hit */
+        max-height: 90px; /* Reduced height */
+        background: rgba(0, 0, 0, 0.7); /* Slightly more opaque */
+        color: #9f9; /* Lighter green for better contrast (default info log) */
         font-family: monospace;
-        font-size: 0.65rem; 
-        padding: calc(var(--spacing-unit)*0.75);
-        border-radius: 6px;
+        font-size: 0.7rem; /* Smaller log font */
+        padding: var(--spacing-unit);
+        border-radius: 8px;
         overflow-y: auto;
-        z-index: 999; 
-        display: none; 
-        border: 1px solid rgba(255,255,255,0.1);
-        transition: opacity 0.3s ease, transform 0.3s ease;
-        opacity: 0;
-        transform: translateY(10px);
-      }
-      #on-screen-log-container.visible {
-        display: block;
-        opacity: 1;
-        transform: translateY(0);
+        z-index: 999; /* Below main controls but above canvas */
+        display: none; /* Hidden by default, shown by JS */
+        border: 1px solid rgba(255,255,255,0.1); /* Subtle border */
       }
     
-      /* App Version Display (Top Left, under GUI toggle) */
+      /* App Version Display (Top Left) */
       #app-version {
         position: fixed;
-        top: calc(var(--spacing-unit) * 2 + 40px + var(--spacing-unit)); /* Below GUI toggle */
+        top: calc(var(--spacing-unit) * 1.5);
         left: calc(var(--spacing-unit) * 2);
         color: var(--text-secondary);
-        font-size: 0.6rem; /* Smaller font */
-        font-weight: 400;
-        background-color: rgba(0,0,0,0.5); 
-        padding: calc(var(--spacing-unit) * 0.4) calc(var(--spacing-unit) * 0.8);
-        border-radius: 4px;
+        font-size: 0.75rem; /* Compact size */
+        font-weight: 500;
+        background-color: rgba(0,0,0,0.4); /* Subtle background for readability */
+        padding: calc(var(--spacing-unit) * 0.5) var(--spacing-unit);
+        border-radius: 6px;
         z-index: 1001; 
       }
     
-      /* lil-gui (Controls Panel) Overrides */
+      /* lil-gui (Controls Panel) Overrides - Retained for consistency */
       .lil-gui {
-        --background-color: rgba(30,30,30,0.9) !important; /* Darker, more translucent */
+        --background-color: var(--surface-dark) !important;
         --text-color: var(--text-primary) !important;
-        --title-background-color: rgba(0,0,0,0.4) !important;
-        --widget-color: rgba(var(--primary-rgb, 227, 168, 87), 0.2) !important; /* Use primary color for widgets */
-        --hover-color: rgba(var(--primary-rgb, 227, 168, 87), 0.3) !important;
-        --focus-color: var(--primary-color) !important;
-        --number-color: var(--secondary-color) !important; /* Lapis for numbers */
-
+        --title-background-color: rgba(0, 0, 0, 0.3) !important;
+        --widget-color: var(--surface-light) !important;
         font-family: 'Plus Jakarta Sans', sans-serif !important;
-        border-radius: 12px !important;
+        border-radius: 16px !important;
         overflow: hidden;
-        z-index: 1005 !important; 
-        box-shadow: 0 5px 20px rgba(0,0,0,0.3);
-        position: fixed !important; /* Ensure it's fixed for toggle */
-        top: calc(var(--spacing-unit) * 2 + 40px + var(--spacing-unit) * 2) !important; /* Position below toggle and version */
-        left: calc(var(--spacing-unit) * 2) !important;
-        max-height: calc(100vh - (var(--spacing-unit) * 4 + 40px + var(--spacing-unit) * 2) - var(--spacing-unit) * 2); /* Avoid overlap */
+        z-index: 1500 !important; /* Ensure it's above other UI but below modals */
       }
       .lil-gui .title {
         font-weight: 600 !important;
-        font-size: 0.9rem !important;
-        background-color: rgba(0,0,0,0.2) !important;
+        font-size: 0.95rem !important;
       }
       .lil-gui .controller {
-        border-radius: 6px !important;
-        margin: 3px 0 !important;
-        border-bottom: 1px solid rgba(255,255,255,0.05) !important;
-      }
-      .lil-gui.root > .children > .lil-gui > .title { /* For folder titles */
-        background-color: rgba(var(--secondary-rgb, 38, 97, 156), 0.2) !important;
+        border-radius: 8px !important;
+        margin: 4px 0 !important;
       }
     </style>
   </head>
   <body>
     <div id="loading-overlay">
       <div class="loading-content">
-        <span class="material-icons-round logo-icon">center_focus_weak</span> 
-        <div class="logo-text-author">OLEH</div>
-        <div class="logo-text-name">FADHILLAH SUKMA ARINI</div>
+        <span class="material-icons-round logo-icon">palette</span> <div class="logo-text">OLEH FADHILLAH SUKMA ARINI</div>
       </div>
-      <div class="spinner"></div>
-      <div class="version-loading">Version 0.0.5</div>
+      <div class="spinner"></div> <div class="version-loading">Version 0.0.5</div>
     </div>
-
-    <button id="gui-toggle-button" title="Toggle Controls">
-      <span class="material-icons-round">tune</span>
-    </button>
     
     <div id="ar-button-container">
       <button id="arButton">
         <span class="material-icons-round">view_in_ar</span>
-        <span id="arButton-text">AR Mode</span>
+        AR Mode
       </button>
     </div>
     
@@ -448,39 +334,36 @@
         Mulai Pindai
       </button>
     </div>
-
-    <div id="ar-reticle-hint" class="ar-interaction-hint">Ketuk untuk menempatkan objek.</div>
-    <div id="ar-model-interaction-hint" class="ar-interaction-hint">Cubit untuk skala, seret untuk putar.</div>
     
-    <div id="reticle"></div>
+    <div id="reticle"></div> 
     
-    <div id="log-controls-container">
-      <button id="log-toggle-button" title="Toggle Log">
-        <span class="material-icons-round">speaker_notes_off</span> </button>
-    </div>
-    <div id="on-screen-log-container"></div> <div id="app-version">APP VERSI 0.0.5</div>
+    <div id="on-screen-log-container"></div>
+    
+    <div id="app-version">APP VERSI 0.0.5</div>
     
     <div class="bottom-nav">
       <button class="view-btn" data-view="Default">
-        <span class="material-icons-round">widgets</span>Default
+        <span class="material-icons-round">auto_awesome</span> Default
       </button>
       <button class="view-btn" data-view="Front">
-        <span class="material-icons-round">flip_to_front</span>Front
+        <span class="material-icons-round">flip_to_front</span> Front
       </button>
       <button class="view-btn" data-view="Back">
-        <span class="material-icons-round">flip_to_back</span>Back
+        <span class="material-icons-round">flip_to_back</span> Back
       </button>
       <button class="view-btn" data-view="Top">
-        <span class="material-icons-round">arrow_upward</span>Top
+        <span class="material-icons-round">arrow_upward</span>
+        Top
       </button>
       <button class="view-btn" data-view="Bottom">
-        <span class="material-icons-round">arrow_downward</span>Bottom
+        <span class="material-icons-round">arrow_downward</span>
+        Bottom
       </button>
       <button class="view-btn" data-view="Left">
-        <span class="material-icons-round">arrow_left</span>Left
+        <span class="material-icons-round">align_horizontal_left</span> Left
       </button>
       <button class="view-btn" data-view="Right">
-        <span class="material-icons-round">arrow_right</span>Right
+        <span class="material-icons-round">align_horizontal_right</span> Right
       </button>
     </div>
     
@@ -488,7 +371,7 @@
       import * as THREE from "three";
       import { OrbitControls } from "three/addons/controls/OrbitControls.js";
       import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
-      import { EffectComposer } from "three/addons/postprocessing/EffectComposer.js";
+      import { EffectComposer }from "three/addons/postprocessing/EffectComposer.js";
       import { RenderPass } from "three/addons/postprocessing/RenderPass.js";
       import { OutputPass } from "three/addons/postprocessing/OutputPass.js";
       import GUI from "lil-gui";
@@ -496,27 +379,11 @@
       let scene, camera, renderer, controls, composer, gui;
       let model, modelContainerGroup, ambientLight, directionalLight;
       let clock;
-
       const arInstructionsPanel = document.getElementById("ar-instructions");
       const startScanButton = document.getElementById("start-scan-button");
       const onScreenLogContainer = document.getElementById("on-screen-log-container");
       const appVersionDisplay = document.getElementById("app-version");
-      const arButtonTextElement = document.getElementById("arButton-text");
-      const guiToggleButton = document.getElementById("gui-toggle-button");
-      const logToggleButton = document.getElementById("log-toggle-button");
-      const logToggleIcon = logToggleButton.querySelector(".material-icons-round");
-      const arReticleHint = document.getElementById("ar-reticle-hint");
-      const arModelInteractionHint = document.getElementById("ar-model-interaction-hint");
-
-
-      // CSS color parsing for JS
-      const rootStyles = getComputedStyle(document.documentElement);
-      const primaryColorRGB = rootStyles.getPropertyValue('--primary-color').match(/\d+/g).map(Number);
-      document.documentElement.style.setProperty('--primary-color-rgb', primaryColorRGB.join(', '));
-      const secondaryColorRGB = rootStyles.getPropertyValue('--secondary-color').match(/\d+/g).map(Number);
-      document.documentElement.style.setProperty('--secondary-color-rgb', secondaryColorRGB.join(', '));
-
-
+    
       let skyboxObject = null;
       const modelCenter = new THREE.Vector3();
       const modelSize = new THREE.Vector3();
@@ -540,33 +407,33 @@
     
       const params = {
         modelPath: "Cupang.glb", 
-        skyboxGlbUrl: "inside_galaxy_skybox_hdri_360_panorama.glb",
+        skyboxGlbUrl: "inside_galaxy_skybox_hdri_360_panorama.glb", 
         toneMappingExposure: 1.0,
-        ambientLightIntensity: 2.8, // Slightly adjusted
-        directionalLightIntensity: 3.5, // Slightly adjusted
-        directionalLightColor: 0xfff5e1, // Warmer white light
+        ambientLightIntensity: 3.0,
+        directionalLightIntensity: 4.0,
+        directionalLightColor: 0xffffff,
         initialRotationX_deg: 0.0,
         initialRotationY_deg: 0.0,
         initialRotationZ_deg: 0.0,
         animateModel: false, 
-        rotationSpeed: 0.08, // Slightly slower
+        rotationSpeed: 0.1, 
         selectedViewPreset: "Default",
         cameraFOV: 50,
         modelScale: 1.0, 
-        arModelScale: 0.4, // Slightly smaller default AR scale
-        skyboxBrightness: 0.8, // Slightly dimmer skybox for better model focus
-        backgroundColor: "#1A1C20", // Darker, less saturated blue/grey
+        arModelScale: 0.5, 
+        skyboxBrightness: 1.0,
+        backgroundColor: "#262626", // Updated default background color to a neutral dark grey
         showSkybox: true,
       };
     
       function logToScreen(message, type = "info") {
         if (onScreenLogContainer) {
           const logEntry = document.createElement("div");
-          const timestamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit'});
+          const timestamp = new Date().toLocaleTimeString();
           logEntry.textContent = `[${timestamp}] ${message}`;
-          if (type === "error") logEntry.style.color = "#ffacac"; 
-          else if (type === "warn") logEntry.style.color = "#ffe0ac"; 
-          else logEntry.style.color = "#acecac"; 
+          if (type === "error") logEntry.style.color = "#ff9999"; 
+          else if (type === "warn") logEntry.style.color = "#ffd799"; 
+          else logEntry.style.color = "#99ff99"; 
           onScreenLogContainer.appendChild(logEntry);
           onScreenLogContainer.scrollTop = onScreenLogContainer.scrollHeight; 
         }
@@ -581,8 +448,8 @@
           setTimeout(() => {
             const loadingOverlay = document.getElementById("loading-overlay");
             if (loadingOverlay) loadingOverlay.remove();
-          }, 700); 
-        }, 3000); // Reduced loading time to 3 seconds for quicker access
+          }, 600); 
+        }, 10000); 
     
         clock = new THREE.Clock(); 
         scene = new THREE.Scene();
@@ -594,7 +461,7 @@
           0.01, 
           10000 
         );
-        camera.position.set(0, 1.2, 2.5); // Slightly adjusted default camera
+        camera.position.set(0, 1.6, 3); 
     
         renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
@@ -607,7 +474,7 @@
     
         controls = new OrbitControls(camera, renderer.domElement);
         controls.enableDamping = true;
-        controls.dampingFactor = 0.04; // Smoother damping
+        controls.dampingFactor = 0.05;
         controls.minDistance = 0.01; 
         controls.maxDistance = 5000;
         controls.target.set(0, 0, 0); 
@@ -616,7 +483,7 @@
         scene.add(ambientLight);
     
         directionalLight = new THREE.DirectionalLight(params.directionalLightColor, params.directionalLightIntensity);
-        directionalLight.position.set(1.5, 2, 1).normalize(); // Adjusted light angle
+        directionalLight.position.set(1, 1.5, 1).normalize();
         scene.add(directionalLight);
     
         modelContainerGroup = new THREE.Group();
@@ -631,29 +498,39 @@
               if (supported) {
                 arButtonElement.addEventListener("click", onARButtonClick);
                 arButtonElement.disabled = false;
-                logToScreen("AR didukung.");
+                logToScreen("AR didukung oleh perangkat/browser ini.");
               } else {
-                if(arButtonTextElement) arButtonTextElement.textContent = "No AR";
+                // Use the existing robust text node selection logic from the original code
+                const arButtonTextNode = arButtonElement.childNodes.length > 1 && arButtonElement.childNodes[1].nodeType === Node.TEXT_NODE 
+                                      ? arButtonElement.childNodes[1] 
+                                      : (arButtonElement.querySelector("span + span") || arButtonElement.appendChild(document.createTextNode("")).previousSibling);
+                if (arButtonTextNode) arButtonTextNode.textContent = " No AR";
                 arButtonElement.disabled = true;
-                logToScreen("AR tidak didukung.", "warn");
+                logToScreen("AR tidak didukung oleh perangkat/browser ini.", "warn");
               }
             })
             .catch((err) => {
-              logToScreen(`Cek AR Error: ${err.message}`, "error");
-              if(arButtonTextElement) arButtonTextElement.textContent = "Err AR";
+              logToScreen(`Error saat memeriksa dukungan AR: ${err.message}`, "error");
+              const arButtonTextNode = arButtonElement.childNodes.length > 1 && arButtonElement.childNodes[1].nodeType === Node.TEXT_NODE 
+                                      ? arButtonElement.childNodes[1] 
+                                      : (arButtonElement.querySelector("span + span") || arButtonElement.appendChild(document.createTextNode("")).previousSibling);
+              if (arButtonTextNode) arButtonTextNode.textContent = " Err AR";
               arButtonElement.disabled = true;
               arButtonElement.style.display = "flex";
             });
         } else {
           arButtonElement.style.display = "flex";
-          if(arButtonTextElement) arButtonTextElement.textContent = "No XR";
+          const arButtonTextNode = arButtonElement.childNodes.length > 1 && arButtonElement.childNodes[1].nodeType === Node.TEXT_NODE 
+                                      ? arButtonElement.childNodes[1] 
+                                      : (arButtonElement.querySelector("span + span") || arButtonElement.appendChild(document.createTextNode("")).previousSibling);
+          if (arButtonTextNode) arButtonTextNode.textContent = " No XR";
           arButtonElement.disabled = true;
-          logToScreen("WebXR API tidak ada.", "warn");
+          logToScreen("WebXR API tidak tersedia di browser ini.", "warn");
         }
     
         reticleMesh = new THREE.Mesh(
-          new THREE.RingGeometry(0.035, 0.045, 32).rotateX(-Math.PI / 2), 
-          new THREE.MeshBasicMaterial({ color: 0xE3A857, opacity: 0.75, transparent: true, depthTest: false }) // Primary color reticle
+          new THREE.RingGeometry(0.04, 0.055, 32).rotateX(-Math.PI / 2), 
+          new THREE.MeshBasicMaterial({ color: 0x00dd00, opacity: 0.8, transparent: true, depthTest: false }) 
         );
         reticleMesh.matrixAutoUpdate = false; 
         reticleMesh.visible = false; 
@@ -663,7 +540,7 @@
         if (params.skyboxGlbUrl && params.skyboxGlbUrl !== "SKYBOX_ANDA.glb" && !params.skyboxGlbUrl.includes("placehold.co")) {
           loadSkyboxFromGLB();
         } else {
-          logToScreen("Path Skybox GLB tidak valid, skybox tidak dimuat.", "warn");
+          logToScreen("Path Skybox GLB tidak valid atau placeholder, skybox tidak akan dimuat secara otomatis.", "warn");
         }
         updateBackgroundVisibility(); 
         loadMainModel();
@@ -677,46 +554,21 @@
         setupGUI();
         setupPresetButtons();
         startScanButton.addEventListener("click", onStartScanButtonClick);
-        guiToggleButton.addEventListener("click", toggleGUIVisibility);
-        logToggleButton.addEventListener("click", toggleLogVisibility);
-
         window.addEventListener("resize", onWindowResize, false);
-        renderer.domElement.addEventListener("click", onSelectAR); 
+        renderer.domElement.addEventListener("click", onSelectAR);  
         
         renderer.setAnimationLoop(animate);
         
-        if (appVersionDisplay) appVersionDisplay.textContent = `VERSI ${APP_VERSION}`;
-        if (gui) gui.hide(); // Hide GUI by default
-      }
-
-      function toggleGUIVisibility() {
-        if (gui) {
-            if (gui.domElement.style.display === 'none' || gui.domElement.style.display === '') {
-                gui.show();
-                guiToggleButton.classList.add('active');
-                guiToggleButton.title = "Sembunyikan Kontrol";
-            } else {
-                gui.hide();
-                guiToggleButton.classList.remove('active');
-                guiToggleButton.title = "Tampilkan Kontrol";
-            }
-        }
-      }
-
-      function toggleLogVisibility() {
-        if (onScreenLogContainer.classList.contains('visible')) {
-            onScreenLogContainer.classList.remove('visible');
-            logToggleIcon.textContent = 'speaker_notes_off';
-            logToggleButton.title = "Tampilkan Log";
-        } else {
-            onScreenLogContainer.classList.add('visible');
-            logToggleIcon.textContent = 'speaker_notes';
-            logToggleButton.title = "Sembunyikan Log";
-        }
+        if (appVersionDisplay) appVersionDisplay.textContent = `APP VERSI ${APP_VERSION}`;
       }
     
       function onARButtonClick() {
         const arButtonElement = document.getElementById("arButton");
+        // Use the existing robust text node selection logic from the original code
+        const arButtonTextNode = arButtonElement.childNodes.length > 1 && arButtonElement.childNodes[1].nodeType === Node.TEXT_NODE 
+                                ? arButtonElement.childNodes[1] 
+                                : (arButtonElement.querySelector("span + span") || arButtonElement.appendChild(document.createTextNode("")).previousSibling);
+
         if (!xrSession) {
           logToScreen("Mencoba memulai sesi AR...");
           navigator.xr
@@ -728,7 +580,7 @@
             .catch((err) => {
               logToScreen(`Gagal memulai sesi AR: ${err.message}`, "error");
               logToScreen("Pastikan perangkat & browser mendukung AR, dan izin kamera diberikan.", "error");
-              if(arButtonTextElement) arButtonTextElement.textContent = "AR Gagal";
+              if (arButtonTextNode) arButtonTextNode.textContent = " AR Fail";
               arButtonElement.classList.remove("ar-active");
             });
         } else {
@@ -741,14 +593,15 @@
         logToScreen(`Sesi AR dimulai.`);
         xrSession = session;
         const arButtonElement = document.getElementById("arButton");
-        if(arButtonTextElement) arButtonTextElement.textContent = "Stop AR";
+        const arButtonTextNode = arButtonElement.childNodes.length > 1 && arButtonElement.childNodes[1].nodeType === Node.TEXT_NODE 
+                                ? arButtonElement.childNodes[1] 
+                                : (arButtonElement.querySelector("span + span") || arButtonElement.appendChild(document.createTextNode("")).previousSibling);
+
+        if (arButtonTextNode) arButtonTextNode.textContent = " Stop AR";
         arButtonElement.classList.add("ar-active");
     
         document.querySelector(".bottom-nav").style.display = "none";
-        if (gui.domElement.style.display !== 'none') gui.hide(); // Hide GUI if open
-        guiToggleButton.style.display = "none"; // Hide GUI toggle button
-        logControlsContainer.style.display = "none"; // Hide log toggle button and log
-
+        if (gui) gui.hide();
         if (skyboxObject) skyboxObject.visible = false; 
         scene.background = null; 
     
@@ -760,51 +613,52 @@
           modelContainerGroup.userData.originalScale = modelContainerGroup.scale.clone(); 
           modelContainerGroup.scale.set(params.arModelScale, params.arModelScale, params.arModelScale);
           modelContainerGroup.userData.initialArScale = params.arModelScale; 
-          logToScreen(`Model disembunyikan, skala AR: ${params.arModelScale}`);
+          logToScreen(`Model disembunyikan, skala AR diatur ke: ${params.arModelScale}`);
         }
         reticleMesh.visible = false; 
         arInstructionsPanel.style.display = "block"; 
-        // onScreenLogContainer.style.display = "block"; // Log shown via toggle now
-        if (appVersionDisplay) appVersionDisplay.style.display = "none"; // Hide app version in AR
+        onScreenLogContainer.style.display = "block"; 
+        if (appVersionDisplay) {
+            appVersionDisplay.style.display = "block"; 
+            appVersionDisplay.textContent = `APP VERSI ${APP_VERSION}`;
+        }
     
         session.addEventListener("end", onSessionEnded); 
     
         renderer.xr.setReferenceSpaceType("local"); 
         renderer.xr
           .setSession(session)
-          .then(() => { logToScreen("Sesi XR diset ke renderer."); })
+          .then(() => { logToScreen("Sesi XR berhasil diset ke renderer."); })
           .catch((err) => {
-            logToScreen(`Error set session: ${err.message}`, "error");
-            session.end().catch((e) => logToScreen(`Error end session: ${e.message}`, "error"));
+            logToScreen(`Error saat set session ke renderer: ${err.message}`, "error");
+            session.end().catch((e) => logToScreen(`Error mengakhiri sesi setelah setSession gagal: ${e.message}`, "error"));
           });
       }
     
       function onStartScanButtonClick() {
-        logToScreen("Tombol 'Mulai Pindai' ditekan.");
+        logToScreen("Tombol 'Mulai Pindai Permukaan' ditekan.");
         arInstructionsPanel.style.display = "none"; 
         if (xrSession && !xrHitTestSource) {
           xrSession.requestReferenceSpace("viewer")
             .then((refSpaceViewer) => {
-              logToScreen("Viewer reference space didapat.");
+              logToScreen("Viewer reference space didapatkan untuk hit-test.");
               return xrSession.requestHitTestSource({ space: refSpaceViewer });
             })
             .then((source) => {
               xrHitTestSource = source; 
               reticleMesh.visible = true; 
-              if(arReticleHint) arReticleHint.style.display = "block"; // Show reticle hint
-              logToScreen("Hit test source aktif. Reticle aktif.");
+              logToScreen("Hit test source berhasil didapatkan. Reticle aktif.");
             })
             .catch((err) => {
-              logToScreen(`Error hit test source: ${err.message}`, "error");
-              logToScreen("Tidak bisa memulai pindai. Coba lagi / restart AR.", "error");
+              logToScreen(`Error mendapatkan hit test source: ${err.message}`, "error");
+              logToScreen("Tidak bisa memulai pemindaian permukaan. Coba lagi atau restart sesi AR.", "error");
               reticleMesh.visible = false;
             });
         } else if (xrHitTestSource) {
-          logToScreen("Hit test source sudah ada. Reticle aktif.");
+          logToScreen("Hit test source sudah ada. Reticle seharusnya sudah aktif.");
           reticleMesh.visible = true;
-          if(arReticleHint) arReticleHint.style.display = "block";
         } else if (!xrSession) {
-          logToScreen("Sesi AR tidak aktif.", "warn");
+          logToScreen("Sesi AR tidak aktif saat mencoba memulai pemindaian.", "warn");
         }
       }
     
@@ -816,18 +670,18 @@
         }
         
         const arButtonElement = document.getElementById("arButton");
-        if(arButtonTextElement) arButtonTextElement.textContent = "AR Mode"; // Correctly reset text
+        const arButtonTextNode = arButtonElement.childNodes.length > 1 && arButtonElement.childNodes[1].nodeType === Node.TEXT_NODE 
+                                ? arButtonElement.childNodes[1] 
+                                : (arButtonElement.querySelector("span + span") || arButtonElement.appendChild(document.createTextNode("")).previousSibling);
+
+        if (arButtonTextNode) arButtonTextNode.textContent = " AR Mode";
         arButtonElement.classList.remove("ar-active");
     
         document.querySelector(".bottom-nav").style.display = "flex";
-        // Don't auto-show GUI, respect its last state or default (hidden)
-        guiToggleButton.style.display = "flex"; 
-        logControlsContainer.style.display = "block"; // Show log toggle
-
+        if (gui) gui.show();
         arInstructionsPanel.style.display = "none";
-        if(arReticleHint) arReticleHint.style.display = "none";
-        if(arModelInteractionHint) arModelInteractionHint.style.display = "none";
-        // onScreenLogContainer.style.display = "none"; // Log visibility controlled by toggle
+        onScreenLogContainer.style.display = "none";
+        if (appVersionDisplay) appVersionDisplay.style.display = "block"; 
     
         reticleMesh.visible = false; 
         if (xrHitTestSource) {
@@ -846,23 +700,22 @@
           modelContainerGroup.visible = true;
           if (modelContainerGroup.userData.originalScale) {
             modelContainerGroup.scale.copy(modelContainerGroup.userData.originalScale);
-            logToScreen(`Skala model kembali ke non-AR: ${modelContainerGroup.scale.x.toFixed(2)}`);
+            logToScreen(`Skala model dikembalikan ke non-AR: ${modelContainerGroup.scale.x.toFixed(2)}`);
           } else {
             modelContainerGroup.scale.set(params.modelScale, params.modelScale, params.modelScale);
           }
         }
-        if (model) goToViewPreset(params.selectedViewPreset, true); 
+        if (model) goToViewPreset(params.selectedViewPreset, true);  
         updateBackgroundVisibility(); 
-        if (appVersionDisplay) appVersionDisplay.style.display = "block";
       }
     
       function onSelectAR(event) {
         logToScreen(
-          `onSelectAR. AR: ${!!xrSession}, Reticle: ${reticleMesh.visible}, Placed: ${modelPlaced}`
+          `onSelectAR. Sesi AR: ${!!xrSession}, Reticle: ${reticleMesh.visible}, Model Ditempatkan: ${modelPlaced}`
         );
         if (xrSession && reticleMesh.visible && !modelPlaced) {
           if (modelContainerGroup && model) {
-            logToScreen("Menempatkan model. Matriks reticle:", reticleMesh.matrix.elements.map((n) => n.toFixed(2)).join(', '));
+            logToScreen("Mencoba menempatkan model. Matriks reticle:", reticleMesh.matrix.elements.map((n) => n.toFixed(2)).join(', '));
             modelContainerGroup.matrix.copy(reticleMesh.matrix);
             modelContainerGroup.matrix.decompose(modelContainerGroup.position, modelContainerGroup.quaternion, modelContainerGroup.scale); 
             modelContainerGroup.scale.set(params.arModelScale, params.arModelScale, params.arModelScale); 
@@ -870,25 +723,23 @@
             modelContainerGroup.visible = true; 
             modelPlaced = true; 
             reticleMesh.visible = false; 
-            if(arReticleHint) arReticleHint.style.display = "none"; // Hide reticle hint
-            if(arModelInteractionHint) { // Show interaction hint
-                arModelInteractionHint.style.display = "block";
-                setTimeout(() => { arModelInteractionHint.style.display = "none"; }, 4000); // Hide after 4s
-            }
-            
+            // if (xrHitTestSource) { 
+            //   // xrHitTestSource.cancel(); 
+            //   // xrHitTestSource = null;  
+            // }
             logToScreen(`Model AR ditempatkan. Pos: ${modelContainerGroup.position.toArray().map((n) => n.toFixed(2))}, Skala: ${params.arModelScale}`);
             
             renderer.domElement.addEventListener("touchstart", handleARtouchstart, { passive: false });
             renderer.domElement.addEventListener("touchmove", handleARtouchmove, { passive: false });
             renderer.domElement.addEventListener("touchend", handleARtouchend, { passive: false });
-            logToScreen("Listener interaksi AR (drag/pinch) ditambah.");
+            logToScreen("Listener interaksi AR (drag/pinch) ditambahkan.");
           } else {
-            logToScreen("Model/group tidak siap untuk AR.", "warn");
+            logToScreen("Model atau modelContainerGroup tidak siap untuk ditempatkan di AR.", "warn");
           }
         } else if (modelPlaced) {
-            logToScreen("Model sudah ditempatkan.");
+            logToScreen("Model sudah ditempatkan. Tap dideteksi.");
         } else {
-          logToScreen("Kondisi menempatkan model AR tidak terpenuhi.");
+          logToScreen("Kondisi untuk menempatkan model AR tidak terpenuhi (reticle tidak terlihat atau sesi AR tidak aktif).");
         }
       }
     
@@ -907,13 +758,13 @@
           arIsPinching = false;
           arLastDragX = touches[0].clientX;
           arLastDragY = touches[0].clientY;
-          // logToScreen("AR Drag Start");
+          logToScreen("AR Drag Start");
         } else if (touches.length === 2) { 
           arIsPinching = true;
           arIsDragging = false;
           arInitialPinchDistance = getDistanceBetweenTouches(touches);
-          modelContainerGroup.userData.currentPinchStartScale = modelContainerGroup.scale.x; 
-          // logToScreen(`AR Pinch Start. Dist: ${arInitialPinchDistance.toFixed(2)}, Scale: ${modelContainerGroup.userData.currentPinchStartScale.toFixed(3)}`);
+          modelContainerGroup.userData.currentPinchStartScale = modelContainerGroup.scale.x;  
+          logToScreen(`AR Pinch Start. Initial Distance: ${arInitialPinchDistance.toFixed(2)}, Start Scale: ${modelContainerGroup.userData.currentPinchStartScale.toFixed(3)}`);
         }
       }
     
@@ -933,9 +784,8 @@
           if (arInitialPinchDistance > 0 && modelContainerGroup.userData.currentPinchStartScale !== undefined) {
             const scaleFactor = currentPinchDistance / arInitialPinchDistance;
             let newScale = modelContainerGroup.userData.currentPinchStartScale * scaleFactor;
-            const baseArScale = modelContainerGroup.userData.initialArScale || params.arModelScale; // Fallback
-            const minScale = baseArScale * 0.1; 
-            const maxScale = baseArScale * 10;  
+            const minScale = modelContainerGroup.userData.initialArScale * 0.1; 
+            const maxScale = modelContainerGroup.userData.initialArScale * 10;  
             newScale = Math.max(minScale, Math.min(newScale, maxScale));
             modelContainerGroup.scale.set(newScale, newScale, newScale);
           }
@@ -946,23 +796,23 @@
         if (!xrSession || !modelPlaced) return;
         if (arIsDragging && event.touches.length < 1) {
           arIsDragging = false;
-          // logToScreen("AR Drag End");
+          logToScreen("AR Drag End");
         }
         if (arIsPinching && event.touches.length < 2) { 
           arIsPinching = false;
           if (modelContainerGroup) {
-            params.arModelScale = modelContainerGroup.scale.x; 
+            params.arModelScale = modelContainerGroup.scale.x;  
             if (gui) { 
               const arScaleController = gui.controllersRecursive().find((c) => c.property === "arModelScale");
               if (arScaleController) arScaleController.setValue(params.arModelScale).updateDisplay();
             }
           }
-          // logToScreen(`AR Pinch End. Final Scale: ${params.arModelScale.toFixed(3)}`);
+          logToScreen(`AR Pinch End. Final AR Scale: ${params.arModelScale.toFixed(3)}`);
         }
       }
     
       function loadMainModel() {
-        logToScreen(`Memuat model: ${params.modelPath}`);
+        logToScreen(`Mulai memuat model dari: ${params.modelPath}`);
         if (model) {
           modelContainerGroup.remove(model);
           model.traverse((node) => { 
@@ -987,27 +837,27 @@
           function (gltf) { 
             model = gltf.scene;
             if (!model) {
-              logToScreen(`GLTF scene kosong: ${params.modelPath}`, "error");
+              logToScreen(`GLTFLoader berhasil, tetapi gltf.scene kosong untuk: ${params.modelPath}`, "error");
               return;
             }
-            logToScreen("Model GLTF di-parse.");
+            logToScreen("Model GLTF berhasil di-parse.");
             modelContainerGroup.add(model);
     
             const box = new THREE.Box3().setFromObject(modelContainerGroup); 
             box.getCenter(modelCenter); 
             box.getSize(modelSize);
-            logToScreen(`Size model: X:${modelSize.x.toFixed(2)}, Y:${modelSize.y.toFixed(2)}, Z:${modelSize.z.toFixed(2)}`);
+            logToScreen(`Ukuran model awal: X:${modelSize.x.toFixed(2)}, Y:${modelSize.y.toFixed(2)}, Z:${modelSize.z.toFixed(2)}`);
             
-            modelContainerGroup.position.sub(modelCenter); 
+            modelContainerGroup.position.sub(modelCenter);  
             modelCenter.set(0,0,0); 
-            logToScreen("ModelContainerGroup dipusatkan.");
+            logToScreen("ModelContainerGroup dipusatkan ke origin.");
     
             applyInitialRotation(); 
-            applyModelScale();      
+            applyModelScale();     
             updateMaterialProperties(); 
-            logToScreen("Model utama dimuat & siap.");
+            logToScreen("Model GLB utama berhasil dimuat dan disiapkan.");
             
-            goToViewPreset(params.selectedViewPreset, true); 
+            goToViewPreset(params.selectedViewPreset, true);  
           },
           function (xhr) { 
             if (xhr.lengthComputable) {
@@ -1018,7 +868,7 @@
             }
           },
           function (error) { 
-            logToScreen(`Gagal memuat model: ${params.modelPath}. Error: ${error.message || error}`, "error");
+            logToScreen(`Gagal memuat model GLB utama dari: ${params.modelPath}. Error: ${error.message || error}`, "error");
           }
         );
       }
@@ -1027,32 +877,32 @@
         if (modelContainerGroup && model) {
           const scaleValue = xrSession ? params.arModelScale : params.modelScale;
           modelContainerGroup.scale.set(scaleValue, scaleValue, scaleValue);
-          logToScreen(`Skala model: ${scaleValue.toFixed(3)} (AR: ${!!xrSession})`);
+          logToScreen(`Skala model diatur ke: ${scaleValue.toFixed(3)} (Sesi AR: ${!!xrSession})`);
           
           if (!xrSession) { 
             const box = new THREE.Box3().setFromObject(modelContainerGroup); 
             box.getSize(modelSize); 
             goToViewPreset(params.selectedViewPreset, true); 
           } else {
-            modelContainerGroup.userData.initialArScale = scaleValue; 
+            modelContainerGroup.userData.initialArScale = scaleValue;  
           }
         } else if (!model) {
-          logToScreen("applyModelScale: model belum dimuat.", "warn");
+          logToScreen("applyModelScale dipanggil tetapi model belum dimuat.", "warn");
         }
       }
     
       function loadSkyboxFromGLB() {
         if (!params.skyboxGlbUrl || params.skyboxGlbUrl === "SKYBOX_ANDA.glb" || params.skyboxGlbUrl.includes("placehold.co")) {
-          logToScreen("URL Skybox GLB tidak valid.", "warn");
+          logToScreen("URL Skybox GLB tidak valid. Skybox tidak akan dimuat.", "warn");
           if (skyboxObject) { 
             scene.remove(skyboxObject);
-            skyboxObject.traverse((node) => { /* dispose */ });
+            skyboxObject.traverse((node) => { if (node.geometry) node.geometry.dispose(); if (node.material) { if (Array.isArray(node.material)) node.material.forEach(mat => mat.dispose()); else node.material.dispose(); }});
             skyboxObject = null;
           }
           updateBackgroundVisibility(); 
           return;
         }
-        logToScreen(`Memuat skybox: ${params.skyboxGlbUrl}`);
+        logToScreen(`Mulai memuat skybox dari: ${params.skyboxGlbUrl}`);
         const loader = new GLTFLoader();
         loader.load(
           params.skyboxGlbUrl,
@@ -1075,18 +925,18 @@
                   material.side = THREE.BackSide; 
                   if (material.isMeshStandardMaterial || material.isMeshPhysicalMaterial) {
                     if (material.userData.initialEmissiveIntensityGLB === undefined) {
-                       material.userData.initialEmissiveIntensityGLB = material.emissiveIntensity !== undefined ? material.emissiveIntensity : 1; 
+                        material.userData.initialEmissiveIntensityGLB = material.emissiveIntensity !== undefined ? material.emissiveIntensity : 1; 
                     }
                     material.emissiveIntensity = material.userData.initialEmissiveIntensityGLB * params.skyboxBrightness;
                     if (!material.emissiveMap) { 
-                        if (material.userData.initialEmissiveColorGLB === undefined) {
-                            material.userData.initialEmissiveColorGLB = material.emissive ? material.emissive.clone() : new THREE.Color(0xffffff); 
-                        }
-                        material.emissive.copy(material.userData.initialEmissiveColorGLB).multiplyScalar(params.skyboxBrightness);
+                      if (material.userData.initialEmissiveColorGLB === undefined) {
+                          material.userData.initialEmissiveColorGLB = material.emissive ? material.emissive.clone() : new THREE.Color(0xffffff); 
+                      }
+                      material.emissive.copy(material.userData.initialEmissiveColorGLB).multiplyScalar(params.skyboxBrightness);
                     }
                   } else if (material.isMeshBasicMaterial) { 
                     if (material.userData.initialColorGLB === undefined) {
-                       material.userData.initialColorGLB = material.color ? material.color.clone() : new THREE.Color(0xffffff);
+                        material.userData.initialColorGLB = material.color ? material.color.clone() : new THREE.Color(0xffffff);
                     }
                     material.color.copy(material.userData.initialColorGLB).multiplyScalar(params.skyboxBrightness);
                   }
@@ -1099,7 +949,7 @@
             skyboxObject.renderOrder = -10; 
             scene.add(skyboxObject);
             updateBackgroundVisibility(); 
-            logToScreen("Skybox GLB dimuat.");
+            logToScreen("Skybox GLB berhasil dimuat.");
           },
           undefined, 
           (error) => { 
@@ -1137,7 +987,7 @@
         if (!model) return;
         model.traverse((node) => {
           if (node.isMesh && node.material) {
-            // Custom material tweaks if needed
+            // Example: node.material.roughness = 0.5;
           }
         });
       }
@@ -1145,7 +995,7 @@
       function goToViewPreset(presetName, instant = false) {
         if (isUpdatingViewPresetGUI) return; 
         if (!modelContainerGroup || !camera || !controls || !model) {
-          logToScreen("goToViewPreset: Komponen belum siap.", "warn");
+          logToScreen("goToViewPreset: Komponen belum siap (model, kamera, atau kontrol).", "warn");
           return;
         }
         isUpdatingViewPresetGUI = true; 
@@ -1159,9 +1009,9 @@
         modelSize.multiply(modelContainerGroup.scale);
 
         const maxDim = Math.max(modelSize.x, modelSize.y, modelSize.z, 0.1); 
-        const distanceFactor = 1.9; // Slightly closer
+        const distanceFactor = 2.0; 
         let distance = maxDim * distanceFactor;
-        distance = Math.max(distance, 0.15); 
+        distance = Math.max(distance, 0.2); 
     
         let newCamPos = new THREE.Vector3();
         camera.up.set(0, 1, 0); 
@@ -1189,7 +1039,7 @@
             break;
           case "Default":
           default:
-            frameArea(modelContainerGroup, camera, controls, instant, 1.7); 
+            frameArea(modelContainerGroup, camera, controls, instant, 1.8); 
             params.selectedViewPreset = "Default";
             if (gui) {
               const presetController = gui.controllersRecursive().find((c) => c.property === "selectedViewPreset");
@@ -1199,7 +1049,6 @@
                 presetController.updateDisplay();
               }
             }
-            updateActiveViewButton("Default");
             isUpdatingViewPresetGUI = false;
             return;
         }
@@ -1225,42 +1074,31 @@
             presetController.updateDisplay(); 
           }
         }
-        updateActiveViewButton(presetName);
         isUpdatingViewPresetGUI = false;
-      }
-
-      function updateActiveViewButton(activePreset) {
-        document.querySelectorAll(".view-btn").forEach(btn => {
-            if (btn.getAttribute('data-view') === activePreset) {
-                btn.classList.add('view-btn-active');
-            } else {
-                btn.classList.remove('view-btn-active');
-            }
-        });
       }
     
       function frameArea(objectToFrame, cam, ctrl, instant = false, fitOffset = 1.5) {
         if (!objectToFrame || !model) { 
-          logToScreen("frameArea: Objek model tidak valid.", "warn");
+          logToScreen("frameArea: Objek model tidak valid atau belum dimuat.", "warn");
           if (instant) { 
             ctrl.target.set(0, 0, 0);
-            cam.position.set(0, 0.5, 2.5); 
+            cam.position.set(0, 0.5, 3); 
             ctrl.update();
           }
           return;
         }
     
         const box = new THREE.Box3();
-        box.setFromObject(objectToFrame); 
+        box.setFromObject(objectToFrame);  
     
         const sizeVec = box.getSize(new THREE.Vector3());
         const centerVec = box.getCenter(new THREE.Vector3()); 
     
         if (sizeVec.lengthSq() === 0) { 
-          logToScreen("frameArea: Ukuran objek nol.", "warn");
+          logToScreen("frameArea: Ukuran objek adalah nol.", "warn");
           if (instant) {
             ctrl.target.copy(centerVec); 
-            cam.position.set(centerVec.x, centerVec.y + 0.5, centerVec.z + 2.5);
+            cam.position.set(centerVec.x, centerVec.y + 0.5, centerVec.z + 3);
             ctrl.update();
           }
           return;
@@ -1276,7 +1114,7 @@
         const targetCamPos = centerVec.clone().add(direction);
     
         if (direction.lengthSq() < 0.001) {
-            targetCamPos.set(centerVec.x, centerVec.y + sizeVec.y * 0.3, centerVec.z + distance); // Adjusted default view
+            targetCamPos.set(centerVec.x, centerVec.y + sizeVec.y * 0.5, centerVec.z + distance); 
         }
     
         cam.near = Math.max(0.01, distance / 100);
@@ -1284,7 +1122,7 @@
         cam.updateProjectionMatrix();
     
         ctrl.maxDistance = distance * 10;
-        ctrl.minDistance = Math.min(0.01, distance * 0.05); // Allow even closer zoom
+        ctrl.minDistance = Math.min(0.01, distance * 0.1); 
     
         if (instant) {
           ctrl.target.copy(centerVec);
@@ -1307,79 +1145,81 @@
             goToViewPreset(view, false); 
           });
         });
-        updateActiveViewButton(params.selectedViewPreset); // Set initial active button
       }
     
       function setupGUI() {
         if (gui) gui.destroy(); 
         gui = new GUI();
-        // gui.title("Kontrol Model"); // Title is now less prominent as it's a toggle panel
-        gui.domElement.style.display = 'none'; // Hidden by default
+        gui.title("Kontrol Model 3D");
     
         const modelFolder = gui.addFolder("Model");
-        modelFolder.add(params, "modelPath").name("Path (.glb)").onFinishChange((value) => {
+        modelFolder.add(params, "modelPath").name("Path Model (.glb)").onFinishChange((value) => {
           params.modelPath = value; loadMainModel();
         });
-        modelFolder.add(params, "modelScale", 0.01, 10, 0.01).name("Skala Non-AR").onChange(applyModelScale);
-        modelFolder.add(params, "arModelScale", 0.01, 5.0, 0.005).name("Skala AR")
+        modelFolder.add(params, "modelScale", 0.01, 10, 0.01).name("Skala (Non-AR)").onChange(applyModelScale);
+        modelFolder.add(params, "arModelScale", 0.01, 5.0, 0.005).name("Skala Model AR")
           .onChange((value) => {
             params.arModelScale = value;
             if (xrSession && modelPlaced && modelContainerGroup) { 
               modelContainerGroup.scale.set(value, value, value);
-              logToScreen(`Skala AR GUI: ${value.toFixed(3)}`);
+              logToScreen(`Skala AR diupdate via GUI menjadi: ${value.toFixed(3)}`);
             } else if (xrSession && !modelPlaced && modelContainerGroup) { 
               modelContainerGroup.scale.set(value, value, value); 
-              logToScreen(`Skala AR pre-place GUI: ${value.toFixed(3)}`);
+              logToScreen(`Skala AR pre-placement diupdate via GUI menjadi: ${value.toFixed(3)}`);
             }
           });
-        const rotFolder = modelFolder.addFolder("Rotasi Awal");
-        rotFolder.add(params, "initialRotationX_deg", -360, 360, 1).name("X").onChange(applyInitialRotation);
-        rotFolder.add(params, "initialRotationY_deg", -360, 360, 1).name("Y").onChange(applyInitialRotation);
-        rotFolder.add(params, "initialRotationZ_deg", -360, 360, 1).name("Z").onChange(applyInitialRotation);
-        modelFolder.add(params, "animateModel").name("Animasi Putar");
-        modelFolder.add(params, "rotationSpeed", 0, 0.5, 0.005).name("Kecep. Putar");
-        // modelFolder.open(); // Folders closed by default now
+        modelFolder.add(params, "initialRotationX_deg", -360, 360, 1).name("Rotasi Awal X").onChange(applyInitialRotation);
+        modelFolder.add(params, "initialRotationY_deg", -360, 360, 1).name("Rotasi Awal Y").onChange(applyInitialRotation);
+        modelFolder.add(params, "initialRotationZ_deg", -360, 360, 1).name("Rotasi Awal Z").onChange(applyInitialRotation);
+        modelFolder.add(params, "animateModel").name("Animasi Putar (Non-AR)");
+        modelFolder.add(params, "rotationSpeed", 0, 1, 0.01).name("Kecepatan Putar");
+        modelFolder.open();
     
-        const bgFolder = gui.addFolder("Latar (Non-AR)");
-        bgFolder.add(params, "showSkybox").name("Skybox").onChange(updateBackgroundVisibility);
-        bgFolder.add(params, "skyboxGlbUrl").name("URL Skybox (.glb)").onFinishChange(loadSkyboxFromGLB);
-        bgFolder.add(params, "skyboxBrightness", 0, 3, 0.05).name("Kecerahan Skybox")
+        const backgroundFolder = gui.addFolder("Latar Belakang (Non-AR)");
+        backgroundFolder.add(params, "showSkybox").name("Tampilkan Skybox").onChange(updateBackgroundVisibility);
+        backgroundFolder.add(params, "skyboxGlbUrl").name("URL Skybox (.glb)").onFinishChange(loadSkyboxFromGLB);
+        backgroundFolder.add(params, "skyboxBrightness", 0, 5, 0.05).name("Kecerahan Skybox")
           .onChange(() => { if (skyboxObject) loadSkyboxFromGLB(); }); 
-        bgFolder.addColor(params, "backgroundColor").name("Warna BG").onChange((value) => {
+        backgroundFolder.addColor(params, "backgroundColor").name("Warna Background").onChange((value) => {
           params.backgroundColor = value; updateBackgroundVisibility();
         });
+        backgroundFolder.open();
     
-        const camFolder = gui.addFolder("Kamera (Non-AR)");
-        camFolder.add(params, "cameraFOV", 10, 120, 1).name("FOV").onChange((value) => {
+        const cameraFolder = gui.addFolder("Kamera & Tampilan (Non-AR)");
+        cameraFolder.add(params, "cameraFOV", 10, 120, 1).name("Field of View (FOV)").onChange((value) => {
           camera.fov = value;
           camera.updateProjectionMatrix();
           if (!xrSession) goToViewPreset(params.selectedViewPreset, true); 
         });
-        camFolder.add(params, "selectedViewPreset", ["Default", "Front", "Back", "Top", "Bottom", "Left", "Right"])
-          .name("Preset View").onChange((value) => {
+        cameraFolder.add(params, "selectedViewPreset", ["Default", "Front", "Back", "Top", "Bottom", "Left", "Right"])
+          .name("Preset Pandangan").onChange((value) => {
             if (!isUpdatingViewPresetGUI) goToViewPreset(value, false); 
           });
+        cameraFolder.open();
     
-        const lightFolder = gui.addFolder("Pencahayaan");
-        lightFolder.add(params, "ambientLightIntensity", 0, 5, 0.05).name("Ambient")
+        const lightingFolder = gui.addFolder("Pencahayaan");
+        lightingFolder.add(params, "ambientLightIntensity", 0, 5, 0.05).name("Intensitas Ambient")
           .onChange((value) => { if (ambientLight) ambientLight.intensity = value; });
-        lightFolder.add(params, "directionalLightIntensity", 0, 5, 0.05).name("Directional")
+        lightingFolder.add(params, "directionalLightIntensity", 0, 5, 0.05).name("Intensitas Directional")
           .onChange((value) => { if (directionalLight) directionalLight.intensity = value; });
-        lightFolder.addColor(params, "directionalLightColor").name("Warna Dir.")
+        lightingFolder.addColor(params, "directionalLightColor").name("Warna Directional")
           .onChange((value) => { if (directionalLight) directionalLight.color.setHex(value); });
+        lightingFolder.open();
     
-        const renderFolder = gui.addFolder("Rendering");
-        renderFolder.add(params, "toneMappingExposure", 0, 2, 0.01).name("Exposure")
+        const renderingFolder = gui.addFolder("Rendering");
+        renderingFolder.add(params, "toneMappingExposure", 0, 2, 0.01).name("Exposure")
           .onChange((value) => { renderer.toneMappingExposure = value; });
+        renderingFolder.open();
         
-        const utilFolder = gui.addFolder("Utilitas");
-        utilFolder.add({ takeScreenshot: takeScreenshot }, "takeScreenshot").name("Screenshot");
+        const utilitiesFolder = gui.addFolder("Utilitas");
+        utilitiesFolder.add({ takeScreenshot: takeScreenshot }, "takeScreenshot").name("Ambil Screenshot (Non-AR)");
+        utilitiesFolder.open();
       }
     
       function takeScreenshot() {
         try {
           if (xrSession) {
-            logToScreen("Screenshot tidak di AR.", "warn");
+            logToScreen("Screenshot tidak didukung dalam mode AR.", "warn");
             return;
           }
           composer.render(); 
@@ -1392,7 +1232,7 @@
           document.body.removeChild(a);
           logToScreen("Screenshot diambil!");
         } catch (e) {
-          logToScreen(`Gagal screenshot: ${e.message}`, "error");
+          logToScreen(`Gagal mengambil screenshot: ${e.message}`, "error");
         }
       }
     
@@ -1430,7 +1270,7 @@
                 } else { reticleMesh.visible = false; }
               } else { reticleMesh.visible = false; } 
             } else if (!modelPlaced && !xrHitTestSource && arInstructionsPanel.style.display === "none" && reticleMesh) {
-              reticleMesh.visible = true; 
+              reticleMesh.visible = true;  
               const camWorldPos = new THREE.Vector3();
               const camWorldDir = new THREE.Vector3();
               camera.getWorldPosition(camWorldPos);
