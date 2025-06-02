@@ -22,7 +22,7 @@
             position: absolute;
             top: 0;
             left: 0;
-            z-index: 0;
+            z-index: 0; /* Canvas behind UI overlay */
         }
         /* Custom scrollbar for log container */
         #on-screen-log-container::-webkit-scrollbar {
@@ -42,15 +42,15 @@
 
         /* Styling for lil-gui */
         :root {
-            --lil-gui-background-color: rgba(31, 41, 55, 0.9); /* bg-gray-800 with opacity */
-            --lil-gui-text-color: #e5e7eb; /* text-gray-200 */
-            --lil-gui-title-background-color: #111827; /* bg-gray-900 */
-            --lil-gui-title-text-color: #f3f4f6; /* text-gray-100 */
-            --lil-gui-widget-color: #4b5563; /* bg-gray-600 */
-            --lil-gui-hover-color: #6b7280; /* bg-gray-500 */
-            --lil-gui-focus-color: #1d4ed8; /* focus:ring-blue-600 */
-            --lil-gui-number-color: #60a5fa; /* text-blue-400 */
-            --lil-gui-string-color: #a3e635; /* text-lime-400 */
+            --lil-gui-background-color: rgba(31, 41, 55, 0.9); 
+            --lil-gui-text-color: #e5e7eb; 
+            --lil-gui-title-background-color: #111827; 
+            --lil-gui-title-text-color: #f3f4f6; 
+            --lil-gui-widget-color: #4b5563; 
+            --lil-gui-hover-color: #6b7280; 
+            --lil-gui-focus-color: #1d4ed8; 
+            --lil-gui-number-color: #60a5fa; 
+            --lil-gui-string-color: #a3e635; 
             --lil-gui-font-size: 14px;
             --lil-gui-input-font-size: 14px;
             --lil-gui-widget-height: 28px;
@@ -58,11 +58,11 @@
             --lil-gui-folder-indent: 10px;
         }
         .lil-gui.autoPlace {
-            top: 70px !important; /* Adjust to avoid overlapping header */
+            top: 60px !important; 
             right: 10px !important;
-            max-height: calc(100vh - 80px - 70px); /* Adjust for header and footer */
+            max-height: calc(100vh - 60px - 70px); 
             overflow-y: auto;
-            z-index: 1000;
+            z-index: 1000; /* Ensure lil-gui is above other elements if needed */
             border-radius: 8px;
             box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
         }
@@ -79,44 +79,57 @@
         }
         /* Loading Spinner */
         .loader {
-            border: 5px solid #4b5563; /* border-gray-600 */
-            border-top: 5px solid #3b82f6; /* border-blue-500 */
+            border: 5px solid #4b5563; 
+            border-top: 5px solid #3b82f6; 
             border-radius: 50%;
             width: 50px;
             height: 50px;
             animation: spin 1s linear infinite;
-            margin: 0 auto 16px auto; /* mb-4 */
+            margin: 0 auto 16px auto; 
         }
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
 
-        /* AR Reticle (from original, slightly adapted) */
         #reticle-display {
             position: absolute;
             width: 35px;
             height: 35px;
             border-radius: 50%;
-            border: 3px solid rgba(52, 211, 153, 0.85); /* emerald-400 */
+            border: 3px solid rgba(52, 211, 153, 0.85); 
             box-shadow: 0 0 12px rgba(52, 211, 153, 0.6);
             box-sizing: border-box;
             display: none;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            z-index: 99;
+            z-index: 99; /* Below UI elements like modals */
         }
-        /* Ensure DOM overlay elements are above the canvas */
         .dom-overlay {
             position: absolute;
             top:0; left:0; right:0; bottom:0;
-            z-index: 10;
-            pointer-events: none; /* Allow clicks to pass through overlay to canvas/buttons */
+            z-index: 10; 
+            pointer-events: none; /* Allows clicks to pass through to canvas by default */
         }
         .dom-overlay > * {
-            pointer-events: auto; /* Re-enable pointer events for children */
+            pointer-events: auto; /* Re-enable pointer events for direct children that are interactive */
         }
+        .dom-overlay > header {
+            position: sticky; 
+            top: 0;
+            z-index: 20; /* Header above other overlay items */
+        }
+        /* Specifically make the main content area pass through events too */
+        .dom-overlay > main {
+            pointer-events: none;
+        }
+         /* Children of main that need interaction would need pointer-events: auto; */
+        .dom-overlay > main > * {
+            pointer-events: auto;
+        }
+
+
     </style>
     <script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
     <script type="importmap">
@@ -131,50 +144,60 @@
 </head>
 <body>
     <div class="dom-overlay flex flex-col h-screen">
-        <header class="p-3 bg-gray-800 bg-opacity-80 backdrop-blur-md shadow-lg flex justify-between items-center">
-            <h1 class="text-xl font-semibold text-gray-100">3D Model Viewer</h1>
-            <div class="flex items-center space-x-2">
+        <header class="p-3 bg-gray-800 bg-opacity-90 backdrop-blur-md shadow-lg flex justify-between items-center">
+            <h1 class="text-lg sm:text-xl font-semibold text-gray-100">3D Model Viewer</h1>
+            <div class="flex items-center space-x-1 sm:space-x-2">
                 <button id="fullscreenButton" title="Mode Layar Penuh" class="p-2 rounded-lg bg-gray-700 hover:bg-gray-600 text-gray-200 transition-colors">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
+                    <svg id="fullscreenIconMaximize" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/>
+                    </svg>
+                    <svg id="fullscreenIconMinimize" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="hidden">
+                        <path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 0-2-2h-3M3 16h3a2 2 0 0 0 2-2v-3"/>
+                    </svg>
                 </button>
                  <button id="toggleLogButton" title="Toggle Log" class="p-2 rounded-lg bg-gray-700 hover:bg-gray-600 text-gray-200 transition-colors">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 12h16M4 18h7"/></svg>
                 </button>
-                <button id="arButton" class="px-4 py-2 rounded-lg font-semibold text-white bg-emerald-500 hover:bg-emerald-600 transition-colors flex items-center space-x-2">
+                <button id="arButton" class="px-3 sm:px-4 py-2 rounded-lg font-semibold text-white bg-emerald-500 hover:bg-emerald-600 transition-colors flex items-center space-x-1 sm:space-x-2">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 18.5A2.5 2.5 0 0 0 12 13.5v0A2.5 2.5 0 0 0 12 18.5Z"/><path d="M12 13.5V6"/><path d="m21 12-9-9-9 9"/><path d="M12 3v10.5"/></svg>
-                    <span>Mulai AR</span>
+                    <span class="text-sm sm:text-base">Mulai AR</span>
                 </button>
             </div>
         </header>
 
-        <main class="flex-grow relative">
-            <div id="reticle-display"></div>
-        </main>
+        <main class="flex-grow relative"> 
+            <div id="reticle-display"></div> </main>
 
-        <div id="preset-buttons-container" class="p-3 bg-gray-800 bg-opacity-80 backdrop-blur-md shadow-t-lg flex flex-wrap justify-center items-center gap-2">
+        <div id="preset-buttons-container" class="p-2 sm:p-3 bg-gray-800 bg-opacity-90 backdrop-blur-md shadow-t-lg flex flex-wrap justify-center items-center gap-1 sm:gap-2">
             <button class="preset-button" data-view="Default" title="Tampilan Default">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" sm:width="20" sm:height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg>
             </button>
             <button class="preset-button" data-view="Kiri" title="Lihat dari Depan Model (Kamera di Depan)">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg> </button>
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" sm:width="20" sm:height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg> 
+            </button>
             <button class="preset-button" data-view="Kanan" title="Lihat dari Belakang Model (Kamera di Belakang)">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" transform="scale(-1, 1)"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg> </button>
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" sm:width="20" sm:height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" transform="scale(-1, 1)"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg> 
+            </button>
             <button class="preset-button" data-view="Atas" title="Lihat dari Atas">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" transform="rotate(90 12 12)"/></svg> </button>
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" sm:width="20" sm:height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" transform="rotate(90 12 12)"/></svg> 
+            </button>
             <button class="preset-button" data-view="Bawah" title="Lihat dari Bawah">
-                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" transform="rotate(-90 12 12)"/></svg> </button>
+                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" sm:width="20" sm:height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" transform="rotate(-90 12 12)"/></svg> 
+            </button>
             <button class="preset-button" data-view="Depan" title="Lihat dari Kiri Model (Kamera di Kiri)">
-                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" transform="rotate(0 12 12) scale(-1,1) translate(-24,0)"/></svg> </button>
+                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" sm:width="20" sm:height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" transform="rotate(0 12 12) scale(-1,1) translate(-24,0)"/></svg> 
+            </button>
             <button class="preset-button" data-view="Belakang" title="Lihat dari Kanan Model (Kamera di Kanan)">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" transform="rotate(0 12 12) scale(1,1) translate(0,0)"/></svg> </button>
-            <button id="resetCameraButton" title="Reset Kamera & Model" class="p-2.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white transition-colors">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0-4.4-3.6-8-8-8s-8 3.6-8 8 3.6 8 8 8h1c1.7 0 3-1.3 3-3s-1.3-3-3-3h-1"/><path d="m15 9 3-3 3 3"/></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" sm:width="20" sm:height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" transform="rotate(0 12 12) scale(1,1) translate(0,0)"/></svg> 
+            </button>
+            <button id="resetCameraButton" title="Reset Kamera & Model" class="p-2 sm:p-2.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" sm:width="20" sm:height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0-4.4-3.6-8-8-8s-8 3.6-8 8 3.6 8 8 8h1c1.7 0 3-1.3 3-3s-1.3-3-3-3h-1"/><path d="m15 9 3-3 3 3"/></svg>
             </button>
         </div>
 
-        <div id="on-screen-log-container" class="absolute bottom-20 left-3 w-2/5 max-w-md h-32 bg-gray-900 bg-opacity-80 backdrop-blur-sm text-xs font-mono p-3 rounded-lg shadow-xl overflow-y-auto hidden">
+        <div id="on-screen-log-container" class="absolute bottom-16 sm:bottom-20 left-2 sm:left-3 w-2/5 max-w-xs sm:max-w-md h-24 sm:h-32 bg-gray-900 bg-opacity-80 backdrop-blur-sm text-xs font-mono p-2 sm:p-3 rounded-lg shadow-xl overflow-y-auto hidden">
             </div>
-        <div id="app-version" class="absolute bottom-3 right-3 text-xs text-gray-500">APP VERSI 0.1.0</div>
+        <div id="app-version" class="absolute bottom-1 sm:bottom-3 right-2 sm:right-3 text-xs text-gray-500">APP VERSI 0.1.2</div>
     </div>
 
     <div id="loading-indicator-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 backdrop-blur-sm flex flex-col items-center justify-center z-50 hidden">
@@ -182,25 +205,25 @@
         <p id="loading-text" class="text-gray-200 text-lg font-medium">Memuat Model...</p>
     </div>
 
-    <div id="ar-instructions-modal" class="fixed inset-0 bg-gray-900 bg-opacity-85 backdrop-blur-md flex flex-col items-center justify-center z-40 p-6 hidden">
-        <div class="bg-gray-800 p-8 rounded-xl shadow-2xl text-center max-w-md">
-            <svg class="mx-auto mb-4 w-16 h-16 text-emerald-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+    <div id="ar-instructions-modal" class="fixed inset-0 bg-gray-900 bg-opacity-85 backdrop-blur-md flex flex-col items-center justify-center z-40 p-4 sm:p-6 hidden">
+        <div class="bg-gray-800 p-6 sm:p-8 rounded-xl shadow-2xl text-center max-w-sm sm:max-w-md">
+            <svg class="mx-auto mb-4 w-12 h-12 sm:w-16 sm:h-16 text-emerald-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" d="M12 18.5A2.5 2.5 0 0 0 12 13.5v0A2.5 2.5 0 0 0 12 18.5Z" />
               <path stroke-linecap="round" stroke-linejoin="round" d="M12 13.5V6" />
               <path stroke-linecap="round" stroke-linejoin="round" d="m21 12-9-9-9 9" />
               <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v10.5" />
             </svg>
-            <h2 id="ar-instruction-title" class="text-2xl font-bold text-gray-100 mb-3">Mode Augmented Reality</h2>
-            <p id="ar-instruction-text" class="text-gray-300 mb-6">Arahkan kamera ke permukaan datar (mis. lantai atau meja) dan gerakkan perlahan untuk mendeteksi area.</p>
-            <div id="ar-interaction-hints" class="text-sm text-gray-400 mb-6 hidden">
+            <h2 id="ar-instruction-title" class="text-xl sm:text-2xl font-bold text-gray-100 mb-3">Mode Augmented Reality</h2>
+            <p id="ar-instruction-text" class="text-sm sm:text-base text-gray-300 mb-4 sm:mb-6">Arahkan kamera ke permukaan datar (mis. lantai atau meja) dan gerakkan perlahan untuk mendeteksi area.</p>
+            <div id="ar-interaction-hints" class="text-xs sm:text-sm text-gray-400 mb-4 sm:mb-6 hidden">
                 <p><strong>Interaksi Model AR:</strong></p>
                 <p>- Cubit (pinch) dengan dua jari untuk mengatur ukuran.</p>
                 <p>- Seret (drag) dengan satu jari untuk memutar model.</p>
             </div>
-            <button id="ar-action-button" class="w-full px-6 py-3 rounded-lg font-semibold text-white bg-emerald-500 hover:bg-emerald-600 transition-colors">
+            <button id="ar-action-button" class="w-full px-4 py-2.5 sm:px-6 sm:py-3 rounded-lg font-semibold text-white bg-emerald-500 hover:bg-emerald-600 transition-colors text-sm sm:text-base">
                 Mulai Pindai Permukaan
             </button>
-             <button id="ar-exit-button" class="mt-3 w-full px-6 py-3 rounded-lg font-semibold text-gray-300 bg-gray-700 hover:bg-gray-600 transition-colors">
+             <button id="ar-exit-button" class="mt-2 sm:mt-3 w-full px-4 py-2.5 sm:px-6 sm:py-3 rounded-lg font-semibold text-gray-300 bg-gray-700 hover:bg-gray-600 transition-colors text-sm sm:text-base">
                 Keluar dari AR
             </button>
         </div>
@@ -232,10 +255,12 @@
         const onScreenLogContainer = document.getElementById('on-screen-log-container');
         const appVersionDisplay = document.getElementById('app-version');
         const arButton = document.getElementById('arButton');
-        const reticleDisplay = document.getElementById('reticle-display'); // CSS Reticle, not the 3D one
+        const reticleDisplay = document.getElementById('reticle-display'); 
         const presetButtonsContainer = document.getElementById('preset-buttons-container');
         const toggleLogButton = document.getElementById('toggleLogButton');
         const fullscreenButton = document.getElementById('fullscreenButton');
+        const fullscreenIconMaximize = document.getElementById('fullscreenIconMaximize');
+        const fullscreenIconMinimize = document.getElementById('fullscreenIconMinimize');
         const resetCameraButton = document.getElementById('resetCameraButton');
 
 
@@ -246,23 +271,22 @@
         let xrSession = null;
         let xrRefSpace = null;
         let xrHitTestSource = null;
-        let reticleMesh; // This is the Three.js reticle
+        let reticleMesh; 
         let modelPlaced = false;
 
         let isUpdatingViewPresetGUI = false;
-        const APP_VERSION = "0.1.0";
+        const APP_VERSION = "0.1.2"; // Version updated
 
-        // AR Interaction State Variables
         let arIsPinching = false;
         let arInitialPinchDistance = 0;
         let arIsDragging = false;
         let arLastDragX = 0;
         let arLastDragY = 0;
-        const arDragSensitivity = 0.004; // Slightly reduced sensitivity
+        const arDragSensitivity = 0.004; 
 
         const params = {
-            modelPath: 'Cupang.glb',
-            skyboxGlbUrl: 'inside_galaxy_skybox_hdri_360_panorama.glb',
+            modelPath: 'Cupang.glb', // Default model
+            skyboxGlbUrl: 'inside_galaxy_skybox_hdri_360_panorama.glb', // Default skybox
             toneMappingExposure: 1.0,
             ambientLightIntensity: 2.8,
             directionalLightIntensity: 3.5,
@@ -275,23 +299,24 @@
             selectedViewPreset: 'Default',
             cameraFOV: 50,
             modelScale: 1.0,
-            arModelScale: 0.3, // Default AR scale
+            arModelScale: 0.3, 
             skyboxBrightness: 1.0,
-            backgroundColor: '#1f2937', // Tailwind bg-gray-800
+            backgroundColor: '#1f2937', 
             showSkybox: true,
         };
 
         function logToScreen(message, type = 'info') {
             if (onScreenLogContainer) {
                 const logEntry = document.createElement('div');
-                const timestamp = new Date().toLocaleTimeString();
+                const timestamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit'});
                 logEntry.textContent = `[${timestamp}] ${message}`;
                 if (type === 'error') logEntry.className = 'text-red-400';
                 else if (type === 'warn') logEntry.className = 'text-yellow-400';
-                else logEntry.className = 'text-emerald-400';
+                else logEntry.className = 'text-emerald-400'; // For success/info
                 onScreenLogContainer.appendChild(logEntry);
-                onScreenLogContainer.scrollTop = onScreenLogContainer.scrollHeight;
+                onScreenLogContainer.scrollTop = onScreenLogContainer.scrollHeight; // Auto-scroll
             }
+            // Also log to console for developers
             if (type === 'error') console.error(message);
             else if (type === 'warn') console.warn(message);
             else console.log(message);
@@ -305,24 +330,26 @@
             scene.background = new THREE.Color(params.backgroundColor);
 
             camera = new THREE.PerspectiveCamera(params.cameraFOV, window.innerWidth / window.innerHeight, 0.01, 10000);
-            camera.position.set(0, 1.6, 3);
+            camera.position.set(0, 1.6, 3); // Default camera position
 
             renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
             renderer.setSize(window.innerWidth, window.innerHeight);
             renderer.setPixelRatio(window.devicePixelRatio);
             renderer.toneMapping = THREE.ACESFilmicToneMapping;
             renderer.toneMappingExposure = params.toneMappingExposure;
-            renderer.outputColorSpace = THREE.SRGBColorSpace;
+            renderer.outputColorSpace = THREE.SRGBColorSpace; // Correct color space
             renderer.xr.enabled = true;
-            document.body.insertBefore(renderer.domElement, document.querySelector('.dom-overlay')); // Insert canvas before overlay
+            // Insert canvas into body, before the .dom-overlay div
+            document.body.insertBefore(renderer.domElement, document.querySelector('.dom-overlay'));
 
             controls = new OrbitControls(camera, renderer.domElement);
             controls.enableDamping = true;
             controls.dampingFactor = 0.05;
-            controls.minDistance = 0.01;
-            controls.maxDistance = 5000;
-            controls.target.set(0, 0, 0);
+            controls.minDistance = 0.01; 
+            controls.maxDistance = 5000; 
+            controls.target.set(0, 0, 0); // Initial target
 
+            // Lighting
             ambientLight = new THREE.AmbientLight(0xffffff, params.ambientLightIntensity);
             scene.add(ambientLight);
 
@@ -330,33 +357,39 @@
             directionalLight.position.set(1, 1.5, 1).normalize();
             scene.add(directionalLight);
 
+            // Model container
             modelContainerGroup = new THREE.Group();
             scene.add(modelContainerGroup);
 
+            // Setup UI and AR features
             setupARButton();
             setupReticle();
 
+            // Load skybox if URL is valid
             if (params.skyboxGlbUrl && params.skyboxGlbUrl !== 'SKYBOX_ANDA.glb' && !params.skyboxGlbUrl.includes('placehold.co')) {
                 loadSkyboxFromGLB();
             } else {
-                logToScreen("Path Skybox GLB tidak valid, skybox tidak dimuat.", "warn");
+                logToScreen("Path Skybox GLB tidak valid atau placeholder, skybox tidak akan dimuat secara otomatis.", "warn");
             }
-            updateBackgroundVisibility();
-            loadMainModel();
+            updateBackgroundVisibility(); // Set initial background based on skybox presence
+            loadMainModel(); // Load the primary 3D model
 
+            // Post-processing
             composer = new EffectComposer(renderer);
             const renderPass = new RenderPass(scene, camera);
             composer.addPass(renderPass);
             const outputPass = new OutputPass();
             composer.addPass(outputPass);
 
+            // Initialize GUI and event listeners
             setupGUI();
             setupPresetButtons();
             setupUtilityButtons();
 
             window.addEventListener('resize', onWindowResize, false);
-            renderer.domElement.addEventListener('click', onSelectAR); // For initial placement
-            renderer.setAnimationLoop(animate);
+            // Click listener for AR placement (also handles GUI click prevention)
+            renderer.domElement.addEventListener('click', onSelectAR); 
+            renderer.setAnimationLoop(animate); // Start animation loop
             logToScreen("Inisialisasi selesai.");
         }
 
@@ -364,7 +397,7 @@
             if (navigator.xr) {
                 navigator.xr.isSessionSupported('immersive-ar')
                     .then((supported) => {
-                        arButton.style.display = 'flex';
+                        arButton.style.display = 'flex'; // Show the button
                         if (supported) {
                             arButton.addEventListener('click', onARButtonClick);
                             arButton.disabled = false;
@@ -391,13 +424,14 @@
         }
 
         function setupReticle() {
+            // 3D Reticle (green ring)
             reticleMesh = new THREE.Mesh(
-                new THREE.RingGeometry(0.04, 0.055, 32).rotateX(-Math.PI / 2),
-                new THREE.MeshBasicMaterial({ color: 0x34d399, opacity: 0.85, transparent: true, depthTest: false }) // emerald-400
+                new THREE.RingGeometry(0.04, 0.055, 32).rotateX(-Math.PI / 2), // Rotate to be flat on surfaces
+                new THREE.MeshBasicMaterial({ color: 0x34d399, opacity: 0.85, transparent: true, depthTest: false }) // Tailwind emerald-400
             );
-            reticleMesh.matrixAutoUpdate = false;
-            reticleMesh.visible = false;
-            reticleMesh.renderOrder = 10;
+            reticleMesh.matrixAutoUpdate = false; // We will update its matrix manually
+            reticleMesh.visible = false; // Initially hidden
+            reticleMesh.renderOrder = 10; // Render on top of most things
             scene.add(reticleMesh);
         }
         
@@ -412,36 +446,37 @@
 
         function showARInstructions(stage) {
             arInstructionsModal.classList.remove('hidden');
-            arInteractionHints.classList.add('hidden'); // Hide by default
+            arInteractionHints.classList.add('hidden'); // Hide hints by default, show when model is placed
 
             switch(stage) {
                 case 'initial':
                     arInstructionTitle.textContent = "Mode Augmented Reality";
                     arInstructionText.innerHTML = "Arahkan kamera ke permukaan datar (mis. lantai atau meja) dan gerakkan perlahan untuk mendeteksi area.<br><br>Pastikan pencahayaan cukup dan permukaan memiliki tekstur.";
                     arActionButton.textContent = "Mulai Pindai Permukaan";
+                    arActionButton.disabled = false;
                     arActionButton.onclick = onStartScanButtonClick;
-                    arExitButton.onclick = () => xrSession.end();
+                    // Allow exiting modal if AR session hasn't started yet
+                    arExitButton.onclick = () => { if(xrSession) xrSession.end(); else arInstructionsModal.classList.add('hidden'); };
                     break;
                 case 'scanning':
                     arInstructionTitle.textContent = "Pindai Permukaan";
                     arInstructionText.textContent = "Gerakkan perangkat Anda perlahan untuk memindai lingkungan. Reticle (lingkaran hijau) akan muncul pada permukaan yang terdeteksi.";
                     arActionButton.textContent = "Menunggu Deteksi...";
-                    arActionButton.disabled = true; // Disabled until surface found, or tap to place
-                    arInteractionHints.classList.add('hidden');
+                    arActionButton.disabled = true; // Becomes enabled via hit-test or tap
                     break;
                 case 'place_model':
                     arInstructionTitle.textContent = "Tempatkan Model";
                     arInstructionText.textContent = "Ketuk layar pada posisi reticle (lingkaran hijau) untuk menempatkan model.";
-                    arActionButton.textContent = "Ketuk untuk Menempatkan";
-                    arActionButton.disabled = true; // Placement is via screen tap
-                    arInteractionHints.classList.add('hidden');
+                    arActionButton.textContent = "Ketuk untuk Menempatkan"; // User taps screen, not this button
+                    arActionButton.disabled = true; 
                     break;
                 case 'model_placed':
                     arInstructionTitle.textContent = "Model Ditempatkan!";
                     arInstructionText.textContent = "Anda sekarang dapat berinteraksi dengan model di dunia nyata.";
                     arActionButton.textContent = "Selesai";
+                    arActionButton.disabled = false;
                     arActionButton.onclick = () => arInstructionsModal.classList.add('hidden');
-                    arInteractionHints.classList.remove('hidden');
+                    arInteractionHints.classList.remove('hidden'); // Show interaction hints
                     break;
             }
         }
@@ -452,14 +487,16 @@
                 logToScreen("Mencoba memulai sesi AR...");
                 showLoadingIndicator("Memulai sesi AR...");
                 navigator.xr.requestSession('immersive-ar', {
-                    requiredFeatures: ['hit-test', 'dom-overlay'],
-                    domOverlay: { root: document.body.querySelector('.dom-overlay') }
+                    requiredFeatures: ['hit-test', 'dom-overlay'], // dom-overlay for UI
+                    domOverlay: { root: document.body.querySelector('.dom-overlay') } // Specify overlay root
                 }).then(onSessionStarted)
                   .catch(err => {
                     hideLoadingIndicator();
                     logToScreen(`Gagal memulai sesi AR: ${err.message}`, "error");
-                    alert(`Gagal memulai sesi AR. Pastikan perangkat & browser mendukung, dan izin kamera diberikan. Error: ${err.message}`);
-                    arButton.querySelector('span').textContent = "AR Gagal";
+                    showARInstructions('initial'); 
+                    arInstructionText.innerHTML = `Gagal memulai sesi AR.<br>Penyebab: ${err.message}.<br>Pastikan perangkat & browser mendukung, dan izin kamera diberikan.`;
+                    arActionButton.textContent = "Coba Lagi";
+                    arActionButton.onclick = onARButtonClick; 
                 });
             } else {
                 logToScreen("Mengakhiri sesi AR...");
@@ -469,38 +506,42 @@
 
         function onSessionStarted(session) {
             hideLoadingIndicator();
-            logToScreen(`Sesi AR dimulai. ID Sesi: ${session}`);
+            logToScreen(`Sesi AR dimulai.`);
             xrSession = session;
+            // Update AR button appearance and text
             arButton.querySelector('span').textContent = 'Keluar AR';
             arButton.classList.add('bg-red-500', 'hover:bg-red-600');
             arButton.classList.remove('bg-emerald-500', 'hover:bg-emerald-600');
 
+            // Hide non-AR UI elements
             presetButtonsContainer.style.display = 'none';
             if(gui) gui.hide();
-            if(skyboxObject) skyboxObject.visible = false;
-            scene.background = null;
+            if(skyboxObject) skyboxObject.visible = false; // Hide skybox in AR
+            scene.background = null; // Transparent background for AR
 
+            // Reset AR state variables
             xrRefSpace = null;
             xrHitTestSource = null;
             modelPlaced = false;
             if(modelContainerGroup) {
-                modelContainerGroup.visible = false;
-                modelContainerGroup.userData.originalScale = modelContainerGroup.scale.clone();
+                modelContainerGroup.visible = false; // Hide model until placed
+                // Store original scale if not already stored, for restoring when exiting AR
+                if (!modelContainerGroup.userData.originalScale) { 
+                    modelContainerGroup.userData.originalScale = modelContainerGroup.scale.clone();
+                }
                 modelContainerGroup.scale.set(params.arModelScale, params.arModelScale, params.arModelScale);
-                modelContainerGroup.userData.initialArScale = params.arModelScale;
+                modelContainerGroup.userData.initialArScale = params.arModelScale; // For pinch scaling reference
                 logToScreen(`Model disembunyikan, skala AR diatur ke: ${params.arModelScale}`);
             }
-            reticleMesh.visible = false;
-            reticleDisplay.style.display = 'none'; // Hide CSS reticle
+            reticleMesh.visible = false; // Hide 3D reticle initially
+            reticleDisplay.style.display = 'none'; // Hide CSS helper reticle
             
-            showARInstructions('initial');
-            if (onScreenLogContainer.classList.contains('hidden')) {
-                 // Show logs if they were hidden
-            }
+            showARInstructions('initial'); // Show initial AR instructions
+            
+            session.addEventListener('end', onSessionEnded); // Handle session end
 
-            session.addEventListener('end', onSessionEnded);
-
-            renderer.xr.setReferenceSpaceType('local');
+            // Set up XR reference space and session for rendering
+            renderer.xr.setReferenceSpaceType('local'); 
             renderer.xr.setSession(session)
                 .then(() => { logToScreen("Sesi XR berhasil diset ke renderer."); })
                 .catch(err => {
@@ -511,28 +552,34 @@
 
         function onStartScanButtonClick() {
             logToScreen("Tombol 'Mulai Pindai Permukaan' ditekan.");
-            showARInstructions('scanning');
+            showARInstructions('scanning'); // Update instruction modal
             
             if (xrSession && !xrHitTestSource) {
-                xrSession.requestReferenceSpace('viewer')
-                    .then((refSpaceViewer) => {
-                        logToScreen("Viewer reference space didapatkan untuk hit-test.");
-                        return xrSession.requestHitTestSource({ space: refSpaceViewer });
-                    })
-                    .then((source) => {
-                        xrHitTestSource = source;
-                        reticleMesh.visible = true; // Show 3D reticle
-                        reticleDisplay.style.display = 'block'; // Show CSS reticle as visual cue
-                        logToScreen("Hit test source berhasil didapatkan. Reticle aktif.");
-                        showARInstructions('place_model');
-                    })
-                    .catch(err => {
-                        logToScreen(`Error mendapatkan hit test source: ${err.message}`, "error");
-                        alert("Tidak bisa memulai pemindaian permukaan. Coba lagi atau restart sesi AR.");
-                        reticleMesh.visible = false;
-                        reticleDisplay.style.display = 'none';
-                        showARInstructions('initial'); // Go back to initial instruction
-                    });
+                xrSession.requestReferenceSpace('viewer').then((viewerSpace) => {
+                    xrSession.requestHitTestSource({ space: viewerSpace }) // Request hit test source
+                        .then((source) => {
+                            xrHitTestSource = source;
+                            reticleMesh.visible = true; // Show 3D reticle
+                            reticleDisplay.style.display = 'block'; // Show CSS helper reticle
+                            logToScreen("Hit test source berhasil didapatkan. Reticle aktif.");
+                            showARInstructions('place_model'); // Update instructions to prompt for placement
+                        })
+                        .catch(err => {
+                            logToScreen(`Error mendapatkan hit test source: ${err.message}`, "error");
+                            showARInstructions('initial');
+                            arInstructionText.innerHTML = `Gagal memulai pemindaian.<br>Penyebab: ${err.message}.<br>Coba lagi atau restart sesi AR.`;
+                            arActionButton.textContent = "Coba Pindai Lagi";
+                            arActionButton.onclick = onStartScanButtonClick;
+                            reticleMesh.visible = false;
+                            reticleDisplay.style.display = 'none';
+                        });
+                }).catch(err => {
+                     logToScreen(`Error mendapatkan viewer reference space: ${err.message}`, "error");
+                     showARInstructions('initial');
+                     arInstructionText.innerHTML = `Gagal mendapatkan viewer space.<br>Penyebab: ${err.message}.`;
+                     arActionButton.textContent = "Coba Lagi";
+                     arActionButton.onclick = onARButtonClick; // Back to main AR button if viewer space fails
+                });
             } else if (xrHitTestSource) {
                 logToScreen("Hit test source sudah ada. Reticle seharusnya sudah aktif.");
                 reticleMesh.visible = true;
@@ -540,6 +587,10 @@
                 showARInstructions('place_model');
             } else if (!xrSession) {
                 logToScreen("Sesi AR tidak aktif saat mencoba memulai pemindaian.", "warn");
+                 showARInstructions('initial');
+                 arInstructionText.innerHTML = `Sesi AR tidak aktif.<br>Silakan mulai sesi AR terlebih dahulu.`;
+                 arActionButton.textContent = "Mulai AR";
+                 arActionButton.onclick = onARButtonClick;
             }
         }
 
@@ -547,17 +598,21 @@
             hideLoadingIndicator();
             logToScreen("Sesi AR berakhir.");
             xrSession = null;
+            // Reset AR button
             arButton.querySelector('span').textContent = 'Mulai AR';
             arButton.classList.remove('bg-red-500', 'hover:bg-red-600');
             arButton.classList.add('bg-emerald-500', 'hover:bg-emerald-600');
 
+            // Restore non-AR UI
             presetButtonsContainer.style.display = 'flex';
             if(gui) gui.show();
-            arInstructionsModal.classList.add('hidden');
+            arInstructionsModal.classList.add('hidden'); // Hide AR instructions
             
+            // Hide AR specific elements
             reticleMesh.visible = false;
             reticleDisplay.style.display = 'none';
 
+            // Remove AR touch listeners
             renderer.domElement.removeEventListener('touchstart', handleARtouchstart);
             renderer.domElement.removeEventListener('touchmove', handleARtouchmove);
             renderer.domElement.removeEventListener('touchend', handleARtouchend);
@@ -565,56 +620,59 @@
             arIsDragging = false;
             logToScreen("Listener interaksi AR dihapus.");
 
+            // Restore model visibility and scale
             if(modelContainerGroup) {
                 modelContainerGroup.visible = true;
                 if (modelContainerGroup.userData.originalScale) {
                     modelContainerGroup.scale.copy(modelContainerGroup.userData.originalScale);
-                } else {
+                } else { // Fallback if originalScale wasn't stored
                     modelContainerGroup.scale.set(params.modelScale, params.modelScale, params.modelScale);
                 }
-                // Reset rotation to initial non-AR rotation
-                applyInitialRotation(); 
+                applyInitialRotation(); // Reset to non-AR initial rotation
             }
-            if(model) goToViewPreset(params.selectedViewPreset, true);
-            updateBackgroundVisibility();
+            if(model) goToViewPreset(params.selectedViewPreset, true); // Restore camera view
+            updateBackgroundVisibility(); // Restore background/skybox
         }
 
         function onSelectAR(event) {
+            // Prevent AR placement if a GUI element was clicked
+            if (event.target.closest('.lil-gui')) {
+                return; 
+            }
+
+            // Proceed with AR placement if in AR session, reticle is visible, and model not yet placed
             if (xrSession && reticleMesh.visible && !modelPlaced) {
                 if (modelContainerGroup && model) {
                     logToScreen("Mencoba menempatkan model di posisi reticle.");
                     
+                    // Position and orient the model container based on the reticle's matrix
                     modelContainerGroup.matrix.copy(reticleMesh.matrix);
                     modelContainerGroup.matrix.decompose(modelContainerGroup.position, modelContainerGroup.quaternion, modelContainerGroup.scale);
                     
+                    // Apply the defined AR model scale
                     modelContainerGroup.scale.set(params.arModelScale, params.arModelScale, params.arModelScale);
-                    modelContainerGroup.userData.initialArScale = params.arModelScale;
+                    modelContainerGroup.userData.initialArScale = params.arModelScale; // Store for pinch reference
                     
-                    modelContainerGroup.visible = true;
-                    modelPlaced = true;
+                    modelContainerGroup.visible = true; // Make the model visible
+                    modelPlaced = true; // Mark model as placed
                     reticleMesh.visible = false; // Hide 3D reticle
-                    reticleDisplay.style.display = 'none'; // Hide CSS reticle
+                    reticleDisplay.style.display = 'none'; // Hide CSS helper reticle
 
-                    logToScreen(`Model AR ditempatkan. Pos: ${modelContainerGroup.position.toArray().map(n=>n.toFixed(2))}, Skala: ${params.arModelScale}`);
-                    showARInstructions('model_placed');
+                    logToScreen(`Model AR ditempatkan.`);
+                    showARInstructions('model_placed'); // Update instructions
 
+                    // Add touch listeners for AR interaction (scale, rotate)
                     renderer.domElement.addEventListener('touchstart', handleARtouchstart, { passive: false });
                     renderer.domElement.addEventListener('touchmove', handleARtouchmove, { passive: false });
                     renderer.domElement.addEventListener('touchend', handleARtouchend, { passive: false });
                     logToScreen("Listener interaksi AR (drag/pinch) ditambahkan.");
-
-                    // Optionally disable hit test source after placement if not needed for repositioning
-                    // if (xrHitTestSource) {
-                    //     xrHitTestSource.cancel();
-                    //     xrHitTestSource = null;
-                    //     logToScreen("Hit test source dihentikan setelah penempatan.");
-                    // }
                 } else {
-                    logToScreen("Model atau modelContainerGroup tidak siap untuk ditempatkan di AR.", "warn");
+                    logToScreen("Model atau container model belum siap untuk penempatan AR.", "warn");
                 }
             }
         }
 
+        // --- AR Interaction Functions (Pinch to Scale, Drag to Rotate) ---
         function getDistanceBetweenTouches(touches) {
             const touch1 = touches[0];
             const touch2 = touches[1];
@@ -626,18 +684,19 @@
 
         function handleARtouchstart(event) {
             if (!xrSession || !modelPlaced || !modelContainerGroup) return;
-            event.preventDefault();
+            event.preventDefault(); // Prevent default browser actions (like scrolling)
             const touches = event.touches;
 
-            if (touches.length === 1) {
+            if (touches.length === 1) { // Single touch for dragging/rotating
                 arIsDragging = true;
-                arIsPinching = false;
+                arIsPinching = false; // Ensure not pinching
                 arLastDragX = touches[0].clientX;
                 arLastDragY = touches[0].clientY;
-            } else if (touches.length === 2) {
+            } else if (touches.length === 2) { // Two touches for pinching/scaling
                 arIsPinching = true;
-                arIsDragging = false;
+                arIsDragging = false; // Prioritize pinch
                 arInitialPinchDistance = getDistanceBetweenTouches(touches);
+                // Store the scale at the beginning of this specific pinch gesture
                 modelContainerGroup.userData.currentPinchStartScale = modelContainerGroup.scale.x;
             }
         }
@@ -647,27 +706,25 @@
             event.preventDefault();
             const touches = event.touches;
 
-            if (arIsDragging && touches.length === 1) {
+            if (arIsDragging && touches.length === 1) { // Handle rotation
                 const deltaX = touches[0].clientX - arLastDragX;
-                // const deltaY = touches[0].clientY - arLastDragY; // Y-axis rotation might be less intuitive for AR
-
+                // Rotate around model's local Y (up) axis
                 modelContainerGroup.rotation.y += deltaX * arDragSensitivity;
-                // modelContainerGroup.rotation.x += deltaY * arDragSensitivity; // Uncomment for X-axis rotation
-
+                // Update last drag position
                 arLastDragX = touches[0].clientX;
                 arLastDragY = touches[0].clientY;
-            } else if (arIsPinching && touches.length === 2) {
+            } else if (arIsPinching && touches.length === 2) { // Handle scaling
                 const currentPinchDistance = getDistanceBetweenTouches(touches);
                 if (arInitialPinchDistance > 0 && modelContainerGroup.userData.currentPinchStartScale !== undefined) {
                     const scaleFactor = currentPinchDistance / arInitialPinchDistance;
                     let newScale = modelContainerGroup.userData.currentPinchStartScale * scaleFactor;
                     
-                    const minScaleFactor = 0.1; // e.g. 10% of initial AR scale
-                    const maxScaleFactor = 10;  // e.g. 10x of initial AR scale
-                    const baseArScale = modelContainerGroup.userData.initialArScale || params.arModelScale; // Use the scale at placement or default
+                    // Clamp scale to reasonable limits (e.g., 0.1x to 10x of the initial AR scale)
+                    const minScaleFactor = 0.1; 
+                    const maxScaleFactor = 10;  
+                    const baseArScale = modelContainerGroup.userData.initialArScale || params.arModelScale; 
                     
                     newScale = Math.max(baseArScale * minScaleFactor, Math.min(newScale, baseArScale * maxScaleFactor));
-                    
                     modelContainerGroup.scale.set(newScale, newScale, newScale);
                 }
             }
@@ -675,15 +732,16 @@
 
         function handleARtouchend(event) {
             if (!xrSession || !modelPlaced) return;
-
+            // Reset dragging/pinching flags when touches end
             if (arIsDragging && event.touches.length < 1) {
                 arIsDragging = false;
             }
             if (arIsPinching && event.touches.length < 2) {
                 arIsPinching = false;
+                // Update params.arModelScale with the final scale after pinch for GUI consistency
                 if (modelContainerGroup) {
-                    params.arModelScale = modelContainerGroup.scale.x; // Update param for GUI consistency if it were visible
-                    if (gui) {
+                    params.arModelScale = modelContainerGroup.scale.x; 
+                    if (gui) { // Update GUI if it were visible
                         const arScaleController = gui.controllersRecursive().find(c => c.property === 'arModelScale');
                         if (arScaleController) arScaleController.setValue(params.arModelScale).updateDisplay();
                     }
@@ -696,10 +754,10 @@
             showLoadingIndicator(`Memuat model: ${params.modelPath}`);
             logToScreen(`Mulai memuat model dari: ${params.modelPath}`);
 
+            // Clean up previous model if any
             if (model) {
                 modelContainerGroup.remove(model);
-                // Dispose geometry and material
-                model.traverse(node => {
+                model.traverse(node => { // Dispose of geometries and materials
                     if (node.geometry) node.geometry.dispose();
                     if (node.material) {
                         if (Array.isArray(node.material)) node.material.forEach(mat => mat.dispose());
@@ -708,6 +766,7 @@
                 });
                 model = null;
             }
+            // Reset container properties
             modelCenter.set(0,0,0);
             modelSize.set(0,0,0);
             modelContainerGroup.position.set(0,0,0);
@@ -718,29 +777,32 @@
             mainModelLoader.load(params.modelPath, function (gltf) {
                 model = gltf.scene;
                 if (!model) {
-                    logToScreen(`GLTFLoader berhasil, tetapi gltf.scene kosong: ${params.modelPath}`, "error");
+                    logToScreen(`GLTFLoader: gltf.scene kosong atau tidak valid untuk path: ${params.modelPath}`, "error");
                     hideLoadingIndicator();
-                    alert(`Gagal memproses model. File "${params.modelPath}" mungkin tidak valid.`);
+                    showARInstructions('initial'); 
+                    arInstructionText.innerHTML = `Gagal memproses model.<br>File "${params.modelPath}" mungkin tidak valid.`;
                     return;
                 }
-                modelContainerGroup.add(model);
+                modelContainerGroup.add(model); // Add new model to the container
                 
+                // Calculate bounding box and center the model within its container
                 const box = new THREE.Box3().setFromObject(modelContainerGroup);
-                box.getCenter(modelCenter);
-                box.getSize(modelSize);
+                box.getCenter(modelCenter); // Get center in world space (relative to container's current state)
+                box.getSize(modelSize);   // Get size
                 
-                modelContainerGroup.position.sub(modelCenter);
-                modelCenter.set(0,0,0);
+                // Translate the container so the model's calculated center is at the container's origin (0,0,0)
+                modelContainerGroup.position.sub(modelCenter); 
+                // After this, the model is effectively centered. modelCenter itself can be reset for future calculations if needed.
+                modelCenter.set(0,0,0); // The conceptual center of the model is now at the origin of modelContainerGroup
 
-                applyInitialRotation();
-                applyModelScale(); // This will also call goToViewPreset
-                updateMaterialProperties();
+                applyInitialRotation(); // Apply any initial rotation from params
+                applyModelScale();      // Apply scale and frame camera
+                updateMaterialProperties(); // Apply any specific material tweaks
                 
-                logToScreen("Model GLB utama berhasil dimuat.");
+                logToScreen("Model GLB utama berhasil dimuat dan disiapkan.");
                 hideLoadingIndicator();
-                // goToViewPreset('Default', true); // Already called in applyModelScale for non-AR
             },
-            function (xhr) {
+            function (xhr) { // Progress callback
                 if (xhr.lengthComputable) {
                     const percentComplete = xhr.loaded / xhr.total * 100;
                     showLoadingIndicator(`Memuat Model: ${Math.round(percentComplete)}%`);
@@ -748,10 +810,11 @@
                     showLoadingIndicator(`Memuat Model... (${(xhr.loaded / 1024 / 1024).toFixed(2)} MB)`);
                 }
             },
-            function (error) {
-                logToScreen(`Gagal memuat model GLB utama dari ${params.modelPath}. Error: ${error.message || error}`, "error");
+            function (error) { // Error callback
+                logToScreen(`Gagal memuat model GLB utama dari path: ${params.modelPath}. Error: ${error.message || error}`, "error");
                 hideLoadingIndicator();
-                alert(`Gagal memuat model "${params.modelPath}". Pastikan path benar dan file valid. Cek konsol.`);
+                showARInstructions('initial');
+                arInstructionText.innerHTML = `Gagal memuat model.<br>Pastikan file "${params.modelPath}" ada dan path benar. Error: ${error.message || 'Tidak diketahui'}`;
             });
         }
 
@@ -761,23 +824,29 @@
                 modelContainerGroup.scale.set(scaleValue, scaleValue, scaleValue);
                 logToScreen(`Skala model diatur ke: ${scaleValue.toFixed(3)} (Sesi AR: ${!!xrSession})`);
                 
-                if (!xrSession) {
+                if (!xrSession) { // Only re-frame camera in non-AR mode
                     // Recalculate model size for framing after scaling
                     const box = new THREE.Box3().setFromObject(modelContainerGroup);
-                    box.getSize(modelSize); 
-                    goToViewPreset(params.selectedViewPreset, true);
+                    box.getSize(modelSize); // modelSize is updated here based on current scale
+                    goToViewPreset(params.selectedViewPreset, true); // Re-frame the camera
                 } else {
-                     modelContainerGroup.userData.initialArScale = scaleValue;
+                     modelContainerGroup.userData.initialArScale = scaleValue; // Update for AR context
                 }
             }
         }
         
         function loadSkyboxFromGLB() {
              if (!params.skyboxGlbUrl || params.skyboxGlbUrl === 'SKYBOX_ANDA.glb' || params.skyboxGlbUrl.includes('placehold.co')) {
-                logToScreen("URL Skybox GLB tidak valid. Skybox tidak dimuat.", "warn");
+                logToScreen("URL Skybox GLB tidak valid atau placeholder. Skybox tidak akan dimuat.", "warn");
                 if (skyboxObject) {
-                    scene.remove(skyboxObject); // Proper removal
-                    skyboxObject.traverse(node => { /* dispose geometry/material */ });
+                    scene.remove(skyboxObject); 
+                    skyboxObject.traverse(node => { 
+                        if (node.geometry) node.geometry.dispose();
+                        if (node.material) {
+                            if(Array.isArray(node.material)) node.material.forEach(m => m.dispose());
+                            else node.material.dispose();
+                        }
+                    });
                     skyboxObject = null;
                 }
                 updateBackgroundVisibility();
@@ -787,12 +856,12 @@
             const loader = new GLTFLoader();
             loader.load(params.skyboxGlbUrl,
                 (gltf) => {
-                    if (skyboxObject) {
+                    if (skyboxObject) { // Clean up old skybox
                         scene.remove(skyboxObject);
-                        skyboxObject.traverse(node => {
+                         skyboxObject.traverse(node => { 
                             if (node.geometry) node.geometry.dispose();
                             if (node.material) {
-                                if (Array.isArray(node.material)) node.material.forEach(mat => mat.dispose());
+                                if(Array.isArray(node.material)) node.material.forEach(m => m.dispose());
                                 else node.material.dispose();
                             }
                         });
@@ -802,36 +871,34 @@
                         if (node.isMesh) {
                             const materials = Array.isArray(node.material) ? node.material : [node.material];
                             materials.forEach(material => {
-                                material.side = THREE.BackSide;
-                                // Brightness adjustment logic (simplified)
+                                material.side = THREE.BackSide; // Render inside of the skybox
+                                // Adjust brightness (emissive for PBR, color for basic)
                                 if (material.isMeshStandardMaterial || material.isMeshPhysicalMaterial) {
-                                    material.emissiveIntensity = (material.userData.initialEmissiveIntensityGLB !== undefined ? material.userData.initialEmissiveIntensityGLB : 1) * params.skyboxBrightness;
+                                    // Store initial emissive intensity if not already stored
+                                    if (material.userData.initialEmissiveIntensityGLB === undefined) material.userData.initialEmissiveIntensityGLB = material.emissiveIntensity !== undefined ? material.emissiveIntensity : 1;
+                                    material.emissiveIntensity = material.userData.initialEmissiveIntensityGLB * params.skyboxBrightness;
                                      if (!material.emissiveMap) { // Only adjust color if no emissive map
-                                        if (material.userData.initialEmissiveColorGLB === undefined) {
-                                            material.userData.initialEmissiveColorGLB = material.emissive.clone();
-                                        }
+                                        if (material.userData.initialEmissiveColorGLB === undefined) material.userData.initialEmissiveColorGLB = material.emissive.clone();
                                         material.emissive.copy(material.userData.initialEmissiveColorGLB).multiplyScalar(params.skyboxBrightness);
                                     }
                                 } else if (material.isMeshBasicMaterial) {
-                                     if (material.userData.initialColorGLB === undefined) {
-                                        material.userData.initialColorGLB = material.color.clone();
-                                    }
+                                     if (material.userData.initialColorGLB === undefined) material.userData.initialColorGLB = material.color.clone();
                                     material.color.copy(material.userData.initialColorGLB).multiplyScalar(params.skyboxBrightness);
                                 }
                                 material.needsUpdate = true;
                             });
                         }
                     });
-                    const skyboxScale = Math.max(camera.far * 0.5, 1000); 
+                    const skyboxScale = Math.max(camera.far * 0.5, 1000); // Ensure skybox is large enough
                     skyboxObject.scale.set(skyboxScale, skyboxScale, skyboxScale);
-                    skyboxObject.renderOrder = -10; 
+                    skyboxObject.renderOrder = -10; // Render skybox behind everything else
                     scene.add(skyboxObject);
-                    updateBackgroundVisibility();
+                    updateBackgroundVisibility(); // Apply visibility based on params
                     logToScreen("Skybox GLB berhasil dimuat.");
                 },
-                undefined, 
+                undefined, // onProgress callback (optional)
                 (error) => {
-                    logToScreen(`Gagal memuat Skybox GLB dari ${params.skyboxGlbUrl}. Error: ${error.message || error}`, "error");
+                    logToScreen(`Gagal memuat Skybox GLB dari path: ${params.skyboxGlbUrl}. Error: ${error.message || error}`, "error");
                     if (skyboxObject) { scene.remove(skyboxObject); skyboxObject = null; }
                     updateBackgroundVisibility();
                 }
@@ -840,19 +907,21 @@
 
         function updateBackgroundVisibility() {
             if (skyboxObject) {
-                skyboxObject.visible = params.showSkybox && !xrSession;
+                skyboxObject.visible = params.showSkybox && !xrSession; // Skybox only visible if enabled AND not in AR
             }
-            if (params.showSkybox && skyboxObject && skyboxObject.children.length > 0 && !xrSession) {
+            // If skybox is shown and valid, scene background should be null (transparent to see skybox)
+            if (params.showSkybox && skyboxObject && skyboxObject.visible && !xrSession) {
                 scene.background = null; 
-            } else if (!xrSession) {
+            } else if (!xrSession) { // Not in AR, and skybox not shown/invalid, use solid color
                 scene.background = new THREE.Color(params.backgroundColor);
-            } else { // AR Session
+            } else { // In AR session, background must be null for camera passthrough
                 scene.background = null;
             }
         }
 
         function applyInitialRotation() {
             if (modelContainerGroup) {
+                // Apply rotation to Euler angles; quaternion will update automatically
                 modelContainerGroup.rotation.set(
                     THREE.MathUtils.degToRad(params.initialRotationX_deg),
                     THREE.MathUtils.degToRad(params.initialRotationY_deg),
@@ -862,11 +931,11 @@
         }
         
         function updateMaterialProperties() {
-            // Basic material properties update, can be expanded
+            // Placeholder for any future global material adjustments on the main model
             if (!model) return;
             model.traverse(node => {
                 if (node.isMesh && node.material) {
-                    // Example: Ensure double side if needed, or other properties
+                    // Example: Ensure double side if needed for all materials
                     // const materials = Array.isArray(node.material) ? node.material : [node.material];
                     // materials.forEach(mat => { mat.side = THREE.DoubleSide; });
                 }
@@ -874,124 +943,137 @@
         }
 
         function frameArea(objectToFrame, cam, ctrl, instant = false, fitOffset = 1.8) {
-            if (!objectToFrame || !model) {
+            if (!objectToFrame || !model) { // Ensure model is also loaded as objectToFrame might be modelContainerGroup
                 logToScreen("frameArea: Objek model tidak valid atau belum dimuat.", "warn");
-                if (instant) { ctrl.target.set(0,0,0); cam.position.set(0,0.5,3); ctrl.update(); }
+                if (instant) { ctrl.target.set(0,0,0); cam.position.set(0,0.5,3); ctrl.update(); } // Basic fallback
                 return;
             }
         
-            const box = new THREE.Box3().setFromObject(objectToFrame); // Use objectToFrame directly
+            const box = new THREE.Box3().setFromObject(objectToFrame); 
             const sizeVec = box.getSize(new THREE.Vector3());
-            const centerVec = box.getCenter(new THREE.Vector3()); // Get center of the passed object
+            const centerVec = box.getCenter(new THREE.Vector3()); // Center of the object to frame
         
-            if (sizeVec.lengthSq() === 0) {
-                logToScreen("frameArea: Ukuran objek adalah nol.", "warn");
-                if (instant) { ctrl.target.copy(centerVec); cam.position.set(centerVec.x, centerVec.y + 0.5, centerVec.z + 3); ctrl.update(); }
+            // Check if size is effectively zero to prevent issues with distance calculation
+            if (sizeVec.x < 1e-6 && sizeVec.y < 1e-6 && sizeVec.z < 1e-6) { 
+                logToScreen("frameArea: Ukuran objek sangat kecil atau nol.", "warn");
+                if (instant) { // Fallback to a default view around the object's reported center
+                    ctrl.target.copy(centerVec); 
+                    cam.position.set(centerVec.x, centerVec.y + 0.5, centerVec.z + 3); 
+                    ctrl.update(); 
+                }
                 return;
             }
         
             const maxSize = Math.max(sizeVec.x, sizeVec.y, sizeVec.z);
             const fovInRadians = cam.fov * (Math.PI / 180);
-            let distance = maxSize / (2 * Math.tan(fovInRadians / 2));
-            distance *= fitOffset; // Apply offset
-            distance = Math.max(distance, 0.2); // Min distance
+            let distance = maxSize / (2 * Math.tan(fovInRadians / 2)); // Calculate distance to fit object in FOV
+            distance *= fitOffset; // Apply user-defined offset
+            distance = Math.max(distance, 0.2); // Ensure a minimum distance
         
-            // Default camera direction relative to the object's center
-            const direction = new THREE.Vector3(0, 0.3, 1).normalize(); // Slightly elevated view
+            // Default camera direction relative to the object's center (slightly elevated view)
+            const direction = new THREE.Vector3(0, 0.3, 1).normalize(); 
             const targetCamPos = centerVec.clone().add(direction.multiplyScalar(distance));
         
+            // Adjust camera near/far planes based on new distance for better culling
             cam.near = Math.max(0.01, distance / 100);
-            cam.far = distance * 100;
+            cam.far = distance * 100; 
             cam.updateProjectionMatrix();
         
-            ctrl.maxDistance = distance * 10;
-            ctrl.minDistance = Math.max(0.01, distance * 0.1);
+            // Update OrbitControls limits
+            ctrl.maxDistance = distance * 10; // Allow zooming out further
+            ctrl.minDistance = Math.max(0.01, distance * 0.1); // Allow zooming in closer
         
             if (instant) {
+                ctrl.target.copy(centerVec); // Set controls target to object center
+                cam.position.copy(targetCamPos); // Move camera
+                cam.lookAt(centerVec); // Ensure camera looks at the target
+                ctrl.update(); // IMPORTANT: Update controls after changing camera/target
+            } else { // For smooth transition (not implemented here, direct set for now)
                 ctrl.target.copy(centerVec);
                 cam.position.copy(targetCamPos);
                 cam.lookAt(centerVec);
-                ctrl.update();
-            } else { // Smooth transition would go here
-                ctrl.target.copy(centerVec);
-                cam.position.copy(targetCamPos);
-                cam.lookAt(centerVec);
-                ctrl.update();
+                ctrl.update(); 
             }
         }
 
 
         function goToViewPreset(presetName, instant = false) {
-            if (isUpdatingViewPresetGUI || xrSession) return; // Don't change view in AR
+            if (isUpdatingViewPresetGUI || xrSession) return; // Don't change view in AR mode
             
             if (!modelContainerGroup || !camera || !controls || !model ) {
-                logToScreen("goToViewPreset: Komponen belum siap.", "warn");
+                logToScreen("goToViewPreset: Komponen (model/kamera/kontrol) belum siap.", "warn");
                 return;
             }
             
-            isUpdatingViewPresetGUI = true;
+            isUpdatingViewPresetGUI = true; // Flag to prevent GUI event recursion
         
             const targetCenter = new THREE.Vector3(0,0,0); // Model is centered in modelContainerGroup
-            // modelSize is already updated by applyModelScale based on current modelContainerGroup scale
+            // modelSize is updated by applyModelScale based on current modelContainerGroup scale
             const currentBox = new THREE.Box3().setFromObject(modelContainerGroup);
             currentBox.getSize(modelSize); // Ensure modelSize is current for this specific call
             
-            const maxDim = Math.max(modelSize.x, modelSize.y, modelSize.z, 0.1); 
-            const distanceFactor = 2.0; // Adjusted for better framing
+            const maxDim = Math.max(modelSize.x, modelSize.y, modelSize.z, 0.1); // Use a small minimum if size is zero
+            const distanceFactor = 2.0; // How far to place camera relative to model size
             let distance = maxDim * distanceFactor; 
-            distance = Math.max(distance, 0.2); 
+            distance = Math.max(distance, 0.2); // Ensure a minimum sensible distance
         
             let newCamPos = new THREE.Vector3();
-            camera.up.set(0,1,0); // Default up vector
+            camera.up.set(0,1,0); // Default camera up vector (Y-up)
         
-            // Corrected preset logic based on user request
+            // Corrected preset logic based on user request:
+            // "Kiri" button shows model's FRONT (camera at +Z)
+            // "Kanan" button shows model's BACK (camera at -Z)
+            // "Depan" button shows model's LEFT (camera at -X)
+            // "Belakang" button shows model's RIGHT (camera at +X)
             switch(presetName) {
-                case 'Kiri': // Shows model's FRONT (camera is at +Z)
+                case 'Kiri': // Shows model's FRONT (camera is at +Z in world space, looking towards -Z)
                     newCamPos.set(targetCenter.x, targetCenter.y, targetCenter.z + distance); break;
-                case 'Kanan': // Shows model's BACK (camera is at -Z)
+                case 'Kanan': // Shows model's BACK (camera is at -Z, looking towards +Z)
                     newCamPos.set(targetCenter.x, targetCenter.y, targetCenter.z - distance); break;
-                case 'Depan': // Shows model's LEFT (camera is at -X)
+                case 'Depan': // Shows model's LEFT (camera is at -X, looking towards +X)
                     newCamPos.set(targetCenter.x - distance, targetCenter.y, targetCenter.z); break;
-                case 'Belakang': // Shows model's RIGHT (camera is at +X)
+                case 'Belakang': // Shows model's RIGHT (camera is at +X, looking towards -X)
                     newCamPos.set(targetCenter.x + distance, targetCenter.y, targetCenter.z); break;
                 case 'Atas': 
-                    newCamPos.set(targetCenter.x, targetCenter.y + distance, targetCenter.z + 0.0001); // Small Z offset for lookAt
-                    camera.up.set(0,0,-1); // Pointing Z-down for "up" when looking from top
+                    newCamPos.set(targetCenter.x, targetCenter.y + distance, targetCenter.z + 0.0001); // Small Z offset for lookAt stability
+                    camera.up.set(0,0,-1); // When looking from top, camera's "up" is along world -Z
                     break;
                 case 'Bawah': 
                     newCamPos.set(targetCenter.x, targetCenter.y - distance, targetCenter.z + 0.0001);
-                    camera.up.set(0,0,1); // Pointing Z-up for "up" when looking from bottom
+                    camera.up.set(0,0,1); // When looking from bottom, camera's "up" is along world +Z
                     break;
                 case 'Default':
                 default:
+                    // Use frameArea for default view to ensure model is nicely framed
                     frameArea(modelContainerGroup, camera, controls, instant);
-                    params.selectedViewPreset = 'Default'; 
-                    if (gui) {
+                    params.selectedViewPreset = 'Default'; // Update param
+                    if (gui) { // Update GUI dropdown
                         const presetController = gui.controllersRecursive().find(c => c.property === 'selectedViewPreset');
                         if (presetController && presetController.getValue() !== 'Default') {
                             presetController.setValue('Default');
                         } else if (presetController) {
-                             presetController.updateDisplay();
+                             presetController.updateDisplay(); // Ensure GUI reflects current state
                         }
                     }
                     isUpdatingViewPresetGUI = false; 
-                    return; 
+                    return; // Exit after frameArea handles it
             }
             
+            // Apply new camera position and update controls
             if (instant) {
                 camera.position.copy(newCamPos);
-                controls.target.copy(targetCenter);
-                camera.lookAt(targetCenter); 
-                controls.update();
-            } else { // For now, direct set for simplicity
+                controls.target.copy(targetCenter); // Ensure target is correct
+                camera.lookAt(targetCenter); // Re-orient camera
+                controls.update(); // CRITICAL: Update OrbitControls internal state
+            } else { // For smooth transition (currently same as instant)
                 camera.position.copy(newCamPos);
                 controls.target.copy(targetCenter);
                 camera.lookAt(targetCenter);
                 controls.update();
             }
         
-            params.selectedViewPreset = presetName;
-            if (gui) { 
+            params.selectedViewPreset = presetName; // Update current preset param
+            if (gui) { // Update GUI dropdown
                 const presetController = gui.controllersRecursive().find(c => c.property === 'selectedViewPreset');
                 if (presetController && presetController.getValue() !== presetName) {
                     presetController.setValue(presetName); 
@@ -1006,12 +1088,12 @@
             const buttons = document.querySelectorAll('.preset-button');
             buttons.forEach(button => {
                 button.addEventListener('click', () => {
-                    if (xrSession) return; // Disable in AR
+                    if (xrSession) return; // Disable preset buttons in AR mode
                     const view = button.getAttribute('data-view');
-                    goToViewPreset(view, false); 
+                    goToViewPreset(view, false); // Apply selected view
                 });
-                // Add Tailwind classes for styling
-                button.classList.add('p-2.5', 'rounded-lg', 'bg-gray-700', 'hover:bg-gray-600', 'text-gray-200', 'transition-colors', 'focus:outline-none', 'focus:ring-2', 'focus:ring-blue-500', 'focus:ring-opacity-50');
+                // Apply Tailwind classes for consistent styling
+                button.classList.add('p-2', 'sm:p-2.5', 'rounded-lg', 'bg-gray-700', 'hover:bg-gray-600', 'text-gray-200', 'transition-colors', 'focus:outline-none', 'focus:ring-2', 'focus:ring-blue-500', 'focus:ring-opacity-50');
             });
         }
 
@@ -1035,42 +1117,48 @@
                     }
                 }
             });
+
+            // Listener for fullscreen change to toggle icon
              document.addEventListener('fullscreenchange', () => {
-                const icon = fullscreenButton.querySelector('svg');
                 if (document.fullscreenElement) {
-                    icon.innerHTML = '<path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 0-2-2h-3M3 16h3a2 2 0 0 0 2-2v-3"/>'; // Minimize icon
+                    fullscreenIconMaximize.classList.add('hidden');
+                    fullscreenIconMinimize.classList.remove('hidden');
                     fullscreenButton.title = "Keluar Layar Penuh";
                 } else {
-                    icon.innerHTML = '<path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/>'; // Maximize icon
+                    fullscreenIconMaximize.classList.remove('hidden');
+                    fullscreenIconMinimize.classList.add('hidden');
                     fullscreenButton.title = "Mode Layar Penuh";
                 }
             });
 
             // Reset Camera Button
             resetCameraButton.addEventListener('click', () => {
-                if (xrSession) return;
-                logToScreen("Mereset kamera dan model ke posisi awal.");
+                if (xrSession) return; // Don't reset in AR
+                logToScreen("Mereset kamera dan model ke posisi dan rotasi awal.");
+                // Reset relevant params to their defaults
                 params.initialRotationX_deg = 0.0;
                 params.initialRotationY_deg = 0.0;
                 params.initialRotationZ_deg = 0.0;
-                params.modelScale = 1.0;
-                if (gui) { // Update GUI if exists
+                params.modelScale = 1.0; // Default non-AR scale
+                if (gui) { // Update GUI controls if they exist
                     gui.controllersRecursive().find(c => c.property === 'initialRotationX_deg')?.setValue(0).updateDisplay();
                     gui.controllersRecursive().find(c => c.property === 'initialRotationY_deg')?.setValue(0).updateDisplay();
                     gui.controllersRecursive().find(c => c.property === 'initialRotationZ_deg')?.setValue(0).updateDisplay();
                     gui.controllersRecursive().find(c => c.property === 'modelScale')?.setValue(1.0).updateDisplay();
                 }
-                applyInitialRotation();
-                applyModelScale(); // This will also re-frame to default
-                goToViewPreset('Default', true);
+                applyInitialRotation(); // Apply reset rotation
+                applyModelScale();      // Apply reset scale (this will also call goToViewPreset('Default'))
+                // goToViewPreset('Default', true); // Explicitly go to default view after reset
             });
         }
 
 
         function setupGUI() {
-            if (gui) gui.destroy(); 
+            if (gui) gui.destroy(); // Destroy old GUI if exists
             gui = new GUI();
             gui.title("Kontrol Model 3D");
+            gui.close(); // Start with GUI closed by default for cleaner initial view
+
 
             const modelFolder = gui.addFolder('Model');
             modelFolder.add(params, 'modelPath').name('Path Model (.glb)').onFinishChange(value => {
@@ -1079,9 +1167,10 @@
             modelFolder.add(params, 'modelScale', 0.01, 10, 0.01).name('Skala (Non-AR)').onChange(applyModelScale);
             modelFolder.add(params, 'arModelScale', 0.01, 5.0, 0.005).name('Skala Model AR').onChange(value => {
                 params.arModelScale = value;
+                // If in AR and model is placed, update its scale directly
                 if (xrSession && modelPlaced && modelContainerGroup) { 
                     modelContainerGroup.scale.set(value, value, value);
-                } else if (xrSession && !modelPlaced && modelContainerGroup) {
+                } else if (xrSession && !modelPlaced && modelContainerGroup) { // Also update if in AR but not yet placed
                     modelContainerGroup.scale.set(value, value, value); 
                 }
             });
@@ -1090,31 +1179,31 @@
             modelFolder.add(params, 'initialRotationZ_deg', -360, 360, 1).name('Rotasi Awal Z').onChange(applyInitialRotation);
             modelFolder.add(params, 'animateModel').name('Animasi Putar (Non-AR)');
             modelFolder.add(params, 'rotationSpeed', 0, 1, 0.01).name('Kecepatan Putar');
-            // modelFolder.open(); // Closed by default for cleaner UI
+            modelFolder.close(); // Keep individual folders closed by default
 
             const backgroundFolder = gui.addFolder('Latar Belakang (Non-AR)');
             backgroundFolder.add(params, 'showSkybox').name('Tampilkan Skybox').onChange(updateBackgroundVisibility);
             backgroundFolder.add(params, 'skyboxGlbUrl').name('URL Skybox (.glb)').onFinishChange(loadSkyboxFromGLB);
             backgroundFolder.add(params, 'skyboxBrightness', 0, 5, 0.05).name('Kecerahan Skybox').onChange(() => {
-                if (skyboxObject) loadSkyboxFromGLB(); 
+                if (skyboxObject) loadSkyboxFromGLB(); // Reload skybox to apply brightness
             });
             backgroundFolder.addColor(params, 'backgroundColor').name('Warna Background').onChange(value => {
                 params.backgroundColor = value; updateBackgroundVisibility();
             });
-            // backgroundFolder.open();
+            backgroundFolder.close();
 
             const cameraFolder = gui.addFolder('Kamera & Tampilan (Non-AR)');
             cameraFolder.add(params, 'cameraFOV', 10, 120, 1).name('Field of View (FOV)')
                 .onChange(value => {
                     camera.fov = value; camera.updateProjectionMatrix();
-                    if (!xrSession) goToViewPreset(params.selectedViewPreset, true); 
+                    if (!xrSession) goToViewPreset(params.selectedViewPreset, true); // Re-frame with new FOV
                 });
             cameraFolder.add(params, 'selectedViewPreset', ['Default', 'Kiri', 'Kanan', 'Atas', 'Bawah', 'Depan', 'Belakang'])
                 .name('Preset Pandangan')
                 .onChange(value => { 
                     if (!isUpdatingViewPresetGUI && !xrSession) { goToViewPreset(value, false); }
                 }); 
-            // cameraFolder.open();
+            cameraFolder.close();
 
             const lightingFolder = gui.addFolder('Pencahayaan');
             lightingFolder.add(params, 'ambientLightIntensity', 0, 5, 0.05).name('Intensitas Ambient')
@@ -1123,26 +1212,29 @@
                 .onChange(value => { if(directionalLight) directionalLight.intensity = value; });
             lightingFolder.addColor(params, 'directionalLightColor').name('Warna Directional')
                 .onChange(value => { if(directionalLight) directionalLight.color.setHex(value); });
-            // lightingFolder.open();
+            lightingFolder.close();
 
             const renderingFolder = gui.addFolder('Rendering');
             renderingFolder.add(params, 'toneMappingExposure', 0, 2, 0.01).name('Exposure')
                 .onChange(value => { renderer.toneMappingExposure = value; });
-            // renderingFolder.open();
+            renderingFolder.close();
 
             const utilitiesFolder = gui.addFolder('Utilitas');
             utilitiesFolder.add({ takeScreenshot: takeScreenshot }, 'takeScreenshot').name('Ambil Screenshot (Non-AR)');
-            // utilitiesFolder.open();
+            utilitiesFolder.close();
         }
 
         function takeScreenshot() {
             try {
                 if (xrSession) {
                     logToScreen("Screenshot tidak didukung dalam mode AR.", "warn");
-                    alert("Screenshot tidak dapat diambil dalam mode AR.");
+                    showARInstructions('initial'); 
+                    arInstructionText.textContent = "Screenshot tidak dapat diambil saat dalam mode AR.";
+                    arActionButton.textContent = "Kembali ke AR";
+                    arActionButton.onclick = () => arInstructionsModal.classList.add('hidden');
                     return;
                 }
-                composer.render(); 
+                composer.render(); // Ensure scene is rendered before capturing
                 
                 const dataURL = renderer.domElement.toDataURL('image/png');
                 const a = document.createElement('a');
@@ -1154,34 +1246,45 @@
                 logToScreen("Screenshot diambil!");
             } catch (e) {
                 logToScreen(`Gagal mengambil screenshot: ${e.message}`, "error");
-                alert(`Gagal mengambil screenshot: ${e.message}`);
+                 showARInstructions('initial'); 
+                 arInstructionText.textContent = `Gagal mengambil screenshot: ${e.message}`;
+                 arActionButton.textContent = "OK";
+                 arActionButton.onclick = () => arInstructionsModal.classList.add('hidden');
             }
         }
 
         function onWindowResize() {
+            // Adjust layout for mobile viewport height changes (URL bar show/hide)
+            const vh = window.innerHeight * 0.01;
+            document.documentElement.style.setProperty('--vh', `${vh}px`);
+            
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
             renderer.setSize(window.innerWidth, window.innerHeight);
             composer.setSize(window.innerWidth, window.innerHeight);
-            if (model && !xrSession) { 
+            if (model && !xrSession) { // Re-frame camera on resize if model loaded and not in AR
                 goToViewPreset(params.selectedViewPreset, true);
             }
         }
+        // Call onWindowResize initially and on load to set --vh and handle initial size
+        window.addEventListener('load', onWindowResize);
+
 
         function animate(timestamp, frame) { 
-            const deltaTime = clock.getDelta();
+            const deltaTime = clock.getDelta(); // Get time since last frame
 
-            if (!xrSession) { 
-                controls.update(); 
-                if (modelContainerGroup && params.animateModel) {
+            if (!xrSession) { // Non-AR mode
+                controls.update(); // IMPORTANT: Update OrbitControls
+                if (modelContainerGroup && params.animateModel) { // Optional model auto-rotation
                     modelContainerGroup.rotation.y += params.rotationSpeed * deltaTime;
                 }
-                if (skyboxObject && skyboxObject.visible) {
+                if (skyboxObject && skyboxObject.visible) { // Keep skybox centered on camera
                     skyboxObject.position.copy(camera.position);
                 }
-                composer.render();
-            } else { // AR Mode
-                if (frame) {
+                composer.render(deltaTime); // Render scene with post-processing
+            } else { // AR mode
+                if (frame) { // If XR frame is available
+                    // Handle hit-testing for reticle placement
                     if (xrHitTestSource && !modelPlaced && reticleMesh) { 
                         const hitTestResults = frame.getHitTestResults(xrHitTestSource);
                         if (hitTestResults.length > 0) {
@@ -1192,36 +1295,36 @@
                                 if (pose) { 
                                     reticleMesh.matrix.fromArray(pose.transform.matrix);
                                     reticleMesh.visible = true; 
-                                    reticleDisplay.style.display = 'block'; // Show CSS reticle
+                                    reticleDisplay.style.display = 'block'; // Show CSS helper reticle
                                 } else {
                                     reticleMesh.visible = false;
                                     reticleDisplay.style.display = 'none';
                                 }
-                            } else {
+                            } else { // No valid reference space
                                 reticleMesh.visible = false;
                                 reticleDisplay.style.display = 'none';
                             }
-                        } else {
+                        } else { // No hit test results
                             reticleMesh.visible = false;
                             reticleDisplay.style.display = 'none';
                         }
-                    } else if (modelPlaced) {
+                    } else if (modelPlaced) { // If model is already placed, hide reticles
                          if(reticleMesh) reticleMesh.visible = false; 
                          if(reticleDisplay) reticleDisplay.style.display = 'none';
                     }
                 }
-                renderer.render(scene, camera); 
+                renderer.render(scene, camera); // Render AR scene (no composer in AR by default)
             }
         }
-        // --- Global error handler for uncaught exceptions ---
+        // Global error handlers for better debugging
         window.addEventListener('error', function(event) {
-            logToScreen(`ERROR TIDAK TERTANGKAP: ${event.message} di ${event.filename}:${event.lineno}`, 'error');
+            logToScreen(`ERROR SCRIPT: ${event.message} (${event.filename}:${event.lineno})`, 'error');
         });
         window.addEventListener('unhandledrejection', function(event) {
-            logToScreen(`PROMISE REJECTION TIDAK TERTANGKAP: ${event.reason}`, 'error');
+            logToScreen(`PROMISE REJECTION TIDAK TERHANDLE: ${event.reason}`, 'error');
         });
 
-        init();
+        init(); // Initialize the application
     </script>
 </body>
 </html>
