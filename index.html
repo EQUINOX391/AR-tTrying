@@ -89,6 +89,11 @@
         width: 70px; 
         height: 70px;
         box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        animation: pulse 2s infinite alternate; /* New animation */
+      }
+      @keyframes pulse {
+        0% { transform: scale(1); box-shadow: 0 4px 12px rgba(255, 215, 0, 0.2); }
+        100% { transform: scale(1.05); box-shadow: 0 8px 20px rgba(255, 215, 0, 0.4); }
       }
       #loading-overlay .logo-text { /* Formerly .logo, for the text part */
         font-size: 1.4rem; /* Adjusted size */
@@ -99,14 +104,29 @@
         border-radius: 12px;
         text-align: center;
         color: var(--text-primary);
+        display: flex;
+        flex-direction: column; /* Stack children vertically */
+        align-items: center; /* Center them horizontally */
+        gap: 5px; /* Small gap between the two lines of text */
+      }
+      #loading-overlay .logo-text .oleh-text {
+        font-size: 1.1rem; /* Slightly smaller for "OLEH" */
+        font-weight: 500;
+        color: var(--text-secondary); /* A bit subdued */
+      }
+      #loading-overlay .logo-text .name-text {
+        font-size: 1.5rem; /* Slightly larger for the name */
+        font-weight: 700;
+        color: var(--primary-color); /* Highlight the name with primary color */
       }
       #loading-overlay .spinner {
-        border: 5px solid rgba(255, 255, 255, 0.2); /* Slightly thinner border */
-        border-top: 5px solid var(--primary-color);
+        border: 6px solid rgba(255, 255, 255, 0.2); /* Slightly thicker border */
+        border-top: 6px solid var(--primary-color);
         border-radius: 50%;
-        width: 45px; /* Slightly smaller spinner */
-        height: 45px;
+        width: 50px; /* Slightly larger spinner */
+        height: 50px;
         animation: spin 1s linear infinite;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.3); /* Subtle shadow for spinner */
       }
       #loading-overlay .version-loading { /* Version text specific to loading screen */
         font-size: 0.9rem;
@@ -317,7 +337,11 @@
   <body>
     <div id="loading-overlay">
       <div class="loading-content">
-        <span class="material-icons-round logo-icon">palette</span> <div class="logo-text">OLEH FADHILLAH SUKMA ARINI</div>
+        <span class="material-icons-round logo-icon">3d_rotation</span>
+        <div class="logo-text">
+          <span class="oleh-text">OLEH</span>
+          <span class="name-text">FADHILLAH SUKMA ARINI</span>
+        </div>
       </div>
       <div class="spinner"></div>
       <div class="version-loading">Version 0.0.5</div>
@@ -375,7 +399,7 @@
       import { OrbitControls } from "three/addons/controls/OrbitControls.js";
       import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
       import { EffectComposer } from "three/addons/postprocessing/EffectComposer.js";
-      import { RenderPass } from "three/addons/postprocessing/RenderPass.js";
+      import { RenderPass } from "three/addons/postprocessing/RenderPass.1js";
       import { OutputPass } from "three/addons/postprocessing/OutputPass.js";
       import GUI from "lil-gui";
     
@@ -737,7 +761,7 @@
           }
         }
         // Reset camera to a default view if model exists
-        if (model) goToViewPreset(params.selectedViewPreset, true); 
+        if (model) goToViewPreset('Default', true); // Explicitly set to Default view
         updateBackgroundVisibility(); // Restore skybox/background color
       }
     
