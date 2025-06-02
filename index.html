@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>3D Model Viewer Sederhana dengan AR</title>
+    <style>
+        body { margin: 0; overflow: hidden; background-color: #111; color: #fff; font-family: 'Inter', sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; }
+        canvas { display: block; width: 100%; height: 100%; }
+        
+        #ar-button-container {
+            position: absolute;
+            top: 10px;
+            left: 10px; 
+            z-index: 1000;
+        }
+
+        #arButton {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            display: none; /* Sembunyikan awal, tampilkan jika AR didukung */
+            width: 52px; /* Lebar tombol persegi */
+            height: 52px; /* Tinggi tombol persegi */
+            font-size: 0.9em; /* Sesuaikan ukuran font untuk teks "AR" dan "Stop AR" */
+            font-weight: bold;
+            text-align: center;
+            /* Untuk memusatkan teks di dalam tombol persegi */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0; /* Hapus padding default jika ukuran diatur dengan width/height */
+            line-height: 1; /* Bantu pusatkan teks vertikal */
+        }
+        #arButton:hover {
+            background-color: #45a049;
+        }
+        #arButton.ar-active { /* Gaya berbeda saat AR aktif */
+            background-color: #f44336; /* Merah untuk tombol Stop */
+        }
+         #arButton.ar-active:hover {
+            background-color: #d32f2f;
+        }
+
+
+        #info {
+            position: absolute;
+            top: 10px;
+            /* Posisikan #info di sebelah kanan tombol AR */
+            left: calc(10px + 52px + 10px); /* margin kiri + lebar tombol AR + jarak */
+            width: auto;
+            /* Sesuaikan max-width agar tidak overlap dengan GUI */
+            max-width: calc(100% - (10px + 52px + 10px) - 220px - 20px); /* kiri + ARbtn + jarak + GUIwidth + margin kanan */
+            text-align: left;
+            z-index: 100;
+            display:block;
+            padding: 10px;
+            background-color: rgba(0,0,0,0.7);
+            border-radius: 8px;
+            font-size: 0.9em;
+        }
+        #loading-indicator {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 1.5em;
+            display: none;
+            background-color: rgba(0,0,0,0.8);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            z-index: 1001; 
+        }
+        :root {
+            --lil-gui-background-color: #1a1a1a;
+            --lil-gui-text-color: #ebebeb;
+            --lil-gui-title-background-color: #101010;
+            --lil-gui-title-text-color: #ebebeb;
+            --lil-gui-widget-color: #333333;
+            --lil-gui-hover-color: #444444;
+            --lil-gui-focus-color: #555555;
+            --lil-gui-number-color: #2cc9ff;
+            --lil-gui-string-color: #a2e952;
+        }
+        #preset-buttons-container {
+            position: absolute;
+            bottom: 20px; 
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 8px; 
+            z-index: 100;
+            padding: 8px;
+            background-color: rgba(0,0,0,0.6);
+            border-radius: 12px;
+            flex-wrap: wrap; 
+            justify-content: center;
+        }
+        .preset-button {
+            background-color: #333;
+            color: #fff;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85em;
+            transition: background-color 0.2s;
+        }
+        .preset-button:hover {
+            background-color: #555;
+        }
+        .preset-button:active {
+            background-color: #222;
+        }
+
+        .lil-gui.autoPlace {
+            top: 10px;
+            right: 10px;
+            max-height: calc(100vh - 80px); 
+            overflow-y: auto; 
+            z-index: 1000; 
+        }
+
+        #reticle { 
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            border: 2px solid white;
+            box-sizing: border-box;
+            display: none; 
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 99;
+        }
+
+    </style>
+    <script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+            "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/",
+            "lil-gui": "https://cdn.jsdelivr.net/npm/lil-gui@0.19.1/dist/lil-gui.esm.js"
+        }
+    }
+    </script>
+</head>
+<body>
+    <div id="info">
+        Menampilkan model 3D Ikan Cupang.<br>
+        Gunakan mouse untuk memutar dan zoom. Gunakan panel kontrol atau tombol di bawah untuk mengubah tampilan.
+    </div>
+    <div id="loading-indicator">Memuat Model...</div>
+    <div id="preset-buttons-container">
+        <button class="preset-button" data-view="Default">Default</button>
+        <button class="preset-button" data-view="Front">Depan</button>
+        <button class="preset-button" data-view="Back">Belakang</button>
+        <button class="preset-button" data-view="Top">Atas</button>
+        <button class="preset-button" data-view="Bottom">Bawah</button>
+        <button class="preset-button" data-view="Left">Kiri</button>
+        <button class="preset-button" data-view="Right">Kanan</button>
+    </div>
+    <div id="ar-button-container">
+        <button id="arButton">AR</button> </div>
+    <div id="reticle"></div> 
+    <script type="module">
+        import * as THREE from 'three';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+        import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+        import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+        import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+        import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+        import GUI from 'lil-gui';
+
+        let scene, camera, renderer, controls, composer, gui;
+        let model, modelContainerGroup, ambientLight, directionalLight;
+        let clock;
+        const loadingIndicator = document.getElementById('loading-indicator');
+        
+        let skyboxObject = null;
+        const modelCenter = new THREE.Vector3(); 
+        const modelSize = new THREE.Vector3(); 
+
+        let xrSession = null;
+        let xrRefSpace = null;
+        let xrHitTestSource = null;
+        let reticleMesh; 
+        let modelPlaced = false; 
+
+        let isUpdatingViewPresetGUI = false;
+
+        const params = {
+            modelPath: 'Cupang.glb', 
+            skyboxGlbUrl: 'inside_galaxy_skybox_hdri_360_panorama.glb', 
+            toneMappingExposure: 1.0,
+            ambientLightIntensity: 2.0, 
+            directionalLightIntensity: 2.5, 
+            directionalLightColor: 0xffffff,
+            initialRotationX_deg: 0.0,
+            initialRotationY_deg: 0.0,
+            initialRotationZ_deg: 0.0,
+            animateModel: false,
+            rotationSpeed: 0.1,
+            selectedViewPreset: 'Default',
+            cameraFOV: 50, 
+            modelScale: 1.0, 
+            skyboxBrightness: 1.0,
+            backgroundColor: '#4682B4', 
+            showSkybox: true,
+        };
+
+        function init() {
+            if (loadingIndicator) loadingIndicator.style.display = 'block';
+            clock = new THREE.Clock();
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(params.backgroundColor);
+            
+            camera = new THREE.PerspectiveCamera(params.cameraFOV, window.innerWidth / window.innerHeight, 0.01, 10000); 
+            camera.position.set(0, 0.5, 3); 
+
+            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(window.devicePixelRatio);
+            renderer.toneMapping = THREE.ACESFilmicToneMapping;
+            renderer.toneMappingExposure = params.toneMappingExposure;
+            renderer.outputColorSpace = THREE.SRGBColorSpace;
+            renderer.xr.enabled = true; 
+            document.body.appendChild(renderer.domElement);
+
+            controls = new OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            controls.dampingFactor = 0.05;
+            controls.minDistance = 0.01; 
+            controls.maxDistance = 5000; 
+            controls.target.set(0, 0, 0); 
+
+            ambientLight = new THREE.AmbientLight(0xffffff, params.ambientLightIntensity);
+            scene.add(ambientLight);
+
+            directionalLight = new THREE.DirectionalLight(params.directionalLightColor, params.directionalLightIntensity);
+            directionalLight.position.set(1, 1, 1).normalize(); 
+            scene.add(directionalLight);
+            
+            modelContainerGroup = new THREE.Group();
+            scene.add(modelContainerGroup);
+
+            const arButtonElement = document.getElementById('arButton');
+            if (navigator.xr) {
+                navigator.xr.isSessionSupported('immersive-ar')
+                    .then((supported) => {
+                        arButtonElement.style.display = 'flex'; // Ubah ke flex untuk centering
+                        if (supported) {
+                            arButtonElement.addEventListener('click', onARButtonClick);
+                            arButtonElement.disabled = false;
+                            arButtonElement.textContent = "AR"; // Set teks awal
+                        } else {
+                            arButtonElement.textContent = "No AR"; // Teks lebih pendek jika tidak didukung
+                            arButtonElement.disabled = true;       
+                        }
+                    })
+                    .catch((err) => { 
+                         console.error("Error cek dukungan AR:", err);
+                         arButtonElement.style.display = 'flex';
+                         arButtonElement.textContent = "Err"; 
+                         arButtonElement.disabled = true;
+                    });
+            } else {
+                 arButtonElement.style.display = 'flex';
+                 arButtonElement.textContent = "No XR";
+                 arButtonElement.disabled = true;       
+            }
+
+            reticleMesh = new THREE.Mesh(
+                new THREE.RingGeometry(0.03, 0.04, 32).rotateX(-Math.PI / 2), 
+                new THREE.MeshBasicMaterial({ color: 0xffffff, opacity:0.7, transparent:true })
+            );
+            reticleMesh.matrixAutoUpdate = false;
+            reticleMesh.visible = false;
+            scene.add(reticleMesh);
+
+            if (params.skyboxGlbUrl && params.skyboxGlbUrl !== 'SKYBOX_ANDA.glb' && !params.skyboxGlbUrl.includes('placehold.co')) {
+                loadSkyboxFromGLB();
+            } else {
+                console.warn("Path Skybox GLB tidak valid atau menggunakan placeholder, skybox tidak akan dimuat secara otomatis.");
+            }
+            updateBackgroundVisibility();
+
+            loadMainModel(); 
+
+            composer = new EffectComposer(renderer);
+            const renderPass = new RenderPass(scene, camera);
+            composer.addPass(renderPass);
+            const outputPass = new OutputPass();
+            composer.addPass(outputPass);
+
+            setupGUI();
+            setupPresetButtons(); 
+            window.addEventListener('resize', onWindowResize, false);
+            
+            renderer.domElement.addEventListener('click', onSelectAR);
+            renderer.setAnimationLoop(animate); 
+        }
+        
+        function onARButtonClick() {
+            const arButtonElement = document.getElementById('arButton');
+            if (!xrSession) {
+                navigator.xr.requestSession('immersive-ar', { 
+                    requiredFeatures: ['hit-test'], // dom-overlay bisa opsional dan kadang menyebabkan masalah jika tidak di-handle dengan baik
+                    // optionalFeatures: ['dom-overlay'], 
+                    // domOverlay: { root: document.body } 
+                }).then(onSessionStarted)
+                  .catch(err => {
+                      console.error("Gagal memulai sesi AR:", err);
+                      alert("Gagal memulai sesi AR. Pastikan perangkat & browser mendukung, dan izin kamera diberikan.");
+                      arButtonElement.textContent = "AR Fail"; // Tunjukkan error di tombol
+                  });
+            } else {
+                xrSession.end();
+            }
+        }
+
+        function onSessionStarted(session) {
+            xrSession = session;
+            const arButtonElement = document.getElementById('arButton');
+            arButtonElement.textContent = 'Stop'; // Teks lebih pendek untuk tombol Stop
+            arButtonElement.classList.add('ar-active');
+
+            document.getElementById('preset-buttons-container').style.display = 'none'; 
+            if(gui) gui.hide(); 
+            if(skyboxObject) skyboxObject.visible = false; 
+            scene.background = null; 
+
+            xrRefSpace = null; 
+            xrHitTestSource = null; 
+            modelPlaced = false; 
+            if(modelContainerGroup) {
+                modelContainerGroup.visible = false; // Sembunyikan model sampai ditempatkan
+                // Simpan skala asli sebelum masuk AR
+                modelContainerGroup.userData.originalScale = modelContainerGroup.scale.clone();
+            }
+            reticleMesh.visible = true; 
+
+            session.addEventListener('end', onSessionEnded);
+            
+            renderer.xr.setReferenceSpaceType('local'); 
+            renderer.xr.setSession(session)
+                .then(() => {
+                    return session.requestReferenceSpace('viewer');
+                })
+                .then((refSpaceViewer) => {
+                    return session.requestHitTestSource({ space: refSpaceViewer });
+                })
+                .then((source) => {
+                    xrHitTestSource = source;
+                })
+                .catch(err => {
+                    console.error("Error selama setup sesi AR (ref space atau hit test):", err);
+                    session.end().catch(e => console.error("Error mengakhiri sesi setelah setup gagal:", e));
+                    alert("Terjadi masalah saat menyiapkan AR. Silakan coba lagi.");
+                });
+        }
+
+        function onSessionEnded() {
+            xrSession = null;
+            const arButtonElement = document.getElementById('arButton');
+            arButtonElement.textContent = 'AR';
+            arButtonElement.classList.remove('ar-active');
+
+            document.getElementById('preset-buttons-container').style.display = 'flex'; 
+            if(gui) gui.show(); 
+            reticleMesh.visible = false;
+            if(modelContainerGroup) {
+                modelContainerGroup.visible = true; 
+                // Kembalikan skala asli
+                if (modelContainerGroup.userData.originalScale) {
+                    modelContainerGroup.scale.copy(modelContainerGroup.userData.originalScale);
+                } else {
+                    modelContainerGroup.scale.set(params.modelScale, params.modelScale, params.modelScale);
+                }
+            }
+            if(model) goToViewPreset(params.selectedViewPreset, true); 
+            updateBackgroundVisibility(); 
+        }
+        
+        function onSelectAR(event) {
+            if (xrSession && reticleMesh.visible && !modelPlaced) {
+                if (modelContainerGroup && model) { 
+                    modelContainerGroup.position.setFromMatrixPosition(reticleMesh.matrix);
+                    // Untuk orientasi, biarkan default agar menghadap pengguna, atau sesuaikan jika perlu
+                    // modelContainerGroup.quaternion.setFromRotationMatrix(reticleMesh.matrix); 
+                    
+                    // Skala model untuk AR
+                    const arScale = params.modelScale * 0.1; // Skala relatif terhadap skala utama, atau nilai absolut
+                    modelContainerGroup.scale.set(arScale, arScale, arScale); 
+                    modelContainerGroup.visible = true;
+                    modelPlaced = true;
+                    reticleMesh.visible = false; 
+
+                    if (xrHitTestSource) {
+                        // xrHitTestSource.cancel(); // Tidak semua implementasi mendukung cancel(), bisa menyebabkan error
+                        // Cukup set ke null agar tidak digunakan lagi di animate loop
+                        xrHitTestSource = null; 
+                    }
+                }
+            }
+        }
+
+        function loadMainModel() {
+            if (loadingIndicator) {
+                loadingIndicator.style.display = 'block';
+                loadingIndicator.textContent = 'Memuat Model...';
+                loadingIndicator.style.color = '#fff';
+            }
+
+            if (model) {
+                modelContainerGroup.remove(model);
+                model.traverse(node => {
+                    if (node.geometry) node.geometry.dispose();
+                    if (node.material) {
+                        if (Array.isArray(node.material)) node.material.forEach(mat => mat.dispose());
+                        else node.material.dispose();
+                    }
+                });
+                model = null;
+            }
+            modelCenter.set(0,0,0);
+            modelSize.set(0,0,0);
+            modelContainerGroup.position.set(0,0,0);
+            modelContainerGroup.rotation.set(0,0,0);
+
+            const mainModelLoader = new GLTFLoader();
+            mainModelLoader.load(params.modelPath, function (gltf) {
+                model = gltf.scene;
+                modelContainerGroup.add(model);
+                
+                const box = new THREE.Box3().setFromObject(modelContainerGroup);
+                box.getCenter(modelCenter);
+                box.getSize(modelSize);
+                
+                modelContainerGroup.position.sub(modelCenter); 
+                modelCenter.set(0,0,0); 
+
+                applyInitialRotation();
+                applyModelScale(); 
+                updateMaterialProperties(); 
+                
+                console.log("Model GLB utama berhasil dimuat:", model);
+                if (loadingIndicator) loadingIndicator.style.display = 'none';
+                
+            }, 
+            function (xhr) { 
+                if (xhr.lengthComputable) {
+                    const percentComplete = xhr.loaded / xhr.total * 100;
+                    if (loadingIndicator) loadingIndicator.textContent = `Memuat Model: ${Math.round(percentComplete, 2)}%`;
+                } else {
+                    if (loadingIndicator) loadingIndicator.textContent = `Memuat Model... (${(xhr.loaded / 1024 / 1024).toFixed(2)} MB)`;
+                }
+            },
+            function (error) { 
+                console.error(`Gagal memuat model GLB utama dari path: ${params.modelPath}`, error);
+                if (loadingIndicator) {
+                    loadingIndicator.innerHTML = `Gagal memuat model.<br>Pastikan file "${params.modelPath}" ada di direktori yang sama atau path URL benar.`;
+                    loadingIndicator.style.color = 'red';
+                }
+            });
+        }
+
+        function applyModelScale() {
+            if (modelContainerGroup) {
+                const scale = xrSession ? (params.modelScale * 0.1) : params.modelScale; 
+                modelContainerGroup.scale.set(scale, scale, scale);
+                
+                if (model && !xrSession) { 
+                    const box = new THREE.Box3().setFromObject(modelContainerGroup);
+                    box.getSize(modelSize); 
+                    goToViewPreset(params.selectedViewPreset, true); 
+                }
+            }
+        }
+        
+        function loadSkyboxFromGLB() {
+             if (!params.skyboxGlbUrl || params.skyboxGlbUrl === 'SKYBOX_ANDA.glb' || params.skyboxGlbUrl.includes('placehold.co')) {
+                console.warn("URL Skybox GLB tidak valid atau placeholder. Skybox tidak akan dimuat.");
+                if (skyboxObject) {
+                    scene.remove(skyboxObject);
+                    skyboxObject.traverse(node => {
+                        if (node.geometry) node.geometry.dispose();
+                        if (node.material) {
+                            if (Array.isArray(node.material)) node.material.forEach(mat => mat.dispose());
+                            else node.material.dispose();
+                        }
+                    });
+                    skyboxObject = null;
+                }
+                updateBackgroundVisibility();
+                return;
+            }
+
+            const loader = new GLTFLoader();
+            loader.load(params.skyboxGlbUrl,
+                (gltf) => {
+                    if (skyboxObject) { 
+                        scene.remove(skyboxObject);
+                         skyboxObject.traverse(node => {
+                            if (node.geometry) node.geometry.dispose();
+                            if (node.material) {
+                                if (Array.isArray(node.material)) node.material.forEach(mat => mat.dispose());
+                                else node.material.dispose();
+                            }
+                        });
+                    }
+                    skyboxObject = gltf.scene;
+                    skyboxObject.traverse(node => {
+                        if (node.isMesh) {
+                            const materials = Array.isArray(node.material) ? node.material : [node.material];
+                            materials.forEach(material => {
+                                material.side = THREE.BackSide;
+                                if (material.isMeshStandardMaterial || material.isMeshPhysicalMaterial) {
+                                    if (material.userData.initialEmissiveIntensityGLB === undefined) {
+                                        material.userData.initialEmissiveIntensityGLB = material.emissiveIntensity;
+                                    }
+                                    material.emissiveIntensity = material.userData.initialEmissiveIntensityGLB * params.skyboxBrightness;
+                                   
+                                    if (!material.emissiveMap) {
+                                        if (material.userData.initialEmissiveColorGLB === undefined) {
+                                            material.userData.initialEmissiveColorGLB = material.emissive.clone();
+                                        }
+                                        material.emissive.copy(material.userData.initialEmissiveColorGLB).multiplyScalar(params.skyboxBrightness);
+                                    }
+                                } else if (material.isMeshBasicMaterial) {
+                                    if (material.userData.initialColorGLB === undefined) {
+                                        material.userData.initialColorGLB = material.color.clone();
+                                    }
+                                    material.color.copy(material.userData.initialColorGLB).multiplyScalar(params.skyboxBrightness);
+                                }
+                                material.needsUpdate = true;
+                            });
+                        }
+                    });
+                    const skyboxScale = Math.max(camera.far * 0.5, 1000); 
+                    skyboxObject.scale.set(skyboxScale, skyboxScale, skyboxScale);
+                    skyboxObject.renderOrder = -10; 
+                    scene.add(skyboxObject);
+                    updateBackgroundVisibility();
+                    console.log("Skybox GLB berhasil dimuat.");
+                },
+                undefined, 
+                (error) => {
+                    console.error(`Gagal memuat Skybox GLB dari path: ${params.skyboxGlbUrl}`, error);
+                    if (skyboxObject) {
+                        scene.remove(skyboxObject);
+                        skyboxObject = null;
+                    }
+                    updateBackgroundVisibility();
+                }
+            );
+        }
+
+        function updateBackgroundVisibility() {
+             if (skyboxObject) {
+                skyboxObject.visible = params.showSkybox && !xrSession; 
+            }
+            if (params.showSkybox && skyboxObject && skyboxObject.children.length > 0 && !xrSession) { 
+                 scene.background = null; 
+            } else if (!xrSession) { 
+                scene.background = new THREE.Color(params.backgroundColor); 
+            } else {
+                scene.background = null; 
+            }
+        }
+
+        function applyInitialRotation() {
+             if (modelContainerGroup) {
+                modelContainerGroup.rotation.set(
+                    THREE.MathUtils.degToRad(params.initialRotationX_deg),
+                    THREE.MathUtils.degToRad(params.initialRotationY_deg),
+                    THREE.MathUtils.degToRad(params.initialRotationZ_deg)
+                );
+            }
+        }
+        
+        function updateMaterialProperties() {
+            if (!model) return;
+            model.traverse(node => {
+                if (node.isMesh && node.material) {
+                    const materials = Array.isArray(node.material) ? node.material : [node.material];
+                    materials.forEach(mat => {
+                        // mat.side = THREE.DoubleSide; 
+                    });
+                }
+            });
+        }
+
+        function frameArea(objectToFrame, cam, ctrl, instant = false, fitOffset = 1.5) {
+             if (!objectToFrame || !model) { 
+                console.warn("frameArea: Objek model tidak valid atau belum dimuat.");
+                if (instant) {
+                    ctrl.target.set(0,0,0);
+                    cam.position.set(0,0.5,3); 
+                    ctrl.update();
+                }
+                return;
+            }
+        
+            const box = new THREE.Box3().setFromObject(objectToFrame);
+            const sizeVec = box.getSize(new THREE.Vector3());
+            const centerVec = new THREE.Vector3(0,0,0); 
+
+            if (sizeVec.lengthSq() === 0) { 
+                 console.warn("frameArea: Ukuran objek adalah nol.");
+                if (instant) {
+                    ctrl.target.copy(centerVec); 
+                    cam.position.set(centerVec.x, centerVec.y + 0.5, centerVec.z + 3); 
+                    ctrl.update();
+                }
+                return;
+            }
+
+            const maxSize = Math.max(sizeVec.x, sizeVec.y, sizeVec.z);
+            const fitHeightDistance = maxSize / (2 * Math.atan(Math.PI * cam.fov / 360));
+            const fitWidthDistance = fitHeightDistance / cam.aspect;
+            let distance = fitOffset * Math.max(fitHeightDistance, fitWidthDistance);
+            distance = Math.max(distance, 0.1); 
+
+            const direction = new THREE.Vector3(0, 0.25, 1).normalize(); 
+            
+            const targetCamPos = centerVec.clone().add(direction.multiplyScalar(distance));
+            
+            cam.near = Math.max(0.01, distance / 100);
+            cam.far = distance * 100; 
+            cam.updateProjectionMatrix();
+
+            ctrl.maxDistance = distance * 10;
+            ctrl.minDistance = Math.min(0.01, distance * 0.1);
+
+            if (instant) {
+                ctrl.target.copy(centerVec);
+                cam.position.copy(targetCamPos);
+                cam.lookAt(centerVec);
+                ctrl.update();
+            } else {
+                ctrl.target.copy(centerVec);
+                cam.position.copy(targetCamPos);
+                cam.lookAt(centerVec);
+                ctrl.update(); 
+            }
+        }
+
+        function goToViewPreset(presetName, instant = false) {
+            if (isUpdatingViewPresetGUI) return; 
+            
+            if (!modelContainerGroup || !camera || !controls || !model ) { 
+                console.warn("goToViewPreset: Komponen belum siap.");
+                return;
+            }
+            
+            isUpdatingViewPresetGUI = true;
+
+            const center = new THREE.Vector3(0,0,0); 
+            const currentBox = new THREE.Box3().setFromObject(modelContainerGroup); 
+            currentBox.getSize(modelSize);
+
+            const maxDim = Math.max(modelSize.x, modelSize.y, modelSize.z, 0.1); 
+            const distanceFactor = 1.8; 
+            let distance = maxDim * distanceFactor; 
+            distance = Math.max(distance, 0.2);
+
+            let newCamPos = new THREE.Vector3();
+            camera.up.set(0,1,0); 
+
+            switch(presetName) {
+                case 'Front': newCamPos.set(center.x, center.y, center.z + distance); break;
+                case 'Back': newCamPos.set(center.x, center.y, center.z - distance); break;
+                case 'Top': newCamPos.set(center.x, center.y + distance, center.z + 0.0001); camera.up.set(0,0,-1); break;
+                case 'Bottom': newCamPos.set(center.x, center.y - distance, center.z + 0.0001); camera.up.set(0,0,1); break;
+                case 'Left': newCamPos.set(center.x - distance, center.y, center.z); break;
+                case 'Right': newCamPos.set(center.x + distance, center.y, center.z); break;
+                case 'Default': 
+                default:
+                    frameArea(modelContainerGroup, camera, controls, instant);
+                    params.selectedViewPreset = 'Default'; 
+                     if (gui) { 
+                        const presetController = gui.controllersRecursive().find(c => c.property === 'selectedViewPreset');
+                        if (presetController && presetController.getValue() !== 'Default') {
+                             presetController.setValue('Default');
+                        } else if (presetController) {
+                            presetController.updateDisplay();
+                        }
+                    }
+                    isUpdatingViewPresetGUI = false; 
+                    return; 
+            }
+            
+            if (instant) {
+                camera.position.copy(newCamPos);
+                controls.target.copy(center);
+                camera.lookAt(center); 
+                controls.update();
+            } else {
+                camera.position.copy(newCamPos);
+                controls.target.copy(center);
+                camera.lookAt(center);
+                controls.update();
+            }
+
+            params.selectedViewPreset = presetName;
+            if (gui) { 
+                const presetController = gui.controllersRecursive().find(c => c.property === 'selectedViewPreset');
+                if (presetController && presetController.getValue() !== presetName) {
+                    presetController.setValue(presetName); 
+                } else if (presetController) {
+                    presetController.updateDisplay();
+                }
+            }
+            isUpdatingViewPresetGUI = false; 
+        }
+
+        function setupPresetButtons() {
+             const buttons = document.querySelectorAll('.preset-button');
+            buttons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const view = button.getAttribute('data-view');
+                    goToViewPreset(view, false); 
+                });
+            });
+        }
+
+        function setupGUI() {
+             if (gui) gui.destroy(); 
+            gui = new GUI();
+            gui.title("Kontrol Model 3D");
+
+            const modelFolder = gui.addFolder('Model');
+            modelFolder.add(params, 'modelPath').name('Path Model (.glb)').onFinishChange(value => {
+                params.modelPath = value;
+                loadMainModel(); 
+            });
+            modelFolder.add(params, 'modelScale', 0.01, 10, 0.01).name('Skala Model').onChange(applyModelScale);
+            modelFolder.add(params, 'initialRotationX_deg', -360, 360, 1).name('Rotasi Awal X').onChange(applyInitialRotation);
+            modelFolder.add(params, 'initialRotationY_deg', -360, 360, 1).name('Rotasi Awal Y').onChange(applyInitialRotation);
+            modelFolder.add(params, 'initialRotationZ_deg', -360, 360, 1).name('Rotasi Awal Z').onChange(applyInitialRotation);
+            modelFolder.add(params, 'animateModel').name('Animasi Putar');
+            modelFolder.add(params, 'rotationSpeed', 0, 1, 0.01).name('Kecepatan Putar');
+            modelFolder.open();
+
+            const backgroundFolder = gui.addFolder('Latar Belakang');
+            backgroundFolder.add(params, 'showSkybox').name('Tampilkan Skybox').onChange(updateBackgroundVisibility);
+            backgroundFolder.add(params, 'skyboxGlbUrl').name('URL Skybox (.glb)').onFinishChange(loadSkyboxFromGLB);
+            backgroundFolder.add(params, 'skyboxBrightness', 0, 5, 0.05).name('Kecerahan Skybox').onChange(() => {
+                if (skyboxObject) loadSkyboxFromGLB(); 
+            });
+            backgroundFolder.addColor(params, 'backgroundColor').name('Warna Background').onChange(value => {
+                params.backgroundColor = value;
+                updateBackgroundVisibility();
+            });
+            backgroundFolder.open();
+
+            const cameraFolder = gui.addFolder('Kamera & Tampilan');
+            cameraFolder.add(params, 'cameraFOV', 10, 120, 1).name('Field of View (FOV)')
+                .onChange(value => {
+                    camera.fov = value;
+                    camera.updateProjectionMatrix();
+                    if (!xrSession) goToViewPreset(params.selectedViewPreset, true); 
+                });
+            cameraFolder.add(params, 'selectedViewPreset', ['Default', 'Front', 'Back', 'Top', 'Bottom', 'Left', 'Right'])
+                .name('Preset Pandangan')
+                .onChange(value => { 
+                    if (!isUpdatingViewPresetGUI) { 
+                        goToViewPreset(value, false); 
+                    }
+                }); 
+            cameraFolder.open();
+
+            const lightingFolder = gui.addFolder('Pencahayaan');
+            lightingFolder.add(params, 'ambientLightIntensity', 0, 5, 0.05).name('Intensitas Ambient')
+                .onChange(value => { if(ambientLight) ambientLight.intensity = value; });
+            lightingFolder.add(params, 'directionalLightIntensity', 0, 5, 0.05).name('Intensitas Directional')
+                .onChange(value => { if(directionalLight) directionalLight.intensity = value; });
+            lightingFolder.addColor(params, 'directionalLightColor').name('Warna Directional')
+                .onChange(value => { if(directionalLight) directionalLight.color.setHex(value); });
+            lightingFolder.open();
+
+            const renderingFolder = gui.addFolder('Rendering');
+            renderingFolder.add(params, 'toneMappingExposure', 0, 2, 0.01).name('Exposure')
+                .onChange(value => { renderer.toneMappingExposure = value; });
+            renderingFolder.open();
+
+            const utilitiesFolder = gui.addFolder('Utilitas');
+            utilitiesFolder.add({ takeScreenshot: takeScreenshot }, 'takeScreenshot').name('Ambil Screenshot');
+            utilitiesFolder.open();
+        }
+
+        function takeScreenshot() {
+             try {
+                composer.render(); 
+                
+                const dataURL = renderer.domElement.toDataURL('image/png');
+                const a = document.createElement('a');
+                a.href = dataURL;
+                a.download = `model_view_${Date.now()}.png`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                console.log("Screenshot diambil!");
+            } catch (e) {
+                console.error("Gagal mengambil screenshot:", e);
+                const infoDiv = document.getElementById('info');
+                if (infoDiv) { 
+                    const errorMsg = document.createElement('p');
+                    errorMsg.textContent = "Gagal mengambil screenshot. Lihat konsol.";
+                    errorMsg.style.color = "red";
+                    infoDiv.appendChild(errorMsg);
+                    setTimeout(() => { if(infoDiv.contains(errorMsg)) infoDiv.removeChild(errorMsg);}, 3000);
+                }
+            }
+        }
+
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            composer.setSize(window.innerWidth, window.innerHeight);
+            if (model && !xrSession) { 
+                 goToViewPreset(params.selectedViewPreset, true);
+            }
+        }
+
+        function animate(timestamp, frame) { 
+            const deltaTime = clock.getDelta();
+
+            if (!xrSession) { 
+                controls.update(); 
+                if (modelContainerGroup && params.animateModel) {
+                    modelContainerGroup.rotation.y += params.rotationSpeed * deltaTime;
+                }
+                if (skyboxObject && skyboxObject.visible) {
+                    skyboxObject.position.copy(camera.position);
+                }
+                composer.render();
+            } else { 
+                if (frame && xrHitTestSource) { 
+                    const hitTestResults = frame.getHitTestResults(xrHitTestSource);
+                    if (hitTestResults.length > 0) {
+                        const hit = hitTestResults[0];
+                        const currentRefSpace = renderer.xr.getReferenceSpace(); 
+                        if (currentRefSpace) {
+                            const pose = hit.getPose(currentRefSpace);
+                            if (pose) { 
+                                reticleMesh.matrix.fromArray(pose.transform.matrix);
+                                reticleMesh.visible = !modelPlaced; 
+                            } else {
+                                reticleMesh.visible = false;
+                            }
+                        } else {
+                             reticleMesh.visible = false;
+                        }
+                    } else {
+                        reticleMesh.visible = false;
+                    }
+                } else if (frame && !xrHitTestSource && !modelPlaced) { 
+                    reticleMesh.visible = true; 
+                    const camWorldPos = new THREE.Vector3();
+                    const camWorldDir = new THREE.Vector3();
+                    camera.getWorldPosition(camWorldPos);
+                    camera.getWorldDirection(camWorldDir);
+                    reticleMesh.position.copy(camWorldPos).add(camWorldDir.multiplyScalar(0.5)); 
+                    reticleMesh.quaternion.setFromRotationMatrix(camera.matrixWorld);
+                    reticleMesh.rotation.x = -Math.PI / 2; 
+                    reticleMesh.updateMatrix();
+
+                } else if (modelPlaced) { // Jika model sudah ditempatkan, sembunyikan reticle
+                     reticleMesh.visible = false;
+                }
+                renderer.render(scene, camera); 
+            }
+        }
+
+        init();
+    </script>
+</body>
+</html>
