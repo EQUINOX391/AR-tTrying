@@ -235,7 +235,7 @@
         bottom: 0;
         left: 0;
         right: 0;
-        background: var(--surface-dark);
+        background: rgba(255, 255, 255, 0.15); /* Lighter translucent background */
         backdrop-filter: blur(10px);
         padding: var(--spacing-unit) var(--spacing-unit) calc(var(--spacing-unit) + var(--safe-area-inset-bottom)); /* Adjusted padding for safe area */
         display: flex;
@@ -243,8 +243,8 @@
         align-items: center; /* Align items if they wrap */
         gap: calc(var(--spacing-unit) * 0.75); /* Reduced gap for compactness */
         z-index: 1000;
-        border-top-left-radius: 16px; /* Softer radius */
-        border-top-right-radius: 16px;
+        border-top-left-radius: 0; /* Removed top-left radius */
+        border-top-right-radius: 0; /* Removed top-right radius */
         box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.2);
         flex-wrap: wrap; /* Allow buttons to wrap on small screens */
       }
@@ -254,7 +254,7 @@
         align-items: center;
         gap: 3px; /* Reduced gap between icon and text */
         padding: calc(var(--spacing-unit) * 0.75) calc(var(--spacing-unit)); /* More compact padding */
-        border-radius: 10px; /* Slightly smaller radius */
+        border-radius: 4px; /* Slightly rounded rectangle */
         border: none;
         background: var(--surface-light);
         color: var(--text-primary);
@@ -322,9 +322,43 @@
         border-radius: 6px;
         z-index: 1001; /* Above AR button container if they were to overlap */
       }
+
+      /* New GUI toggle button styling */
+      #gui-toggle-container {
+          position: fixed;
+          top: calc(var(--spacing-unit) * 2.5); /* Align with AR button's top */
+          right: calc(var(--spacing-unit) * 9); /* Position to the left of AR button */
+          z-index: 1001;
+      }
+
+      #guiToggleButton {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 48px;
+          height: 48px;
+          background: var(--surface-dark);
+          border: none;
+          border-radius: 50%; /* Circular button */
+          color: var(--text-primary);
+          cursor: pointer;
+          transition: all 0.2s ease;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      }
+
+      #guiToggleButton:hover {
+          background: rgba(255, 255, 255, 0.15);
+          transform: translateY(-2px);
+          box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+      }
+
+      #guiToggleButton .material-icons-round {
+          font-size: 1.5rem;
+      }
     
       /* lil-gui (Controls Panel) Overrides - Retained for consistency */
       .lil-gui {
+        /* lil-gui manages its own display, so remove 'display: none;' from here */
         --background-color: var(--surface-dark) !important;
         --text-color: var(--text-primary) !important;
         --title-background-color: rgba(0, 0, 0, 0.3) !important;
@@ -378,6 +412,12 @@
     
     <div id="app-version">APP VERSI 0.0.5</div>
     
+    <div id="gui-toggle-container">
+        <button id="guiToggleButton">
+            <span class="material-icons-round">tune</span>
+        </button>
+    </div>
+
     <div class="bottom-nav">
       <button class="view-btn" data-view="Default">
         <span class="material-icons-round">restore</span> Default
@@ -1294,7 +1334,26 @@
       function setupGUI() {
         if (gui) gui.destroy(); // Destroy old GUI if exists
         gui = new GUI();
-        gui.title("Kontrol Model 3D");
+        gui.title("Kontrol Model 3D"); // Title remains for internal GUI structure
+        
+        // Lil-gui creates its own DOM element. We need to explicitly hide it after creation.
+        // The CSS rule for .lil-gui should NOT have display: none;
+        gui.domElement.style.display = 'none'; // Hide it initially via JS
+
+        const guiToggleButton = document.getElementById('guiToggleButton');
+        const guiToggleButtonIcon = guiToggleButton.querySelector('.material-icons-round');
+
+        guiToggleButton.addEventListener('click', () => {
+            if (gui.domElement.style.display === 'none') { // Check current display style
+                gui.show();
+                guiToggleButtonIcon.textContent = 'close'; 
+                logToScreen("Panel Kontrol Model 3D dibuka.");
+            } else {
+                gui.hide();
+                guiToggleButtonIcon.textContent = 'tune';
+                logToScreen("Panel Kontrol Model 3D ditutup.");
+            }
+        });
     
         const modelFolder = gui.addFolder("Model");
         modelFolder.add(params, "modelPath").name("Path Model (.glb)").onFinishChange((value) => {
