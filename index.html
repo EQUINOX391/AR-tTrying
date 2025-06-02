@@ -27,7 +27,7 @@
             font-size: 0.9em; 
             font-weight: bold;
             text-align: center;
-            display: flex;
+            /* display: flex; // Dihapus karena akan diatur oleh JS */
             align-items: center;
             justify-content: center;
             padding: 0; 
@@ -43,20 +43,8 @@
             background-color: #d32f2f;
         }
 
-        #info {
-            position: absolute;
-            top: 10px;
-            left: calc(10px + 52px + 10px); 
-            width: auto;
-            max-width: calc(100% - (10px + 52px + 10px) - 220px - 20px); 
-            text-align: left;
-            z-index: 100;
-            display:block;
-            padding: 10px;
-            background-color: rgba(0,0,0,0.7);
-            border-radius: 8px;
-            font-size: 0.9em;
-        }
+        /* Panel Info dihapus dari CSS */
+
         #loading-indicator {
             position: absolute;
             top: 50%;
@@ -115,7 +103,7 @@
         .lil-gui.autoPlace {
             top: 10px;
             right: 10px;
-            max-height: calc(100vh - 80px); 
+            max-height: calc(100vh - 20px); /* Disesuaikan karena info panel hilang */
             overflow-y: auto; 
             z-index: 1000; 
         }
@@ -147,10 +135,6 @@
     </script>
 </head>
 <body>
-    <div id="info">
-        Menampilkan model 3D Ikan Cupang.<br>
-        Gunakan mouse untuk memutar dan zoom. Gunakan panel kontrol atau tombol di bawah untuk mengubah tampilan.
-    </div>
     <div id="loading-indicator">Memuat Model...</div>
     <div id="preset-buttons-container">
         <button class="preset-button" data-view="Default">Default</button>
@@ -178,7 +162,7 @@
         let model, modelContainerGroup, ambientLight, directionalLight;
         let clock;
         const loadingIndicator = document.getElementById('loading-indicator');
-        const infoPanel = document.getElementById('info'); // Ambil referensi ke panel info
+        // const infoPanel = document.getElementById('info'); // Referensi infoPanel dihapus
         
         let skyboxObject = null;
         const modelCenter = new THREE.Vector3(); 
@@ -196,8 +180,8 @@
             modelPath: 'Cupang.glb', 
             skyboxGlbUrl: 'inside_galaxy_skybox_hdri_360_panorama.glb', 
             toneMappingExposure: 1.0,
-            ambientLightIntensity: 2.5, // Sedikit dinaikkan untuk visibilitas di AR
-            directionalLightIntensity: 3.0, // Sedikit dinaikkan
+            ambientLightIntensity: 2.8, // Sedikit dinaikkan lagi
+            directionalLightIntensity: 3.5, // Sedikit dinaikkan lagi
             directionalLightColor: 0xffffff,
             initialRotationX_deg: 0.0,
             initialRotationY_deg: 0.0,
@@ -207,14 +191,13 @@
             selectedViewPreset: 'Default',
             cameraFOV: 50, 
             modelScale: 1.0, 
-            arModelScale: 0.1, // Skala khusus untuk AR, bisa disesuaikan
+            arModelScale: 0.15, // Default skala AR sedikit diperbesar, sesuaikan jika perlu
             skyboxBrightness: 1.0,
             backgroundColor: '#4682B4', 
             showSkybox: true,
         };
 
         function init() {
-            // ... (kode init lainnya tetap sama)
             if (loadingIndicator) loadingIndicator.style.display = 'block';
             clock = new THREE.Clock();
             scene = new THREE.Scene();
@@ -243,7 +226,7 @@
             scene.add(ambientLight);
 
             directionalLight = new THREE.DirectionalLight(params.directionalLightColor, params.directionalLightIntensity);
-            directionalLight.position.set(1, 1.5, 1).normalize(); // Arah sedikit diubah
+            directionalLight.position.set(1, 1.5, 1).normalize(); 
             scene.add(directionalLight);
             
             modelContainerGroup = new THREE.Group();
@@ -276,8 +259,8 @@
             }
 
             reticleMesh = new THREE.Mesh(
-                new THREE.RingGeometry(0.04, 0.055, 32).rotateX(-Math.PI / 2), // Reticle sedikit lebih besar
-                new THREE.MeshBasicMaterial({ color: 0x00ff00, opacity:0.8, transparent:true }) // Warna hijau agar lebih terlihat
+                new THREE.RingGeometry(0.04, 0.055, 32).rotateX(-Math.PI / 2), 
+                new THREE.MeshBasicMaterial({ color: 0x00ff00, opacity:0.8, transparent:true }) 
             );
             reticleMesh.matrixAutoUpdate = false;
             reticleMesh.visible = false;
@@ -307,13 +290,10 @@
         }
         
         function onARButtonClick() {
-            // ... (fungsi onARButtonClick tetap sama)
             const arButtonElement = document.getElementById('arButton');
             if (!xrSession) {
                 navigator.xr.requestSession('immersive-ar', { 
                     requiredFeatures: ['hit-test'], 
-                    // optionalFeatures: ['dom-overlay'], 
-                    // domOverlay: { root: document.body } 
                 }).then(onSessionStarted)
                   .catch(err => {
                       console.error("Gagal memulai sesi AR:", err);
@@ -333,7 +313,7 @@
 
             document.getElementById('preset-buttons-container').style.display = 'none'; 
             if(gui) gui.hide(); 
-            if(infoPanel) infoPanel.style.display = 'none'; // Sembunyikan panel info
+            // Panel info sudah dihapus, jadi tidak perlu disembunyikan lagi
             if(skyboxObject) skyboxObject.visible = false; 
             scene.background = null; 
 
@@ -343,7 +323,6 @@
             if(modelContainerGroup) {
                 modelContainerGroup.visible = false; 
                 modelContainerGroup.userData.originalScale = modelContainerGroup.scale.clone();
-                // Set skala AR saat sesi dimulai, sebelum penempatan, agar jika ada logika lain yang bergantung padanya sudah benar
                 modelContainerGroup.scale.set(params.arModelScale, params.arModelScale, params.arModelScale);
             }
             reticleMesh.visible = true; 
@@ -360,6 +339,7 @@
                 })
                 .then((source) => {
                     xrHitTestSource = source;
+                    console.log("Hit test source berhasil didapatkan.");
                 })
                 .catch(err => {
                     console.error("Error selama setup sesi AR (ref space atau hit test):", err);
@@ -376,14 +356,14 @@
 
             document.getElementById('preset-buttons-container').style.display = 'flex'; 
             if(gui) gui.show(); 
-            if(infoPanel) infoPanel.style.display = 'block'; // Tampilkan kembali panel info
+            // Panel info sudah dihapus
             reticleMesh.visible = false;
 
             if(modelContainerGroup) {
                 modelContainerGroup.visible = true; 
                 if (modelContainerGroup.userData.originalScale) {
                     modelContainerGroup.scale.copy(modelContainerGroup.userData.originalScale);
-                } else { // Fallback jika originalScale tidak tersimpan
+                } else { 
                     modelContainerGroup.scale.set(params.modelScale, params.modelScale, params.modelScale);
                 }
             }
@@ -392,33 +372,37 @@
         }
         
         function onSelectAR(event) {
+            console.log("onSelectAR dipanggil. xrSession:", xrSession, "reticleMesh.visible:", reticleMesh.visible, "modelPlaced:", modelPlaced);
             if (xrSession && reticleMesh.visible && !modelPlaced) {
                 if (modelContainerGroup && model) { 
+                    console.log("Mencoba menempatkan model. Matriks reticle:", reticleMesh.matrix.elements);
                     modelContainerGroup.position.setFromMatrixPosition(reticleMesh.matrix);
-                    // Orientasi model di AR mungkin perlu sedikit penyesuaian agar menghadap ke depan
-                    // Anda bisa mencoba ini atau biarkan default (menghadap pengguna)
-                    // const forward = new THREE.Vector3(0,0,-1);
-                    // forward.applyQuaternion(camera.quaternion); // Arahkan model ke mana kamera menghadap
-                    // modelContainerGroup.lookAt(modelContainerGroup.position.clone().add(forward));
+                    // Orientasi model di AR: Coba agar menghadap ke arah yang sama dengan reticle (yang biasanya flat di permukaan)
+                    // Ini mungkin memerlukan penyesuaian rotasi model asli jika pivotnya tidak standar
+                    // Untuk sekarang, kita biarkan orientasi default dari reticle.matrix
+                    modelContainerGroup.quaternion.setFromRotationMatrix(reticleMesh.matrix);
                     
-                    // Skala sudah diatur di onSessionStarted atau bisa diatur di sini jika perlu
-                    // modelContainerGroup.scale.set(params.arModelScale, params.arModelScale, params.arModelScale); 
+                    // Skala sudah diatur di onSessionStarted, atau bisa di-override di sini
+                    modelContainerGroup.scale.set(params.arModelScale, params.arModelScale, params.arModelScale); 
                     modelContainerGroup.visible = true;
                     modelPlaced = true;
                     reticleMesh.visible = false; 
 
-                    console.log("Model AR ditempatkan di:", modelContainerGroup.position, "dengan skala:", modelContainerGroup.scale);
+                    console.log("Model AR SEHARUSNYA ditempatkan di:", modelContainerGroup.position, "dengan skala:", modelContainerGroup.scale);
 
                     if (xrHitTestSource) {
-                        // xrHitTestSource.cancel(); // Lebih aman untuk tidak memanggil ini
-                        xrHitTestSource = null; 
+                        xrHitTestSource = null; // Hentikan hit-testing setelah penempatan
+                        console.log("Hit test source dihentikan setelah penempatan.");
                     }
+                } else {
+                    console.warn("Model atau modelContainerGroup tidak siap untuk ditempatkan di AR.");
                 }
+            } else {
+                 console.log("Kondisi untuk menempatkan model AR tidak terpenuhi.");
             }
         }
 
         function loadMainModel() {
-            // ... (fungsi loadMainModel tetap sama)
             if (loadingIndicator) {
                 loadingIndicator.style.display = 'block';
                 loadingIndicator.textContent = 'Memuat Model...';
@@ -480,7 +464,6 @@
 
         function applyModelScale() {
             if (modelContainerGroup) {
-                // Skala diatur berdasarkan apakah sedang dalam sesi AR atau tidak
                 const scaleValue = xrSession ? params.arModelScale : params.modelScale;
                 modelContainerGroup.scale.set(scaleValue, scaleValue, scaleValue);
                 
@@ -489,14 +472,12 @@
                     box.getSize(modelSize); 
                     goToViewPreset(params.selectedViewPreset, true); 
                 } else if (model && xrSession && modelPlaced) {
-                    // Jika model sudah ditempatkan di AR dan skala AR diubah dari GUI (jika ada kontrolnya)
-                    // Ini memerlukan kontrol GUI tambahan untuk arModelScale
+                    // Skala sudah diatur, tidak perlu panggil goToViewPreset di sini untuk AR
                 }
             }
         }
         
         function loadSkyboxFromGLB() {
-            // ... (fungsi loadSkyboxFromGLB tetap sama)
              if (!params.skyboxGlbUrl || params.skyboxGlbUrl === 'SKYBOX_ANDA.glb' || params.skyboxGlbUrl.includes('placehold.co')) {
                 console.warn("URL Skybox GLB tidak valid atau placeholder. Skybox tidak akan dimuat.");
                 if (skyboxObject) {
@@ -756,7 +737,10 @@
             modelFolder.add(params, 'modelScale', 0.01, 10, 0.01).name('Skala (Non-AR)').onChange(applyModelScale);
             modelFolder.add(params, 'arModelScale', 0.01, 1.0, 0.005).name('Skala Model AR').onChange(value => {
                 params.arModelScale = value;
-                if (xrSession && modelPlaced && modelContainerGroup) { // Update skala jika sudah di AR & ditempatkan
+                if (xrSession && modelPlaced && modelContainerGroup) { 
+                    modelContainerGroup.scale.set(value, value, value);
+                } else if (xrSession && !modelPlaced && modelContainerGroup) {
+                    // Jika belum ditempatkan, set skala AR untuk penempatan berikutnya
                     modelContainerGroup.scale.set(value, value, value);
                 }
             });
@@ -832,14 +816,20 @@
                 console.log("Screenshot diambil!");
             } catch (e) {
                 console.error("Gagal mengambil screenshot:", e);
-                const infoDiv = document.getElementById('info');
-                if (infoDiv) { 
-                    const errorMsg = document.createElement('p');
-                    errorMsg.textContent = "Gagal mengambil screenshot. Lihat konsol.";
-                    errorMsg.style.color = "red";
-                    infoDiv.appendChild(errorMsg);
-                    setTimeout(() => { if(infoDiv.contains(errorMsg)) infoDiv.removeChild(errorMsg);}, 3000);
-                }
+                // Panel info sudah dihapus, jadi log ke konsol saja atau buat elemen pesan sementara
+                const tempErrorMsg = document.createElement('div');
+                tempErrorMsg.textContent = "Gagal screenshot. Lihat konsol.";
+                tempErrorMsg.style.position = 'absolute';
+                tempErrorMsg.style.bottom = '70px'; // Di atas tombol preset
+                tempErrorMsg.style.left = '50%';
+                tempErrorMsg.style.transform = 'translateX(-50%)';
+                tempErrorMsg.style.padding = '10px';
+                tempErrorMsg.style.backgroundColor = 'rgba(255,0,0,0.8)';
+                tempErrorMsg.style.color = 'white';
+                tempErrorMsg.style.borderRadius = '5px';
+                tempErrorMsg.style.zIndex = '1002';
+                document.body.appendChild(tempErrorMsg);
+                setTimeout(() => { if(document.body.contains(tempErrorMsg)) document.body.removeChild(tempErrorMsg);}, 3000);
             }
         }
 
