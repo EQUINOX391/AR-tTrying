@@ -206,7 +206,8 @@
     </div>
     <div id="reticle"></div> 
     <div id="on-screen-log-container"></div>
-    <div id="app-version">APP VERSI 0.0.5</div> <script type="module">
+    <div id="app-version">APP VERSI 0.0.5</div> 
+    <script type="module">
         import * as THREE from 'three';
         import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
         import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
@@ -229,15 +230,15 @@
         const modelSize = new THREE.Vector3(); 
 
         let xrSession = null;
-        let xrViewerSpace = null; // Menyimpan viewer reference space
+        let xrViewerSpace = null; 
         let xrHitTestSource = null;
         let reticleMesh; 
         let modelPlaced = false; 
-        let detectedPlanes = new Map(); // Untuk menyimpan visualisasi plane
+        let detectedPlanes = new Map(); 
 
         let isUpdatingViewPresetGUI = false;
 
-        const APP_VERSION = "0.0.5"; // Versi aplikasi diupdate
+        const APP_VERSION = "0.0.5"; 
 
         const params = {
             modelPath: 'Cupang.glb', 
@@ -254,12 +255,12 @@
             selectedViewPreset: 'Default',
             cameraFOV: 50, 
             modelScale: 1.0, 
-            arModelScale: 0.25, // Skala AR default sedikit lebih besar
-            arModelRotationY_deg: 0, // Untuk rotasi model di AR
+            arModelScale: 0.25, 
+            arModelRotationY_deg: 0, 
             skyboxBrightness: 1.0,
             backgroundColor: '#4682B4', 
             showSkybox: true,
-            showDetectedPlanes: true, // Opsi untuk menampilkan/menyembunyikan visualisasi plane
+            showDetectedPlanes: true, 
         };
 
         function logToScreen(message, type = 'info') {
@@ -283,7 +284,6 @@
         }
 
         function init() {
-            // ... (kode init lainnya tetap sama)
             if (loadingIndicator) loadingIndicator.style.display = 'block';
             clock = new THREE.Clock();
             scene = new THREE.Scene();
@@ -384,10 +384,10 @@
             const arButtonElement = document.getElementById('arButton');
             if (!xrSession) {
                 logToScreen("Mencoba memulai sesi AR...");
-                // Meminta fitur plane-detection
+                // Menyederhanakan permintaan sesi, menghapus dom-overlay dari required
                 navigator.xr.requestSession('immersive-ar', { 
-                    requiredFeatures: ['hit-test', 'dom-overlay'], 
-                    optionalFeatures: ['plane-detection'] // Jadikan plane-detection opsional
+                    requiredFeatures: ['hit-test'], 
+                    optionalFeatures: ['plane-detection'] 
                 }).then(onSessionStarted)
                   .catch(err => {
                       logToScreen(`Gagal memulai sesi AR: ${err.message}`, "error");
@@ -412,14 +412,14 @@
             if(skyboxObject) skyboxObject.visible = false; 
             scene.background = null; 
 
-            xrViewerSpace = null; // Reset viewer space
+            xrViewerSpace = null; 
             xrHitTestSource = null; 
             modelPlaced = false; 
             if(modelContainerGroup) {
                 modelContainerGroup.visible = false; 
                 modelContainerGroup.userData.originalScale = modelContainerGroup.scale.clone();
                 modelContainerGroup.scale.set(params.arModelScale, params.arModelScale, params.arModelScale);
-                modelContainerGroup.rotation.y = THREE.MathUtils.degToRad(params.arModelRotationY_deg); // Terapkan rotasi awal AR
+                modelContainerGroup.rotation.y = THREE.MathUtils.degToRad(params.arModelRotationY_deg); 
                 logToScreen(`Model disembunyikan, skala AR diatur ke: ${params.arModelScale}, rotasi Y: ${params.arModelRotationY_deg} deg`);
             }
             reticleMesh.visible = false; 
@@ -434,12 +434,11 @@
             renderer.xr.setSession(session)
                 .then(() => {
                     logToScreen("Sesi XR berhasil diset ke renderer.");
-                    return session.requestReferenceSpace('viewer'); // Dapatkan viewer space
+                    return session.requestReferenceSpace('viewer'); 
                 })
                 .then((refSpace) => {
-                    xrViewerSpace = refSpace; // Simpan viewer space
+                    xrViewerSpace = refSpace; 
                     logToScreen("Viewer reference space didapatkan.");
-                    // Hit test source akan diminta setelah tombol "Mulai Pindai" ditekan
                 })
                 .catch(err => {
                     logToScreen(`Error saat set session atau mendapatkan viewer space: ${err.message}`, "error");
@@ -451,7 +450,7 @@
             logToScreen("Tombol 'Mulai Pindai Permukaan' ditekan.");
             arInstructionsPanel.style.display = 'none'; 
             
-            if (xrSession && !xrHitTestSource && xrViewerSpace) { // Pastikan viewerSpace ada
+            if (xrSession && !xrHitTestSource && xrViewerSpace) { 
                 xrSession.requestHitTestSource({ space: xrViewerSpace })
                     .then((source) => {
                         xrHitTestSource = source;
@@ -476,7 +475,7 @@
         function onSessionEnded() {
             logToScreen("Sesi AR berakhir.");
             xrSession = null;
-            xrViewerSpace = null; // Reset viewer space
+            xrViewerSpace = null; 
             const arButtonElement = document.getElementById('arButton');
             arButtonElement.textContent = 'AR';
             arButtonElement.classList.remove('ar-active');
@@ -488,10 +487,8 @@
             appVersionDisplay.style.display = 'none'; 
 
             reticleMesh.visible = false;
-            // Hapus visualisasi plane
             detectedPlanes.forEach(planeMesh => scene.remove(planeMesh));
             detectedPlanes.clear();
-
 
             if(modelContainerGroup) {
                 modelContainerGroup.visible = true; 
@@ -501,7 +498,7 @@
                 } else { 
                     modelContainerGroup.scale.set(params.modelScale, params.modelScale, params.modelScale);
                 }
-                 modelContainerGroup.rotation.y = THREE.MathUtils.degToRad(params.initialRotationY_deg); // Kembalikan rotasi non-AR
+                 modelContainerGroup.rotation.y = THREE.MathUtils.degToRad(params.initialRotationY_deg); 
             }
             if(model) goToViewPreset(params.selectedViewPreset, true); 
             updateBackgroundVisibility(); 
@@ -517,7 +514,6 @@
                     modelContainerGroup.matrix.decompose(modelContainerGroup.position, modelContainerGroup.quaternion, modelContainerGroup.scale); 
                     
                     modelContainerGroup.scale.set(params.arModelScale, params.arModelScale, params.arModelScale); 
-                    // Terapkan rotasi Y dari GUI
                     modelContainerGroup.rotation.y = THREE.MathUtils.degToRad(params.arModelRotationY_deg);
 
                     modelContainerGroup.visible = true;
@@ -539,7 +535,6 @@
         }
 
         function loadMainModel() {
-            // ... (fungsi loadMainModel tetap sama)
             if (loadingIndicator) {
                 loadingIndicator.style.display = 'block';
                 loadingIndicator.textContent = 'Memuat Model...';
@@ -630,7 +625,6 @@
         }
         
         function loadSkyboxFromGLB() {
-            // ... (fungsi loadSkyboxFromGLB tetap sama)
              if (!params.skyboxGlbUrl || params.skyboxGlbUrl === 'SKYBOX_ANDA.glb' || params.skyboxGlbUrl.includes('placehold.co')) {
                 logToScreen("URL Skybox GLB tidak valid atau placeholder. Skybox tidak akan dimuat.", "warn");
                 if (skyboxObject) {
@@ -1019,36 +1013,53 @@
 
                     if (viewerPose) {
                         // Handle Plane Detection
-                        if (params.showDetectedPlanes && session.detectedPlanes) { // 'detectedPlanes' adalah fitur eksperimental
-                            const planes = frame.worldInformation?.detectedPlanes; // Cara baru mendapatkan plane (jika didukung)
-                            if (planes) {
-                                logToScreen(`Plane terdeteksi: ${planes.size}`, 'info');
+                        if (params.showDetectedPlanes && session.updateWorldTrackingState) { // Cek apakah fitur ini ada
+                            const worldInfo = session.updateWorldTrackingState({ planeDetectionState: { enabled: true } });
+                            if (worldInfo && worldInfo.detectedPlanes) {
+                                const planes = worldInfo.detectedPlanes;
+                                // logToScreen(`Plane terdeteksi: ${planes.size}`, 'info'); // Bisa terlalu banyak log
                                 planes.forEach(plane => {
                                     if (!detectedPlanes.has(plane)) {
                                         logToScreen(`Plane baru terdeteksi: ${plane.orientation}, ID: ${plane.lastChangedTime}`);
-                                        const planeGeometry = new THREE.PlaneGeometry(plane.polygon[0].x * 2, plane.polygon[0].z * 2); // Estimasi kasar
-                                        const planeMaterial = new THREE.MeshBasicMaterial({
-                                            color: 0x00ff00,
-                                            transparent: true,
-                                            opacity: 0.3,
-                                            side: THREE.DoubleSide,
-                                            wireframe: true
-                                        });
-                                        const planeMesh = new THREE.Mesh(planeGeometry, planeMaterial);
                                         
-                                        // Atur posisi dan orientasi planeMesh berdasarkan XRPlane.planeSpace
-                                        // Ini memerlukan konversi dari XRSpace ke Three.js world space
-                                        // Untuk penyederhanaan, kita letakkan di origin dulu, ini perlu perbaikan
-                                        // const planePose = frame.getPose(plane.planeSpace, renderer.xr.getReferenceSpace());
-                                        // if(planePose) planeMesh.matrix.fromArray(planePose.transform.matrix);
+                                        // Membuat mesh dari polygon plane
+                                        const planePolygon = plane.polygon; // Array dari XRPoint
+                                        if (planePolygon && planePolygon.length > 2) {
+                                            const shape = new THREE.Shape();
+                                            shape.moveTo(planePolygon[0].x, planePolygon[0].z);
+                                            for (let i = 1; i < planePolygon.length; i++) {
+                                                shape.lineTo(planePolygon[i].x, planePolygon[i].z);
+                                            }
+                                            const planeGeometry = new THREE.ShapeGeometry(shape);
+                                            
+                                            const planeMaterial = new THREE.MeshBasicMaterial({
+                                                color: 0x00ff00,
+                                                transparent: true,
+                                                opacity: 0.25,
+                                                side: THREE.DoubleSide,
+                                                wireframe: true
+                                            });
+                                            const planeMesh = new THREE.Mesh(planeGeometry, planeMaterial);
+                                            
+                                            // Atur posisi dan orientasi planeMesh
+                                            const planePose = frame.getPose(plane.planeSpace, renderer.xr.getReferenceSpace());
+                                            if(planePose) {
+                                                planeMesh.matrix.fromArray(planePose.transform.matrix);
+                                                planeMesh.matrix.decompose(planeMesh.position, planeMesh.quaternion, planeMesh.scale);
+                                            }
 
-                                        scene.add(planeMesh);
-                                        detectedPlanes.set(plane, planeMesh);
+                                            scene.add(planeMesh);
+                                            detectedPlanes.set(plane, planeMesh);
+                                        }
                                     } else {
-                                        // Update posisi/orientasi planeMesh jika plane berubah
+                                        // Update plane jika perlu (misalnya jika polygon berubah)
                                         const planeMesh = detectedPlanes.get(plane);
-                                        // const planePose = frame.getPose(plane.planeSpace, renderer.xr.getReferenceSpace());
-                                        // if(planePose) planeMesh.matrix.fromArray(planePose.transform.matrix);
+                                        const planePose = frame.getPose(plane.planeSpace, renderer.xr.getReferenceSpace());
+                                        if(planePose && planeMesh) { // Pastikan planeMesh ada
+                                            planeMesh.matrix.fromArray(planePose.transform.matrix);
+                                            planeMesh.matrix.decompose(planeMesh.position, planeMesh.quaternion, planeMesh.scale);
+                                            // Update geometri jika polygon berubah (lebih kompleks)
+                                        }
                                     }
                                 });
                                 // Hapus visualisasi untuk plane yang tidak lagi terdeteksi
