@@ -203,6 +203,8 @@
       width: 90%;
       max-width: 500px;
       text-align: left;
+      max-height: 90vh;
+      overflow-y: auto;
     }
     #instruction-modal h2 {
       margin-bottom: 15px;
@@ -268,7 +270,6 @@
   <div id="loading-indicator">Memuat Model...</div>
   <!-- Preset buttons -->
   <div id="preset-buttons-container">
-    <!-- Urutan tombol sesuai preset yang diubah: Front dan Back sudah diremap -->
     <button class="preset-button" data-view="Default">Default</button>
     <button class="preset-button" data-view="Front">Front</button>
     <button class="preset-button" data-view="Back">Back</button>
@@ -869,12 +870,11 @@
       });
     }
 
-    // Fungsi ini mengatur ulang posisi kamera berdasarkan preset view yang dipilih.
     // PRESET BARU:
-    // - "Front" => tampil dari kiri (x - distance)
-    // - "Back" => tampil dari kanan (x + distance)
-    // - "Left" => tampil dari depan (z + distance)
-    // - "Right" => tampil dari belakang (z - distance)
+    // "Front" => tampilan dari kiri
+    // "Back" => tampilan dari kanan
+    // "Left" => tampilan dari depan
+    // "Right" => tampilan dari belakang
     function goToViewPreset(presetName, instant = false) {
       if (isUpdatingViewPresetGUI) return;
       if (!modelContainerGroup || !camera || !controls || !model) {
@@ -893,19 +893,15 @@
       camera.up.set(0, 1, 0);
       switch(presetName) {
         case 'Front':
-          // Seharusnya tampak dari kiri
           newCamPos.set(center.x - distance, center.y, center.z);
           break;
         case 'Back':
-          // Seharusnya tampak dari kanan
           newCamPos.set(center.x + distance, center.y, center.z);
           break;
         case 'Left':
-          // Seharusnya tampak dari depan
           newCamPos.set(center.x, center.y, center.z + distance);
           break;
         case 'Right':
-          // Seharusnya tampak dari belakang
           newCamPos.set(center.x, center.y, center.z - distance);
           break;
         case 'Top':
