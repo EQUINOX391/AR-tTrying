@@ -24,15 +24,17 @@
     <style>
       /* Root Variables for Consistent Styling */
       :root {
-        --primary-color: #4caf50; /* Green for primary actions */
-        --primary-hover: #45a049;
-        --error-color: #f44336; /* Red for errors or active AR stop */
-        --surface-dark: rgba(0, 0, 0, 0.8); /* Dark translucent surface */
-        --surface-light: rgba(255, 255, 255, 0.1); /* Light translucent surface for buttons */
+        --primary-color: #E3A857; /* Indian Yellow - Dominan */
+        --primary-hover: #D19847; /* Darker Indian Yellow for hover */
+        --secondary-color: #26619C; /* Lapis Lazuli Blue - Sekunder */
+        --secondary-hover: #1E4D7B; /* Darker Lapis Lazuli for hover */
+        --error-color: #f44336; 
+        --surface-dark: rgba(0, 0, 0, 0.85); /* Slightly more opaque */
+        --surface-light: rgba(255, 255, 255, 0.1); 
         --text-primary: #ffffff;
-        --text-secondary: rgba(255, 255, 255, 0.8);
+        --text-secondary: rgba(255, 255, 255, 0.85);
+        --text-on-primary: #000000; /* Black text on yellow background */
         --spacing-unit: 8px;
-        /* Corrected safe area variable name for consistency if used elsewhere, though env() is standard */
         --safe-area-inset-bottom: env(safe-area-inset-bottom, 20px);
       }
     
@@ -44,288 +46,398 @@
       }
       body {
         font-family: 'Plus Jakarta Sans', sans-serif;
-        background: linear-gradient(135deg, #1a1a1a, #2c2c2c); /* Dark gradient background */
+        background: linear-gradient(135deg, #18181a, #28292d); /* Slightly adjusted dark gradient */
         color: var(--text-primary);
-        overflow: hidden; /* Prevent scrollbars on the body */
-        height: 100vh; /* Full viewport height */
-        position: relative; /* For positioning fixed children */
+        overflow: hidden; 
+        height: 100vh; 
+        position: relative; 
       }
       canvas {
-        display: block; /* Remove extra space below canvas */
+        display: block; 
         width: 100%;
         height: 100%;
       }
     
-      /* Loading Overlay with Enhanced Icon and Text */
+      /* Loading Overlay */
       #loading-overlay {
         position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: #111; /* Solid dark background for loading */
-        z-index: 2000; /* Highest z-index to cover everything */
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: #121212; /* Darker background */
+        z-index: 2000; 
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        gap: calc(var(--spacing-unit) * 2.5); /* Space between elements */
+        gap: calc(var(--spacing-unit) * 3);
+        opacity: 1;
+        transition: opacity 0.7s ease-out; /* Smoother fade */
       }
-      #loading-overlay .loading-content { /* Wrapper for icon and logo text */
+      #loading-overlay .loading-content {
         display: flex;
         flex-direction: column;
         align-items: center;
-        gap: var(--spacing-unit) * 1.5; /* Space between icon and text */
+        gap: calc(var(--spacing-unit) * 1); 
       }
-      #loading-overlay .logo-icon { /* Styling for the new loading icon */
-        font-size: 3.5rem; 
+      #loading-overlay .logo-icon { 
+        font-size: 4rem; /* Larger icon */
         color: var(--primary-color);
         padding: var(--spacing-unit);
-        background-color: rgba(255,255,255,0.05); /* Subtle background */
-        border-radius: 50%; /* Circular icon background */
+        border: 2px solid var(--primary-color); /* Line style border */
+        border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
-        width: 70px; 
-        height: 70px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        width: 80px; 
+        height: 80px;
+        box-shadow: 0 0 15px rgba(var(--primary-color-rgb, 227, 168, 87), 0.3); /* Subtle glow */
+        animation: pulseIcon 2s infinite ease-in-out;
       }
-      #loading-overlay .logo-text { /* Formerly .logo, for the text part */
-        font-size: 1.4rem; /* Adjusted size */
-        font-weight: 600;
-        letter-spacing: 0.2px;
-        padding: calc(var(--spacing-unit) * 1) calc(var(--spacing-unit) * 1.5);
-        background: transparent; /* Cleaner look */
-        border-radius: 12px;
-        text-align: center;
-        color: var(--text-primary);
+      @keyframes pulseIcon {
+        0% { transform: scale(1); box-shadow: 0 0 15px rgba(var(--primary-color-rgb, 227, 168, 87), 0.2); }
+        50% { transform: scale(1.05); box-shadow: 0 0 25px rgba(var(--primary-color-rgb, 227, 168, 87), 0.4); }
+        100% { transform: scale(1); box-shadow: 0 0 15px rgba(var(--primary-color-rgb, 227, 168, 87), 0.2); }
       }
-      #loading-overlay .spinner {
-        border: 5px solid rgba(255, 255, 255, 0.2); /* Slightly thinner border */
-        border-top: 5px solid var(--primary-color);
-        border-radius: 50%;
-        width: 45px; /* Slightly smaller spinner */
-        height: 45px;
-        animation: spin 1s linear infinite;
-      }
-      #loading-overlay .version-loading { /* Version text specific to loading screen */
+      #loading-overlay .logo-text-author {
         font-size: 0.9rem;
         color: var(--text-secondary);
         font-weight: 500;
-        /* position: absolute; 
-        bottom: calc(var(--spacing-unit) * 3); */ /* Positioned in flow now */
+        margin-bottom: -2px; /* Bring closer to name */
+      }
+      #loading-overlay .logo-text-name { 
+        font-size: 1.5rem; 
+        font-weight: 700; /* Bolder name */
+        letter-spacing: 0.5px;
+        color: var(--text-primary);
+        padding: calc(var(--spacing-unit) * 0.5) calc(var(--spacing-unit) * 1.5);
+        border-radius: 8px;
+        text-align: center;
+      }
+      #loading-overlay .spinner {
+        border: 4px solid rgba(255, 255, 255, 0.15); 
+        border-top: 4px solid var(--primary-color);
+        border-radius: 50%;
+        width: 40px; 
+        height: 40px;
+        animation: spin 1.2s linear infinite;
+      }
+      #loading-overlay .version-loading { 
+        font-size: 0.8rem; /* Smaller version text */
+        color: var(--text-secondary);
+        font-weight: 400;
       }
       @keyframes spin {
         0% { transform: rotate(0deg); }
         100% { transform: rotate(360deg); }
       }
-    
-      /* After 10 seconds, fade out overlay */
       body.loaded #loading-overlay {
         opacity: 0;
-        transition: opacity 0.5s ease-out;
-        pointer-events: none; /* Allow interaction with elements below */
+        pointer-events: none; 
       }
     
       /* AR Button (Top Right) */
       #ar-button-container {
         position: fixed;
-        top: calc(var(--spacing-unit) * 2.5); /* Adjusted spacing */
-        right: calc(var(--spacing-unit) * 2.5);
-        z-index: 1000;
+        top: calc(var(--spacing-unit) * 2); 
+        right: calc(var(--spacing-unit) * 2);
+        z-index: 1010; /* Above GUI toggle */
       }
       #arButton {
         display: flex;
         align-items: center;
-        gap: var(--spacing-unit);
-        padding: calc(var(--spacing-unit) * 1.25) calc(var(--spacing-unit) * 2); /* Slightly more compact */
-        background: var(--primary-color);
+        gap: calc(var(--spacing-unit) * 0.75);
+        padding: calc(var(--spacing-unit) * 1.2) calc(var(--spacing-unit) * 1.8); 
+        background: var(--secondary-color); /* Use secondary color */
         border: none;
-        border-radius: 12px; /* Consistent border radius */
-        color: #fff;
+        border-radius: 10px; 
+        color: var(--text-primary);
         font-weight: 600;
-        font-size: 0.95rem; /* Slightly smaller font */
+        font-size: 0.9rem; 
         cursor: pointer;
-        transition: all 0.2s ease;
-        box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+        transition: all 0.25s ease;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.25);
       }
       #arButton:hover {
-        background: var(--primary-hover);
-        transform: translateY(-2px);
-        box-shadow: 0 6px 16px rgba(76, 175, 80, 0.4);
+        background: var(--secondary-hover);
+        transform: translateY(-1px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
       }
-      #arButton.ar-active { /* When AR mode is active */
+      #arButton.ar-active { 
         background: var(--error-color);
-        box-shadow: 0 4px 12px rgba(244, 67, 54, 0.3);
+        box-shadow: 0 3px 10px rgba(244, 67, 54, 0.3);
       }
       #arButton .material-icons-round {
-        font-size: 1.25rem; /* Adjusted icon size */
+        font-size: 1.2rem; 
       }
-    
+      #arButton-text { /* Span for AR button text */
+        transition: all 0.2s ease-in-out;
+      }
+
+      /* GUI Toggle Button (Top Left) */
+      #gui-toggle-button {
+        position: fixed;
+        top: calc(var(--spacing-unit) * 2);
+        left: calc(var(--spacing-unit) * 2);
+        z-index: 1010;
+        background: var(--surface-light);
+        border: none;
+        border-radius: 50%;
+        color: var(--text-primary);
+        font-size: 1.5rem; /* Icon size */
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.25s ease;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+      }
+      #gui-toggle-button:hover {
+        background: rgba(255,255,255,0.2);
+        transform: scale(1.05);
+      }
+      #gui-toggle-button.active {
+        background: var(--primary-color);
+        color: var(--text-on-primary);
+      }
+
       /* AR Instructions Panel (Center) */
       #ar-instructions {
-        position: fixed;
-        top: 50%;
-        left: 50%;
+        position: fixed; top: 50%; left: 50%;
         transform: translate(-50%, -50%);
         background: var(--surface-dark);
-        backdrop-filter: blur(10px); /* Frosted glass effect */
-        border-radius: 16px; /* Softer radius */
-        padding: calc(var(--spacing-unit) * 2.5); /* Adjusted padding */
-        width: calc(100% - var(--spacing-unit) * 5); /* Responsive width with margins */
-        max-width: 360px; /* Max width for readability */
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-        z-index: 1200; /* Above other UI elements */
-        display: none; /* Initially hidden */
+        backdrop-filter: blur(8px); 
+        border-radius: 14px; 
+        padding: calc(var(--spacing-unit) * 2.5) calc(var(--spacing-unit) * 3);
+        width: calc(100% - var(--spacing-unit) * 6); 
+        max-width: 340px; 
+        box-shadow: 0 6px 25px rgba(0, 0, 0, 0.25);
+        z-index: 1200; 
+        display: none; 
         text-align: center;
       }
       #ar-instructions p {
-        font-size: 0.95rem; /* Optimized for mobile */
-        line-height: 1.6; /* Improved readability */
-        margin-bottom: calc(var(--spacing-unit) * 2.5);
+        font-size: 0.9rem; 
+        line-height: 1.55; 
+        margin-bottom: calc(var(--spacing-unit) * 2);
       }
       #start-scan-button {
         width: 100%;
-        padding: calc(var(--spacing-unit) * 1.75); /* Good tap target size */
+        padding: calc(var(--spacing-unit) * 1.5); 
         background: var(--primary-color);
         border: none;
-        border-radius: 12px;
-        color: #fff;
+        border-radius: 10px;
+        color: var(--text-on-primary);
         font-weight: 600;
         font-size: 0.95rem;
         cursor: pointer;
         transition: all 0.2s ease;
-        display: flex; /* To align icon and text */
+        display: flex; 
         align-items: center;
         justify-content: center;
         gap: var(--spacing-unit);
       }
       #start-scan-button:hover {
         background: var(--primary-hover);
-        transform: translateY(-2px);
       }
       #start-scan-button .material-icons-round {
-        font-size: 1.3rem;
+        font-size: 1.25rem;
+      }
+
+      /* AR Interaction Hints */
+      .ar-interaction-hint {
+        position: fixed;
+        bottom: calc(90px + var(--safe-area-inset-bottom) + var(--spacing-unit) * 2); /* Above log and nav */
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(0,0,0,0.75);
+        color: var(--text-primary);
+        padding: var(--spacing-unit) calc(var(--spacing-unit) * 1.5);
+        border-radius: 8px;
+        font-size: 0.8rem;
+        z-index: 1100;
+        display: none; /* Hidden by default */
+        animation: fadeInHint 0.3s ease-out;
+      }
+      @keyframes fadeInHint {
+        from { opacity: 0; transform: translate(-50%, 10px); }
+        to { opacity: 1; transform: translate(-50%, 0); }
       }
     
-      /* Bottom Navigation Bar for View Presets (Edge Navbar) */
+      /* Bottom Navigation Bar */
       .bottom-nav {
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        right: 0;
+        position: fixed; bottom: 0; left: 0; right: 0;
         background: var(--surface-dark);
-        backdrop-filter: blur(10px);
-        padding: var(--spacing-unit) var(--spacing-unit) calc(var(--spacing-unit) + var(--safe-area-inset-bottom)); /* Adjusted padding for safe area */
+        backdrop-filter: blur(8px);
+        padding: calc(var(--spacing-unit)*0.75) calc(var(--spacing-unit)*0.75) calc(var(--spacing-unit)*0.75 + var(--safe-area-inset-bottom));
         display: flex;
-        justify-content: center; /* Center buttons in the row */
-        align-items: center; /* Align items if they wrap */
-        gap: var(--spacing-unit); /* Reduced gap for compactness */
+        justify-content: center; 
+        align-items: center; 
+        gap: calc(var(--spacing-unit) * 0.75); /* Slightly smaller gap */
         z-index: 1000;
-        border-top-left-radius: 16px; /* Softer radius */
-        border-top-right-radius: 16px;
-        box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.2);
-        flex-wrap: wrap; /* Allow buttons to wrap on small screens */
+        border-top-left-radius: 14px; 
+        border-top-right-radius: 14px;
+        box-shadow: 0 -3px 15px rgba(0, 0, 0, 0.2);
+        flex-wrap: nowrap; /* Try to keep in one row */
+        overflow-x: auto; /* Allow horizontal scroll if truly needed, but aim for no-wrap */
       }
       .view-btn {
         display: flex;
         flex-direction: column;
         align-items: center;
-        gap: 3px; /* Reduced gap between icon and text */
-        padding: calc(var(--spacing-unit) * 1) calc(var(--spacing-unit) * 1.25); /* More compact padding */
-        border-radius: 10px; /* Slightly smaller radius */
+        gap: 2px; 
+        padding: calc(var(--spacing-unit) * 0.75) var(--spacing-unit); 
+        border-radius: 8px; 
         border: none;
         background: var(--surface-light);
-        color: var(--text-primary);
+        color: var(--text-secondary); /* Lighter text for inactive */
         font-family: inherit;
         font-weight: 500;
-        font-size: 0.7rem; /* Smaller font for compact buttons */
+        font-size: 0.65rem; /* Even smaller font */
         cursor: pointer;
         transition: all 0.2s ease;
-        min-width: 50px; /* Ensure a minimum tap width */
+        min-width: 48px; /* Adjusted min-width */
+        flex-shrink: 0; /* Prevent shrinking too much */
         text-align: center;
       }
       .view-btn:hover {
-        background: rgba(255, 255, 255, 0.15);
-        transform: translateY(-1px);
+        background: rgba(255, 255, 255, 0.2);
+        color: var(--text-primary);
+      }
+      .view-btn.view-btn-active { /* Active state for bottom nav buttons */
+        background: var(--primary-color);
+        color: var(--text-on-primary);
+        font-weight: 600;
       }
       .view-btn .material-icons-round {
-        font-size: 1.25rem; /* Smaller icons */
+        font-size: 1.1rem; /* Smaller icons */
       }
     
-      /* On-Screen Log (Positioned above bottom nav) */
+      /* On-Screen Log & Toggle */
+      #log-controls-container {
+        position: fixed;
+        bottom: calc(75px + var(--safe-area-inset-bottom)); /* Adjust based on nav height */
+        left: calc(var(--spacing-unit) * 1.5);
+        z-index: 1005;
+      }
+      #log-toggle-button {
+        background: var(--surface-light);
+        border: none;
+        border-radius: 50%;
+        color: var(--text-primary);
+        font-size: 1.2rem; /* Icon size */
+        width: 36px;
+        height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        box-shadow: 0 1px 5px rgba(0,0,0,0.2);
+      }
+      #log-toggle-button:hover {
+        background: rgba(255,255,255,0.25);
+      }
+      #log-toggle-button.active {
+        background: var(--secondary-color);
+      }
+
       #on-screen-log-container {
         position: fixed;
-        /* Calculated to be above the bottom nav: 
-           Approx nav height (button + padding) ~70-80px + safe area + margin */
-        bottom: calc(80px + var(--safe-area-inset-bottom) + var(--spacing-unit)); 
-        left: calc(var(--spacing-unit) * 1.5);
-        right: calc(var(--spacing-unit) * 1.5); /* Span more of the width */
-        width: auto; /* Let left/right define width */
-        max-width: 400px; /* Max width on larger screens if desired */
-        margin-left: auto; /* Centering if max-width is hit */
-        margin-right: auto; /* Centering if max-width is hit */
-        max-height: 90px; /* Reduced height */
-        background: rgba(0, 0, 0, 0.7); /* Slightly more opaque */
-        color: #9f9; /* Lighter green for better contrast */
+        bottom: calc(75px + var(--safe-area-inset-bottom) + var(--spacing-unit)); 
+        left: calc(var(--spacing-unit) * 1.5 + 36px + var(--spacing-unit)); /* Next to toggle button */
+        right: calc(var(--spacing-unit) * 1.5); 
+        width: auto; 
+        max-width: calc(100vw - 80px - var(--spacing-unit) * 4); /* Adjust width considering toggle button */
+        max-height: 75px; 
+        background: rgba(0, 0, 0, 0.75); 
+        color: #a0ffa0; /* Softer green */
         font-family: monospace;
-        font-size: 0.7rem; /* Smaller log font */
-        padding: var(--spacing-unit);
-        border-radius: 8px;
+        font-size: 0.65rem; 
+        padding: calc(var(--spacing-unit)*0.75);
+        border-radius: 6px;
         overflow-y: auto;
-        z-index: 999; /* Below main controls but above canvas */
-        display: none; /* Hidden by default, shown by JS */
-        border: 1px solid rgba(255,255,255,0.1); /* Subtle border */
+        z-index: 999; 
+        display: none; 
+        border: 1px solid rgba(255,255,255,0.1);
+        transition: opacity 0.3s ease, transform 0.3s ease;
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      #on-screen-log-container.visible {
+        display: block;
+        opacity: 1;
+        transform: translateY(0);
       }
     
-      /* App Version Display (Top Left) */
+      /* App Version Display (Top Left, under GUI toggle) */
       #app-version {
         position: fixed;
-        top: calc(var(--spacing-unit) * 1.5);
+        top: calc(var(--spacing-unit) * 2 + 40px + var(--spacing-unit)); /* Below GUI toggle */
         left: calc(var(--spacing-unit) * 2);
         color: var(--text-secondary);
-        font-size: 0.75rem; /* Compact size */
-        font-weight: 500;
-        background-color: rgba(0,0,0,0.4); /* Subtle background for readability */
-        padding: calc(var(--spacing-unit) * 0.5) var(--spacing-unit);
-        border-radius: 6px;
-        z-index: 1001; /* Above AR button container if they were to overlap */
+        font-size: 0.6rem; /* Smaller font */
+        font-weight: 400;
+        background-color: rgba(0,0,0,0.5); 
+        padding: calc(var(--spacing-unit) * 0.4) calc(var(--spacing-unit) * 0.8);
+        border-radius: 4px;
+        z-index: 1001; 
       }
     
-      /* lil-gui (Controls Panel) Overrides - Retained for consistency */
+      /* lil-gui (Controls Panel) Overrides */
       .lil-gui {
-        --background-color: var(--surface-dark) !important;
+        --background-color: rgba(30,30,30,0.9) !important; /* Darker, more translucent */
         --text-color: var(--text-primary) !important;
-        --title-background-color: rgba(0, 0, 0, 0.3) !important;
-        --widget-color: var(--surface-light) !important;
+        --title-background-color: rgba(0,0,0,0.4) !important;
+        --widget-color: rgba(var(--primary-rgb, 227, 168, 87), 0.2) !important; /* Use primary color for widgets */
+        --hover-color: rgba(var(--primary-rgb, 227, 168, 87), 0.3) !important;
+        --focus-color: var(--primary-color) !important;
+        --number-color: var(--secondary-color) !important; /* Lapis for numbers */
+
         font-family: 'Plus Jakarta Sans', sans-serif !important;
-        border-radius: 16px !important;
+        border-radius: 12px !important;
         overflow: hidden;
-        z-index: 1500 !important; /* Ensure it's above other UI but below modals */
+        z-index: 1005 !important; 
+        box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+        position: fixed !important; /* Ensure it's fixed for toggle */
+        top: calc(var(--spacing-unit) * 2 + 40px + var(--spacing-unit) * 2) !important; /* Position below toggle and version */
+        left: calc(var(--spacing-unit) * 2) !important;
+        max-height: calc(100vh - (var(--spacing-unit) * 4 + 40px + var(--spacing-unit) * 2) - var(--spacing-unit) * 2); /* Avoid overlap */
       }
       .lil-gui .title {
         font-weight: 600 !important;
-        font-size: 0.95rem !important;
+        font-size: 0.9rem !important;
+        background-color: rgba(0,0,0,0.2) !important;
       }
       .lil-gui .controller {
-        border-radius: 8px !important;
-        margin: 4px 0 !important;
+        border-radius: 6px !important;
+        margin: 3px 0 !important;
+        border-bottom: 1px solid rgba(255,255,255,0.05) !important;
+      }
+      .lil-gui.root > .children > .lil-gui > .title { /* For folder titles */
+        background-color: rgba(var(--secondary-rgb, 38, 97, 156), 0.2) !important;
       }
     </style>
   </head>
   <body>
     <div id="loading-overlay">
       <div class="loading-content">
-        <span class="material-icons-round logo-icon">palette</span> <div class="logo-text">OLEH FADHILLAH SUKMA ARINI</div>
+        <span class="material-icons-round logo-icon">center_focus_weak</span> 
+        <div class="logo-text-author">OLEH</div>
+        <div class="logo-text-name">FADHILLAH SUKMA ARINI</div>
       </div>
       <div class="spinner"></div>
       <div class="version-loading">Version 0.0.5</div>
     </div>
+
+    <button id="gui-toggle-button" title="Toggle Controls">
+      <span class="material-icons-round">tune</span>
+    </button>
     
     <div id="ar-button-container">
       <button id="arButton">
         <span class="material-icons-round">view_in_ar</span>
-        AR Mode
+        <span id="arButton-text">AR Mode</span>
       </button>
     </div>
     
@@ -336,36 +448,39 @@
         Mulai Pindai
       </button>
     </div>
+
+    <div id="ar-reticle-hint" class="ar-interaction-hint">Ketuk untuk menempatkan objek.</div>
+    <div id="ar-model-interaction-hint" class="ar-interaction-hint">Cubit untuk skala, seret untuk putar.</div>
     
     <div id="reticle"></div>
     
-    <div id="on-screen-log-container"></div>
-    
-    <div id="app-version">APP VERSI 0.0.5</div>
+    <div id="log-controls-container">
+      <button id="log-toggle-button" title="Toggle Log">
+        <span class="material-icons-round">speaker_notes_off</span> </button>
+    </div>
+    <div id="on-screen-log-container"></div> <div id="app-version">APP VERSI 0.0.5</div>
     
     <div class="bottom-nav">
       <button class="view-btn" data-view="Default">
-        <span class="material-icons-round">auto_awesome</span> Default
+        <span class="material-icons-round">widgets</span>Default
       </button>
       <button class="view-btn" data-view="Front">
-        <span class="material-icons-round">flip_to_front</span> Front
+        <span class="material-icons-round">flip_to_front</span>Front
       </button>
       <button class="view-btn" data-view="Back">
-        <span class="material-icons-round">flip_to_back</span> Back
+        <span class="material-icons-round">flip_to_back</span>Back
       </button>
       <button class="view-btn" data-view="Top">
-        <span class="material-icons-round">arrow_upward</span>
-        Top
+        <span class="material-icons-round">arrow_upward</span>Top
       </button>
       <button class="view-btn" data-view="Bottom">
-        <span class="material-icons-round">arrow_downward</span>
-        Bottom
+        <span class="material-icons-round">arrow_downward</span>Bottom
       </button>
       <button class="view-btn" data-view="Left">
-        <span class="material-icons-round">align_horizontal_left</span> Left
+        <span class="material-icons-round">arrow_left</span>Left
       </button>
       <button class="view-btn" data-view="Right">
-        <span class="material-icons-round">align_horizontal_right</span> Right
+        <span class="material-icons-round">arrow_right</span>Right
       </button>
     </div>
     
@@ -381,348 +496,345 @@
       let scene, camera, renderer, controls, composer, gui;
       let model, modelContainerGroup, ambientLight, directionalLight;
       let clock;
-      // const loadingIndicator = document.getElementById("loading-indicator"); // This element was not in the original HTML, so commenting out. If needed, it should be added.
+
       const arInstructionsPanel = document.getElementById("ar-instructions");
       const startScanButton = document.getElementById("start-scan-button");
       const onScreenLogContainer = document.getElementById("on-screen-log-container");
       const appVersionDisplay = document.getElementById("app-version");
-    
+      const arButtonTextElement = document.getElementById("arButton-text");
+      const guiToggleButton = document.getElementById("gui-toggle-button");
+      const logToggleButton = document.getElementById("log-toggle-button");
+      const logToggleIcon = logToggleButton.querySelector(".material-icons-round");
+      const arReticleHint = document.getElementById("ar-reticle-hint");
+      const arModelInteractionHint = document.getElementById("ar-model-interaction-hint");
+
+
+      // CSS color parsing for JS
+      const rootStyles = getComputedStyle(document.documentElement);
+      const primaryColorRGB = rootStyles.getPropertyValue('--primary-color').match(/\d+/g).map(Number);
+      document.documentElement.style.setProperty('--primary-color-rgb', primaryColorRGB.join(', '));
+      const secondaryColorRGB = rootStyles.getPropertyValue('--secondary-color').match(/\d+/g).map(Number);
+      document.documentElement.style.setProperty('--secondary-color-rgb', secondaryColorRGB.join(', '));
+
+
       let skyboxObject = null;
       const modelCenter = new THREE.Vector3();
       const modelSize = new THREE.Vector3();
     
       let xrSession = null;
-      let xrRefSpace = null; // Reference space for AR
+      let xrRefSpace = null; 
       let xrHitTestSource = null;
-      let reticleMesh; // The 3D object used as a reticle
-      let modelPlaced = false; // Flag to track if the AR model has been placed
+      let reticleMesh; 
+      let modelPlaced = false; 
     
-      let isUpdatingViewPresetGUI = false; // Prevents GUI update loops
+      let isUpdatingViewPresetGUI = false; 
     
-      const APP_VERSION = "0.0.5"; // App version constant
+      const APP_VERSION = "0.0.5"; 
     
-      // AR interaction state variables
       let arIsPinching = false;
       let arInitialPinchDistance = 0;
       let arIsDragging = false;
       let arLastDragX = 0;
       let arLastDragY = 0;
-      const arDragSensitivity = 0.005; // How much the model rotates per drag pixel
+      const arDragSensitivity = 0.005; 
     
-      // Configuration parameters for the viewer
       const params = {
-        modelPath: "Cupang.glb", // Default model path
-        skyboxGlbUrl: "inside_galaxy_skybox_hdri_360_panorama.glb", // Default skybox
+        modelPath: "Cupang.glb", 
+        skyboxGlbUrl: "inside_galaxy_skybox_hdri_360_panorama.glb",
         toneMappingExposure: 1.0,
-        ambientLightIntensity: 3.0,
-        directionalLightIntensity: 4.0,
-        directionalLightColor: 0xffffff,
+        ambientLightIntensity: 2.8, // Slightly adjusted
+        directionalLightIntensity: 3.5, // Slightly adjusted
+        directionalLightColor: 0xfff5e1, // Warmer white light
         initialRotationX_deg: 0.0,
         initialRotationY_deg: 0.0,
         initialRotationZ_deg: 0.0,
-        animateModel: false, // Whether the model auto-rotates
-        rotationSpeed: 0.1, // Auto-rotation speed
+        animateModel: false, 
+        rotationSpeed: 0.08, // Slightly slower
         selectedViewPreset: "Default",
         cameraFOV: 50,
-        modelScale: 1.0, // Scale for non-AR mode
-        arModelScale: 0.5, // Initial scale for AR mode
-        skyboxBrightness: 1.0,
-        backgroundColor: "#4682B4", // Fallback background color
+        modelScale: 1.0, 
+        arModelScale: 0.4, // Slightly smaller default AR scale
+        skyboxBrightness: 0.8, // Slightly dimmer skybox for better model focus
+        backgroundColor: "#1A1C20", // Darker, less saturated blue/grey
         showSkybox: true,
       };
     
-      // Function to log messages to the on-screen console and browser console
       function logToScreen(message, type = "info") {
         if (onScreenLogContainer) {
           const logEntry = document.createElement("div");
-          const timestamp = new Date().toLocaleTimeString();
+          const timestamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit'});
           logEntry.textContent = `[${timestamp}] ${message}`;
-          if (type === "error") logEntry.style.color = "#ff9999"; // Lighter red for dark bg
-          else if (type === "warn") logEntry.style.color = "#ffd799"; // Lighter orange
-          else logEntry.style.color = "#99ff99"; // Lighter green
+          if (type === "error") logEntry.style.color = "#ffacac"; 
+          else if (type === "warn") logEntry.style.color = "#ffe0ac"; 
+          else logEntry.style.color = "#acecac"; 
           onScreenLogContainer.appendChild(logEntry);
-          onScreenLogContainer.scrollTop = onScreenLogContainer.scrollHeight; // Auto-scroll
+          onScreenLogContainer.scrollTop = onScreenLogContainer.scrollHeight; 
         }
         if (type === "error") console.error(message);
         else if (type === "warn") console.warn(message);
         else console.log(message);
       }
     
-      // Initializes the 3D scene, camera, renderer, and loads initial assets
       function init() {
-        // Simulate a loading animation for 10 seconds before fading out.
         setTimeout(() => {
           document.body.classList.add("loaded");
           setTimeout(() => {
             const loadingOverlay = document.getElementById("loading-overlay");
             if (loadingOverlay) loadingOverlay.remove();
-          }, 600); // Match CSS transition time + a bit
-        }, 10000); // Original 10-second delay
+          }, 700); 
+        }, 3000); // Reduced loading time to 3 seconds for quicker access
     
-        // if (loadingIndicator) { // loadingIndicator is not defined in HTML
-        //   loadingIndicator.style.display = "block";
-        //   loadingIndicator.textContent = "Memuat Model...";
-        // }
-        clock = new THREE.Clock(); // For animation timing
+        clock = new THREE.Clock(); 
         scene = new THREE.Scene();
         scene.background = new THREE.Color(params.backgroundColor);
     
-        // Setup camera
         camera = new THREE.PerspectiveCamera(
           params.cameraFOV,
           window.innerWidth / window.innerHeight,
-          0.01, // Near clipping plane (increased for small AR objects)
-          10000 // Far clipping plane
+          0.01, 
+          10000 
         );
-        camera.position.set(0, 1.6, 3); // Default camera position
+        camera.position.set(0, 1.2, 2.5); // Slightly adjusted default camera
     
-        // Setup renderer
         renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.setPixelRatio(window.devicePixelRatio);
         renderer.toneMapping = THREE.ACESFilmicToneMapping;
         renderer.toneMappingExposure = params.toneMappingExposure;
         renderer.outputColorSpace = THREE.SRGBColorSpace;
-        renderer.xr.enabled = true; // Enable WebXR
+        renderer.xr.enabled = true; 
         document.body.appendChild(renderer.domElement);
     
-        // Setup orbit controls for non-AR mode
         controls = new OrbitControls(camera, renderer.domElement);
         controls.enableDamping = true;
-        controls.dampingFactor = 0.05;
-        controls.minDistance = 0.01; // Allow zooming very close
+        controls.dampingFactor = 0.04; // Smoother damping
+        controls.minDistance = 0.01; 
         controls.maxDistance = 5000;
-        controls.target.set(0, 0, 0); // Look at the center of the scene
+        controls.target.set(0, 0, 0); 
     
-        // Setup lighting
         ambientLight = new THREE.AmbientLight(0xffffff, params.ambientLightIntensity);
         scene.add(ambientLight);
     
         directionalLight = new THREE.DirectionalLight(params.directionalLightColor, params.directionalLightIntensity);
-        directionalLight.position.set(1, 1.5, 1).normalize();
+        directionalLight.position.set(1.5, 2, 1).normalize(); // Adjusted light angle
         scene.add(directionalLight);
     
-        // Group to hold the main model, allowing easy transformation
         modelContainerGroup = new THREE.Group();
         scene.add(modelContainerGroup);
     
-        // Setup AR button based on WebXR availability
         const arButtonElement = document.getElementById("arButton");
         if (navigator.xr) {
           navigator.xr
             .isSessionSupported("immersive-ar")
             .then((supported) => {
-              arButtonElement.style.display = "flex"; // Show button
+              arButtonElement.style.display = "flex"; 
               if (supported) {
                 arButtonElement.addEventListener("click", onARButtonClick);
                 arButtonElement.disabled = false;
-                // AR Button text is already set in HTML, no need to change here unless dynamic
-                logToScreen("AR didukung oleh perangkat/browser ini.");
+                logToScreen("AR didukung.");
               } else {
-                arButtonElement.querySelector("span + span") // Get text node
-                if(arButtonElement.childNodes.length > 1 && arButtonElement.childNodes[1].nodeType === Node.TEXT_NODE) {
-                    arButtonElement.childNodes[1].textContent = " No AR";
-                } else {
-                    arButtonElement.insertAdjacentText('beforeend', ' No AR'); // Fallback
-                }
+                if(arButtonTextElement) arButtonTextElement.textContent = "No AR";
                 arButtonElement.disabled = true;
-                logToScreen("AR tidak didukung oleh perangkat/browser ini.", "warn");
+                logToScreen("AR tidak didukung.", "warn");
               }
             })
             .catch((err) => {
-              logToScreen(`Error saat memeriksa dukungan AR: ${err.message}`, "error");
-              if(arButtonElement.childNodes.length > 1 && arButtonElement.childNodes[1].nodeType === Node.TEXT_NODE) {
-                  arButtonElement.childNodes[1].textContent = " Err AR";
-              } else {
-                  arButtonElement.insertAdjacentText('beforeend', ' Err AR');
-              }
+              logToScreen(`Cek AR Error: ${err.message}`, "error");
+              if(arButtonTextElement) arButtonTextElement.textContent = "Err AR";
               arButtonElement.disabled = true;
               arButtonElement.style.display = "flex";
             });
         } else {
           arButtonElement.style.display = "flex";
-          if(arButtonElement.childNodes.length > 1 && arButtonElement.childNodes[1].nodeType === Node.TEXT_NODE) {
-              arButtonElement.childNodes[1].textContent = " No XR";
-          } else {
-              arButtonElement.insertAdjacentText('beforeend', ' No XR');
-          }
+          if(arButtonTextElement) arButtonTextElement.textContent = "No XR";
           arButtonElement.disabled = true;
-          logToScreen("WebXR API tidak tersedia di browser ini.", "warn");
+          logToScreen("WebXR API tidak ada.", "warn");
         }
     
-        // Create AR reticle (visual guide for placing objects)
         reticleMesh = new THREE.Mesh(
-          new THREE.RingGeometry(0.04, 0.055, 32).rotateX(-Math.PI / 2), // Ring shape, rotated flat
-          new THREE.MeshBasicMaterial({ color: 0x00dd00, opacity: 0.8, transparent: true, depthTest: false }) // Bright green, semi-transparent
+          new THREE.RingGeometry(0.035, 0.045, 32).rotateX(-Math.PI / 2), 
+          new THREE.MeshBasicMaterial({ color: 0xE3A857, opacity: 0.75, transparent: true, depthTest: false }) // Primary color reticle
         );
-        reticleMesh.matrixAutoUpdate = false; // Position will be updated manually from hit-test results
-        reticleMesh.visible = false; // Initially hidden
-        reticleMesh.renderOrder = 10; // Render on top of most things
+        reticleMesh.matrixAutoUpdate = false; 
+        reticleMesh.visible = false; 
+        reticleMesh.renderOrder = 10; 
         scene.add(reticleMesh);
     
-        // Load skybox and main model
         if (params.skyboxGlbUrl && params.skyboxGlbUrl !== "SKYBOX_ANDA.glb" && !params.skyboxGlbUrl.includes("placehold.co")) {
           loadSkyboxFromGLB();
         } else {
-          logToScreen("Path Skybox GLB tidak valid atau placeholder, skybox tidak akan dimuat secara otomatis.", "warn");
+          logToScreen("Path Skybox GLB tidak valid, skybox tidak dimuat.", "warn");
         }
-        updateBackgroundVisibility(); // Set initial background/skybox state
+        updateBackgroundVisibility(); 
         loadMainModel();
     
-        // Setup post-processing composer (e.g., for effects, though only basic passes here)
         composer = new EffectComposer(renderer);
         const renderPass = new RenderPass(scene, camera);
         composer.addPass(renderPass);
-        const outputPass = new OutputPass(); // Ensures correct output encoding
+        const outputPass = new OutputPass(); 
         composer.addPass(outputPass);
     
-        // Initialize GUI controls and preset buttons
         setupGUI();
         setupPresetButtons();
         startScanButton.addEventListener("click", onStartScanButtonClick);
+        guiToggleButton.addEventListener("click", toggleGUIVisibility);
+        logToggleButton.addEventListener("click", toggleLogVisibility);
+
         window.addEventListener("resize", onWindowResize, false);
-        // Click listener for placing AR model (now on renderer.domElement for broader capture)
         renderer.domElement.addEventListener("click", onSelectAR); 
         
-        // Start the animation loop
         renderer.setAnimationLoop(animate);
         
-        // Set initial app version display
-        if (appVersionDisplay) appVersionDisplay.textContent = `APP VERSI ${APP_VERSION}`;
+        if (appVersionDisplay) appVersionDisplay.textContent = `VERSI ${APP_VERSION}`;
+        if (gui) gui.hide(); // Hide GUI by default
+      }
+
+      function toggleGUIVisibility() {
+        if (gui) {
+            if (gui.domElement.style.display === 'none' || gui.domElement.style.display === '') {
+                gui.show();
+                guiToggleButton.classList.add('active');
+                guiToggleButton.title = "Sembunyikan Kontrol";
+            } else {
+                gui.hide();
+                guiToggleButton.classList.remove('active');
+                guiToggleButton.title = "Tampilkan Kontrol";
+            }
+        }
+      }
+
+      function toggleLogVisibility() {
+        if (onScreenLogContainer.classList.contains('visible')) {
+            onScreenLogContainer.classList.remove('visible');
+            logToggleIcon.textContent = 'speaker_notes_off';
+            logToggleButton.title = "Tampilkan Log";
+        } else {
+            onScreenLogContainer.classList.add('visible');
+            logToggleIcon.textContent = 'speaker_notes';
+            logToggleButton.title = "Sembunyikan Log";
+        }
       }
     
-      // Handles AR button click to start or end an AR session
       function onARButtonClick() {
         const arButtonElement = document.getElementById("arButton");
-        const arButtonTextNode = arButtonElement.childNodes[1].nodeType === Node.TEXT_NODE ? arButtonElement.childNodes[1] : arButtonElement.querySelector("span + span") || arButtonElement.appendChild(document.createTextNode("")).previousSibling;
-
-
         if (!xrSession) {
           logToScreen("Mencoba memulai sesi AR...");
           navigator.xr
             .requestSession("immersive-ar", {
-              requiredFeatures: ["hit-test", "dom-overlay"], // Request hit-testing and DOM overlay
-              domOverlay: { root: document.body }, // Specify root for DOM overlay
+              requiredFeatures: ["hit-test", "dom-overlay"], 
+              domOverlay: { root: document.body }, 
             })
             .then(onSessionStarted)
             .catch((err) => {
               logToScreen(`Gagal memulai sesi AR: ${err.message}`, "error");
               logToScreen("Pastikan perangkat & browser mendukung AR, dan izin kamera diberikan.", "error");
-              if (arButtonTextNode) arButtonTextNode.textContent = " AR Fail";
+              if(arButtonTextElement) arButtonTextElement.textContent = "AR Gagal";
               arButtonElement.classList.remove("ar-active");
             });
         } else {
           logToScreen("Mengakhiri sesi AR...");
-          xrSession.end(); // xrSession.end() will trigger onSessionEnded via event listener
+          xrSession.end(); 
         }
       }
     
-      // Called when an AR session successfully starts
       function onSessionStarted(session) {
         logToScreen(`Sesi AR dimulai.`);
         xrSession = session;
         const arButtonElement = document.getElementById("arButton");
-        const arButtonTextNode = arButtonElement.childNodes[1].nodeType === Node.TEXT_NODE ? arButtonElement.childNodes[1] : arButtonElement.querySelector("span + span") || arButtonElement.appendChild(document.createTextNode("")).previousSibling;
-
-        if (arButtonTextNode) arButtonTextNode.textContent = " Stop AR";
+        if(arButtonTextElement) arButtonTextElement.textContent = "Stop AR";
         arButtonElement.classList.add("ar-active");
     
-        // Hide non-AR UI elements
         document.querySelector(".bottom-nav").style.display = "none";
-        if (gui) gui.hide();
-        if (skyboxObject) skyboxObject.visible = false; // Hide skybox in AR
-        scene.background = null; // Transparent background for AR camera feed
+        if (gui.domElement.style.display !== 'none') gui.hide(); // Hide GUI if open
+        guiToggleButton.style.display = "none"; // Hide GUI toggle button
+        logControlsContainer.style.display = "none"; // Hide log toggle button and log
+
+        if (skyboxObject) skyboxObject.visible = false; 
+        scene.background = null; 
     
-        // Reset AR state
         xrRefSpace = null;
         xrHitTestSource = null;
         modelPlaced = false;
         if (modelContainerGroup) {
-          modelContainerGroup.visible = false; // Hide model until placed
-          modelContainerGroup.userData.originalScale = modelContainerGroup.scale.clone(); // Store original scale
+          modelContainerGroup.visible = false; 
+          modelContainerGroup.userData.originalScale = modelContainerGroup.scale.clone(); 
           modelContainerGroup.scale.set(params.arModelScale, params.arModelScale, params.arModelScale);
-          modelContainerGroup.userData.initialArScale = params.arModelScale; // Store initial AR scale for pinch reference
-          logToScreen(`Model disembunyikan, skala AR diatur ke: ${params.arModelScale}`);
+          modelContainerGroup.userData.initialArScale = params.arModelScale; 
+          logToScreen(`Model disembunyikan, skala AR: ${params.arModelScale}`);
         }
-        reticleMesh.visible = false; // Hide reticle until scanning starts
-        arInstructionsPanel.style.display = "block"; // Show AR placement instructions
-        onScreenLogContainer.style.display = "block"; // Show log in AR for debugging
-        if (appVersionDisplay) {
-            appVersionDisplay.style.display = "block"; // Show app version
-            appVersionDisplay.textContent = `APP VERSI ${APP_VERSION}`;
-        }
+        reticleMesh.visible = false; 
+        arInstructionsPanel.style.display = "block"; 
+        // onScreenLogContainer.style.display = "block"; // Log shown via toggle now
+        if (appVersionDisplay) appVersionDisplay.style.display = "none"; // Hide app version in AR
     
-        session.addEventListener("end", onSessionEnded); // Handle session end
+        session.addEventListener("end", onSessionEnded); 
     
-        // Set up reference space and XR session for the renderer
-        renderer.xr.setReferenceSpaceType("local"); // 'local' is good for AR experiences where origin is at viewer's start
+        renderer.xr.setReferenceSpaceType("local"); 
         renderer.xr
           .setSession(session)
-          .then(() => { logToScreen("Sesi XR berhasil diset ke renderer."); })
+          .then(() => { logToScreen("Sesi XR diset ke renderer."); })
           .catch((err) => {
-            logToScreen(`Error saat set session ke renderer: ${err.message}`, "error");
-            session.end().catch((e) => logToScreen(`Error mengakhiri sesi setelah setSession gagal: ${e.message}`, "error"));
+            logToScreen(`Error set session: ${err.message}`, "error");
+            session.end().catch((e) => logToScreen(`Error end session: ${e.message}`, "error"));
           });
       }
     
-      // Called when user clicks "Start Scan" in AR instructions
       function onStartScanButtonClick() {
-        logToScreen("Tombol 'Mulai Pindai Permukaan' ditekan.");
-        arInstructionsPanel.style.display = "none"; // Hide instructions
+        logToScreen("Tombol 'Mulai Pindai' ditekan.");
+        arInstructionsPanel.style.display = "none"; 
         if (xrSession && !xrHitTestSource) {
-          // Request a 'viewer' reference space to base the hit-test source on
           xrSession.requestReferenceSpace("viewer")
             .then((refSpaceViewer) => {
-              logToScreen("Viewer reference space didapatkan untuk hit-test.");
-              // Create a hit-test source from the viewer space
+              logToScreen("Viewer reference space didapat.");
               return xrSession.requestHitTestSource({ space: refSpaceViewer });
             })
             .then((source) => {
-              xrHitTestSource = source; // Store the hit-test source
-              reticleMesh.visible = true; // Show the reticle now that scanning can begin
-              logToScreen("Hit test source berhasil didapatkan. Reticle aktif.");
+              xrHitTestSource = source; 
+              reticleMesh.visible = true; 
+              if(arReticleHint) arReticleHint.style.display = "block"; // Show reticle hint
+              logToScreen("Hit test source aktif. Reticle aktif.");
             })
             .catch((err) => {
-              logToScreen(`Error mendapatkan hit test source: ${err.message}`, "error");
-              logToScreen("Tidak bisa memulai pemindaian permukaan. Coba lagi atau restart sesi AR.", "error");
+              logToScreen(`Error hit test source: ${err.message}`, "error");
+              logToScreen("Tidak bisa memulai pindai. Coba lagi / restart AR.", "error");
               reticleMesh.visible = false;
             });
         } else if (xrHitTestSource) {
-          logToScreen("Hit test source sudah ada. Reticle seharusnya sudah aktif.");
+          logToScreen("Hit test source sudah ada. Reticle aktif.");
           reticleMesh.visible = true;
+          if(arReticleHint) arReticleHint.style.display = "block";
         } else if (!xrSession) {
-          logToScreen("Sesi AR tidak aktif saat mencoba memulai pemindaian.", "warn");
+          logToScreen("Sesi AR tidak aktif.", "warn");
         }
       }
     
-      // Called when an AR session ends (either by user or programmatically)
       function onSessionEnded() {
         logToScreen("Sesi AR berakhir.");
-        if (xrSession) { // Ensure cleanup only if session was active
-            xrSession.removeEventListener("end", onSessionEnded); // Clean up event listener
+        if (xrSession) { 
+            xrSession.removeEventListener("end", onSessionEnded); 
             xrSession = null;
         }
         
         const arButtonElement = document.getElementById("arButton");
-        const arButtonTextNode = arButtonElement.childNodes[1].nodeType === Node.TEXT_NODE ? arButtonElement.childNodes[1] : arButtonElement.querySelector("span + span") || arButtonElement.appendChild(document.createTextNode("")).previousSibling;
-
-        if (arButtonTextNode) arButtonTextNode.textContent = " AR Mode";
+        if(arButtonTextElement) arButtonTextElement.textContent = "AR Mode"; // Correctly reset text
         arButtonElement.classList.remove("ar-active");
     
-        // Restore non-AR UI
         document.querySelector(".bottom-nav").style.display = "flex";
-        if (gui) gui.show();
+        // Don't auto-show GUI, respect its last state or default (hidden)
+        guiToggleButton.style.display = "flex"; 
+        logControlsContainer.style.display = "block"; // Show log toggle
+
         arInstructionsPanel.style.display = "none";
-        onScreenLogContainer.style.display = "none";
-        if (appVersionDisplay) appVersionDisplay.style.display = "block"; // Keep version visible or hide as preferred
+        if(arReticleHint) arReticleHint.style.display = "none";
+        if(arModelInteractionHint) arModelInteractionHint.style.display = "none";
+        // onScreenLogContainer.style.display = "none"; // Log visibility controlled by toggle
     
-        reticleMesh.visible = false; // Hide reticle
+        reticleMesh.visible = false; 
         if (xrHitTestSource) {
-            xrHitTestSource.cancel(); // Important: cancel the hit test source
+            xrHitTestSource.cancel(); 
             xrHitTestSource = null;
         }
     
-        // Remove AR-specific touch listeners
         renderer.domElement.removeEventListener("touchstart", handleARtouchstart);
         renderer.domElement.removeEventListener("touchmove", handleARtouchmove);
         renderer.domElement.removeEventListener("touchend", handleARtouchend);
@@ -730,61 +842,56 @@
         arIsDragging = false;
         logToScreen("Listener interaksi AR dihapus.");
     
-        // Restore model visibility and scale for non-AR mode
         if (modelContainerGroup) {
           modelContainerGroup.visible = true;
           if (modelContainerGroup.userData.originalScale) {
             modelContainerGroup.scale.copy(modelContainerGroup.userData.originalScale);
-            logToScreen(`Skala model dikembalikan ke non-AR: ${modelContainerGroup.scale.x.toFixed(2)}`);
+            logToScreen(`Skala model kembali ke non-AR: ${modelContainerGroup.scale.x.toFixed(2)}`);
           } else {
-            // Fallback if originalScale wasn't set (shouldn't happen in normal flow)
             modelContainerGroup.scale.set(params.modelScale, params.modelScale, params.modelScale);
           }
         }
-        // Reset camera to a default view if model exists
         if (model) goToViewPreset(params.selectedViewPreset, true); 
-        updateBackgroundVisibility(); // Restore skybox/background color
+        updateBackgroundVisibility(); 
+        if (appVersionDisplay) appVersionDisplay.style.display = "block";
       }
     
-      // Handles tap/click in AR mode to place the model
       function onSelectAR(event) {
         logToScreen(
-          `onSelectAR. Sesi AR: ${!!xrSession}, Reticle: ${reticleMesh.visible}, Model Ditempatkan: ${modelPlaced}`
+          `onSelectAR. AR: ${!!xrSession}, Reticle: ${reticleMesh.visible}, Placed: ${modelPlaced}`
         );
         if (xrSession && reticleMesh.visible && !modelPlaced) {
           if (modelContainerGroup && model) {
-            logToScreen("Mencoba menempatkan model. Matriks reticle:", reticleMesh.matrix.elements.map((n) => n.toFixed(2)).join(', '));
-            // Set model's pose to the reticle's pose
+            logToScreen("Menempatkan model. Matriks reticle:", reticleMesh.matrix.elements.map((n) => n.toFixed(2)).join(', '));
             modelContainerGroup.matrix.copy(reticleMesh.matrix);
-            modelContainerGroup.matrix.decompose(modelContainerGroup.position, modelContainerGroup.quaternion, modelContainerGroup.scale); // Apply matrix to position, rotation, scale
-            modelContainerGroup.scale.set(params.arModelScale, params.arModelScale, params.arModelScale); // Ensure AR scale is applied
-            modelContainerGroup.userData.initialArScale = params.arModelScale; // Re-affirm initial AR scale for interactions
-            modelContainerGroup.visible = true; // Make model visible
-            modelPlaced = true; // Mark model as placed
-            reticleMesh.visible = false; // Hide reticle
-            if (xrHitTestSource) { // It's good practice to cancel hit test source once model is placed if not needed further
-                // xrHitTestSource.cancel(); // Might re-enable if user wants to move object later
-                // xrHitTestSource = null; 
+            modelContainerGroup.matrix.decompose(modelContainerGroup.position, modelContainerGroup.quaternion, modelContainerGroup.scale); 
+            modelContainerGroup.scale.set(params.arModelScale, params.arModelScale, params.arModelScale); 
+            modelContainerGroup.userData.initialArScale = params.arModelScale; 
+            modelContainerGroup.visible = true; 
+            modelPlaced = true; 
+            reticleMesh.visible = false; 
+            if(arReticleHint) arReticleHint.style.display = "none"; // Hide reticle hint
+            if(arModelInteractionHint) { // Show interaction hint
+                arModelInteractionHint.style.display = "block";
+                setTimeout(() => { arModelInteractionHint.style.display = "none"; }, 4000); // Hide after 4s
             }
+            
             logToScreen(`Model AR ditempatkan. Pos: ${modelContainerGroup.position.toArray().map((n) => n.toFixed(2))}, Skala: ${params.arModelScale}`);
             
-            // Add touch listeners for AR interaction (drag, pinch)
             renderer.domElement.addEventListener("touchstart", handleARtouchstart, { passive: false });
             renderer.domElement.addEventListener("touchmove", handleARtouchmove, { passive: false });
             renderer.domElement.addEventListener("touchend", handleARtouchend, { passive: false });
-            logToScreen("Listener interaksi AR (drag/pinch) ditambahkan.");
+            logToScreen("Listener interaksi AR (drag/pinch) ditambah.");
           } else {
-            logToScreen("Model atau modelContainerGroup tidak siap untuk ditempatkan di AR.", "warn");
+            logToScreen("Model/group tidak siap untuk AR.", "warn");
           }
         } else if (modelPlaced) {
-            // If model is already placed, a tap could potentially select it for re-positioning (future feature)
-            logToScreen("Model sudah ditempatkan. Tap dideteksi.");
+            logToScreen("Model sudah ditempatkan.");
         } else {
-          logToScreen("Kondisi untuk menempatkan model AR tidak terpenuhi (reticle tidak terlihat atau sesi AR tidak aktif).");
+          logToScreen("Kondisi menempatkan model AR tidak terpenuhi.");
         }
       }
     
-      // --- AR Interaction Functions (Touch for Pinch & Drag) ---
       function getDistanceBetweenTouches(touches) {
         const touch1 = touches[0];
         const touch2 = touches[1];
@@ -793,21 +900,20 @@
     
       function handleARtouchstart(event) {
         if (!xrSession || !modelPlaced || !modelContainerGroup) return;
-        event.preventDefault(); // Prevent default browser actions like scrolling
+        event.preventDefault(); 
         const touches = event.touches;
-        if (touches.length === 1) { // Single touch: Drag to rotate
+        if (touches.length === 1) { 
           arIsDragging = true;
           arIsPinching = false;
           arLastDragX = touches[0].clientX;
           arLastDragY = touches[0].clientY;
-          logToScreen("AR Drag Start");
-        } else if (touches.length === 2) { // Two touches: Pinch to scale
+          // logToScreen("AR Drag Start");
+        } else if (touches.length === 2) { 
           arIsPinching = true;
           arIsDragging = false;
           arInitialPinchDistance = getDistanceBetweenTouches(touches);
-          // Store the scale at the beginning of the pinch
           modelContainerGroup.userData.currentPinchStartScale = modelContainerGroup.scale.x; 
-          logToScreen(`AR Pinch Start. Initial Distance: ${arInitialPinchDistance.toFixed(2)}, Start Scale: ${modelContainerGroup.userData.currentPinchStartScale.toFixed(3)}`);
+          // logToScreen(`AR Pinch Start. Dist: ${arInitialPinchDistance.toFixed(2)}, Scale: ${modelContainerGroup.userData.currentPinchStartScale.toFixed(3)}`);
         }
       }
     
@@ -815,21 +921,21 @@
         if (!xrSession || !modelPlaced || !modelContainerGroup) return;
         event.preventDefault();
         const touches = event.touches;
-        if (arIsDragging && touches.length === 1) { // Dragging
+        if (arIsDragging && touches.length === 1) { 
           const deltaX = touches[0].clientX - arLastDragX;
           const deltaY = touches[0].clientY - arLastDragY;
-          modelContainerGroup.rotation.y += deltaX * arDragSensitivity; // Rotate around Y axis
-          modelContainerGroup.rotation.x += deltaY * arDragSensitivity; // Rotate around X axis
+          modelContainerGroup.rotation.y += deltaX * arDragSensitivity; 
+          modelContainerGroup.rotation.x += deltaY * arDragSensitivity; 
           arLastDragX = touches[0].clientX;
           arLastDragY = touches[0].clientY;
-        } else if (arIsPinching && touches.length === 2) { // Pinching
+        } else if (arIsPinching && touches.length === 2) { 
           const currentPinchDistance = getDistanceBetweenTouches(touches);
           if (arInitialPinchDistance > 0 && modelContainerGroup.userData.currentPinchStartScale !== undefined) {
             const scaleFactor = currentPinchDistance / arInitialPinchDistance;
             let newScale = modelContainerGroup.userData.currentPinchStartScale * scaleFactor;
-            // Clamp scale to reasonable limits
-            const minScale = modelContainerGroup.userData.initialArScale * 0.1; // 10% of initial AR scale
-            const maxScale = modelContainerGroup.userData.initialArScale * 10;  // 1000% of initial AR scale
+            const baseArScale = modelContainerGroup.userData.initialArScale || params.arModelScale; // Fallback
+            const minScale = baseArScale * 0.1; 
+            const maxScale = baseArScale * 10;  
             newScale = Math.max(minScale, Math.min(newScale, maxScale));
             modelContainerGroup.scale.set(newScale, newScale, newScale);
           }
@@ -838,37 +944,28 @@
     
       function handleARtouchend(event) {
         if (!xrSession || !modelPlaced) return;
-        // event.preventDefault(); // Not always needed on touchend, but can be for consistency
         if (arIsDragging && event.touches.length < 1) {
           arIsDragging = false;
-          logToScreen("AR Drag End");
+          // logToScreen("AR Drag End");
         }
-        if (arIsPinching && event.touches.length < 2) { // If one finger is lifted during pinch
+        if (arIsPinching && event.touches.length < 2) { 
           arIsPinching = false;
           if (modelContainerGroup) {
-            // Update the base AR scale param for future GUI interactions or re-pinching
             params.arModelScale = modelContainerGroup.scale.x; 
-            if (gui) { // Update GUI if it exists
+            if (gui) { 
               const arScaleController = gui.controllersRecursive().find((c) => c.property === "arModelScale");
               if (arScaleController) arScaleController.setValue(params.arModelScale).updateDisplay();
             }
           }
-          logToScreen(`AR Pinch End. Final AR Scale: ${params.arModelScale.toFixed(3)}`);
+          // logToScreen(`AR Pinch End. Final Scale: ${params.arModelScale.toFixed(3)}`);
         }
       }
-      // --- End AR Interaction Functions ---
     
-      // Loads the main 3D model (GLB/GLTF)
       function loadMainModel() {
-        // if (loadingIndicator) { // loadingIndicator is not defined
-        //   loadingIndicator.style.display = "block";
-        //   loadingIndicator.textContent = "Memuat Model...";
-        // }
-        logToScreen(`Mulai memuat model dari: ${params.modelPath}`);
-        // Clean up previous model if any
+        logToScreen(`Memuat model: ${params.modelPath}`);
         if (model) {
           modelContainerGroup.remove(model);
-          model.traverse((node) => { // Dispose geometries and materials
+          model.traverse((node) => { 
             if (node.geometry) node.geometry.dispose();
             if (node.material) {
               if (Array.isArray(node.material)) node.material.forEach((mat) => mat.dispose());
@@ -878,109 +975,89 @@
           model = null;
           logToScreen("Model lama dibersihkan.");
         }
-        // Reset model transformation trackers
         modelCenter.set(0, 0, 0);
         modelSize.set(0, 0, 0);
         modelContainerGroup.position.set(0, 0, 0);
         modelContainerGroup.rotation.set(0, 0, 0);
-        modelContainerGroup.quaternion.identity(); // Reset quaternion
+        modelContainerGroup.quaternion.identity(); 
     
         const mainModelLoader = new GLTFLoader();
         mainModelLoader.load(
           params.modelPath,
-          function (gltf) { // Success callback
+          function (gltf) { 
             model = gltf.scene;
             if (!model) {
-              logToScreen(`GLTFLoader berhasil, tetapi gltf.scene kosong untuk: ${params.modelPath}`, "error");
-              // if (loadingIndicator) {
-              //   loadingIndicator.innerHTML = `Gagal memproses model.<br>File "${params.modelPath}" mungkin tidak valid.`;
-              //   loadingIndicator.style.color = "red";
-              // }
+              logToScreen(`GLTF scene kosong: ${params.modelPath}`, "error");
               return;
             }
-            logToScreen("Model GLTF berhasil di-parse.");
+            logToScreen("Model GLTF di-parse.");
             modelContainerGroup.add(model);
     
-            // Calculate bounding box and center the model
-            const box = new THREE.Box3().setFromObject(modelContainerGroup); // Use modelContainerGroup for correct centering after adding
-            box.getCenter(modelCenter); // Get center in world space OF THE GROUP
+            const box = new THREE.Box3().setFromObject(modelContainerGroup); 
+            box.getCenter(modelCenter); 
             box.getSize(modelSize);
-            logToScreen(`Ukuran model awal: X:${modelSize.x.toFixed(2)}, Y:${modelSize.y.toFixed(2)}, Z:${modelSize.z.toFixed(2)}`);
+            logToScreen(`Size model: X:${modelSize.x.toFixed(2)}, Y:${modelSize.y.toFixed(2)}, Z:${modelSize.z.toFixed(2)}`);
             
-            // Offset the group so its center is at the world origin (0,0,0)
-            // This makes rotations and camera targeting simpler.
             modelContainerGroup.position.sub(modelCenter); 
-            modelCenter.set(0,0,0); // Now the logical center of the model (within the group) is (0,0,0)
-            logToScreen("ModelContainerGroup dipusatkan ke origin.");
+            modelCenter.set(0,0,0); 
+            logToScreen("ModelContainerGroup dipusatkan.");
     
-            applyInitialRotation(); // Apply user-defined initial rotation
-            applyModelScale();      // Apply user-defined scale (handles AR vs non-AR)
-            updateMaterialProperties(); // Any custom material tweaks
-            logToScreen("Model GLB utama berhasil dimuat dan disiapkan.");
-            // if (loadingIndicator) loadingIndicator.style.display = "none";
+            applyInitialRotation(); 
+            applyModelScale();      
+            updateMaterialProperties(); 
+            logToScreen("Model utama dimuat & siap.");
             
-            // After model is loaded, set to default view
             goToViewPreset(params.selectedViewPreset, true); 
           },
-          function (xhr) { // Progress callback
+          function (xhr) { 
             if (xhr.lengthComputable) {
               const percentComplete = (xhr.loaded / xhr.total) * 100;
-              // if (loadingIndicator) loadingIndicator.textContent = `Memuat Model: ${Math.round(percentComplete, 2)}%`;
               console.log(`Memuat Model: ${Math.round(percentComplete, 2)}%`);
             } else {
-              // if (loadingIndicator)
-              //   loadingIndicator.textContent = `Memuat Model... (${(xhr.loaded / 1024 / 1024).toFixed(2)} MB)`;
               console.log(`Memuat Model... (${(xhr.loaded / 1024 / 1024).toFixed(2)} MB)`);
             }
           },
-          function (error) { // Error callback
-            logToScreen(`Gagal memuat model GLB utama dari: ${params.modelPath}. Error: ${error.message || error}`, "error");
-            // if (loadingIndicator) {
-            //   loadingIndicator.innerHTML = `Gagal memuat model.<br>Pastikan file "${params.modelPath}" ada atau URL benar. Cek konsol.`;
-            //   loadingIndicator.style.color = "red";
-            // }
+          function (error) { 
+            logToScreen(`Gagal memuat model: ${params.modelPath}. Error: ${error.message || error}`, "error");
           }
         );
       }
     
-      // Applies the current scale parameter to the model
       function applyModelScale() {
         if (modelContainerGroup && model) {
           const scaleValue = xrSession ? params.arModelScale : params.modelScale;
           modelContainerGroup.scale.set(scaleValue, scaleValue, scaleValue);
-          logToScreen(`Skala model diatur ke: ${scaleValue.toFixed(3)} (Sesi AR: ${!!xrSession})`);
+          logToScreen(`Skala model: ${scaleValue.toFixed(3)} (AR: ${!!xrSession})`);
           
-          if (!xrSession) { // Only re-frame if not in AR, as AR placement handles initial view
-            const box = new THREE.Box3().setFromObject(modelContainerGroup); // Recalculate size after scaling
-            box.getSize(modelSize); // Update modelSize for preset views
-            goToViewPreset(params.selectedViewPreset, true); // Re-apply view preset with new scale
+          if (!xrSession) { 
+            const box = new THREE.Box3().setFromObject(modelContainerGroup); 
+            box.getSize(modelSize); 
+            goToViewPreset(params.selectedViewPreset, true); 
           } else {
-            // For AR, this scale is the base for pinch-to-zoom
             modelContainerGroup.userData.initialArScale = scaleValue; 
           }
         } else if (!model) {
-          logToScreen("applyModelScale dipanggil tetapi model belum dimuat.", "warn");
+          logToScreen("applyModelScale: model belum dimuat.", "warn");
         }
       }
     
-      // Loads a skybox from a GLB file
       function loadSkyboxFromGLB() {
         if (!params.skyboxGlbUrl || params.skyboxGlbUrl === "SKYBOX_ANDA.glb" || params.skyboxGlbUrl.includes("placehold.co")) {
-          logToScreen("URL Skybox GLB tidak valid. Skybox tidak akan dimuat.", "warn");
-          if (skyboxObject) { // Clean up old skybox if any
+          logToScreen("URL Skybox GLB tidak valid.", "warn");
+          if (skyboxObject) { 
             scene.remove(skyboxObject);
-            skyboxObject.traverse((node) => { /* dispose geometry/material */ });
+            skyboxObject.traverse((node) => { /* dispose */ });
             skyboxObject = null;
           }
-          updateBackgroundVisibility(); // Fallback to color
+          updateBackgroundVisibility(); 
           return;
         }
-        logToScreen(`Mulai memuat skybox dari: ${params.skyboxGlbUrl}`);
+        logToScreen(`Memuat skybox: ${params.skyboxGlbUrl}`);
         const loader = new GLTFLoader();
         loader.load(
           params.skyboxGlbUrl,
-          (gltf) => { // Success
-            if (skyboxObject) { // Clean up previous skybox
+          (gltf) => { 
+            if (skyboxObject) { 
               scene.remove(skyboxObject);
               skyboxObject.traverse((node) => {
                 if (node.geometry) node.geometry.dispose();
@@ -991,24 +1068,23 @@
               });
             }
             skyboxObject = gltf.scene;
-            skyboxObject.traverse((node) => { // Ensure skybox material properties are correct
+            skyboxObject.traverse((node) => { 
               if (node.isMesh) {
                 const materials = Array.isArray(node.material) ? node.material : [node.material];
                 materials.forEach((material) => {
-                  material.side = THREE.BackSide; // Render inside of the skybox
-                  // Adjust brightness based on params.skyboxBrightness
+                  material.side = THREE.BackSide; 
                   if (material.isMeshStandardMaterial || material.isMeshPhysicalMaterial) {
                     if (material.userData.initialEmissiveIntensityGLB === undefined) {
-                       material.userData.initialEmissiveIntensityGLB = material.emissiveIntensity !== undefined ? material.emissiveIntensity : 1; // Default to 1 if not set
+                       material.userData.initialEmissiveIntensityGLB = material.emissiveIntensity !== undefined ? material.emissiveIntensity : 1; 
                     }
                     material.emissiveIntensity = material.userData.initialEmissiveIntensityGLB * params.skyboxBrightness;
-                    if (!material.emissiveMap) { // If no emissive map, tint the emissive color
+                    if (!material.emissiveMap) { 
                         if (material.userData.initialEmissiveColorGLB === undefined) {
-                            material.userData.initialEmissiveColorGLB = material.emissive ? material.emissive.clone() : new THREE.Color(0xffffff); // Default to white
+                            material.userData.initialEmissiveColorGLB = material.emissive ? material.emissive.clone() : new THREE.Color(0xffffff); 
                         }
                         material.emissive.copy(material.userData.initialEmissiveColorGLB).multiplyScalar(params.skyboxBrightness);
                     }
-                  } else if (material.isMeshBasicMaterial) { // For basic materials, adjust color
+                  } else if (material.isMeshBasicMaterial) { 
                     if (material.userData.initialColorGLB === undefined) {
                        material.userData.initialColorGLB = material.color ? material.color.clone() : new THREE.Color(0xffffff);
                     }
@@ -1018,38 +1094,35 @@
                 });
               }
             });
-            // Scale skybox to be very large
-            const skyboxScale = Math.max(camera.far * 0.5, 1000); // Ensure it's beyond far plane or at least 1000 units
+            const skyboxScale = Math.max(camera.far * 0.5, 1000); 
             skyboxObject.scale.set(skyboxScale, skyboxScale, skyboxScale);
-            skyboxObject.renderOrder = -10; // Render behind everything else
+            skyboxObject.renderOrder = -10; 
             scene.add(skyboxObject);
-            updateBackgroundVisibility(); // Apply visibility based on params
-            logToScreen("Skybox GLB berhasil dimuat.");
+            updateBackgroundVisibility(); 
+            logToScreen("Skybox GLB dimuat.");
           },
-          undefined, // Progress callback (optional)
-          (error) => { // Error callback
+          undefined, 
+          (error) => { 
             logToScreen(`Gagal memuat Skybox GLB: ${params.skyboxGlbUrl}. Error: ${error.message || error}`, "error");
             if (skyboxObject) { scene.remove(skyboxObject); skyboxObject = null; }
-            updateBackgroundVisibility(); // Fallback to color
+            updateBackgroundVisibility(); 
           }
         );
       }
     
-      // Updates visibility of skybox vs. solid background color
       function updateBackgroundVisibility() {
         if (skyboxObject) {
-          skyboxObject.visible = params.showSkybox && !xrSession; // Skybox visible if toggled and not in AR
+          skyboxObject.visible = params.showSkybox && !xrSession; 
         }
         if (params.showSkybox && skyboxObject && skyboxObject.children.length > 0 && !xrSession) {
-          scene.background = null; // Use skybox if available and shown
-        } else if (!xrSession) { // Not in AR, use background color
+          scene.background = null; 
+        } else if (!xrSession) { 
           scene.background = new THREE.Color(params.backgroundColor);
-        } else { // In AR, background should be transparent (camera feed)
+        } else { 
           scene.background = null;
         }
       }
     
-      // Applies initial rotation from params to the model
       function applyInitialRotation() {
         if (modelContainerGroup) {
           modelContainerGroup.rotation.set(
@@ -1060,75 +1133,63 @@
         }
       }
     
-      // Placeholder for any custom material updates needed on the model
       function updateMaterialProperties() {
         if (!model) return;
         model.traverse((node) => {
           if (node.isMesh && node.material) {
-            // Example: node.material.roughness = 0.5;
-            // This function can be expanded to tweak materials after loading
+            // Custom material tweaks if needed
           }
         });
       }
     
-      // Moves camera to a predefined view preset
-      // Note on view mapping: "Front" view looks AT the model's front (camera is on model's -Z if model faces +Z)
-      // The original code had a different interpretation, this is a more standard one.
-      // For this implementation: Front = camera at (0,0,D), Left = camera at (-D,0,0) etc.
-      // The user's original comment: "Front" => dari kiri, "Back" => dari kanan, "Left" => dari depan, "Right" => dari belakang.
-      // I will stick to the user's interpretation for consistency with their intent.
       function goToViewPreset(presetName, instant = false) {
-        if (isUpdatingViewPresetGUI) return; // Prevent recursion if called from GUI change
+        if (isUpdatingViewPresetGUI) return; 
         if (!modelContainerGroup || !camera || !controls || !model) {
-          logToScreen("goToViewPreset: Komponen belum siap (model, kamera, atau kontrol).", "warn");
+          logToScreen("goToViewPreset: Komponen belum siap.", "warn");
           return;
         }
-        isUpdatingViewPresetGUI = true; // Flag to prevent GUI feedback loop
+        isUpdatingViewPresetGUI = true; 
     
-        const center = new THREE.Vector3(0, 0, 0); // Model is centered at origin within its group
-        // Recalculate bounding box of the *visible model parts* within the container group
+        const center = new THREE.Vector3(0, 0, 0); 
         const currentBox = new THREE.Box3();
-        model.traverseVisible(obj => { // Only consider visible parts of the model itself
+        model.traverseVisible(obj => { 
             if(obj.isMesh) currentBox.expandByObject(obj);
         });
-        currentBox.getSize(modelSize); // Get size of the actual model meshes
-        // Apply current group scale to the modelSize
+        currentBox.getSize(modelSize); 
         modelSize.multiply(modelContainerGroup.scale);
 
-
-        const maxDim = Math.max(modelSize.x, modelSize.y, modelSize.z, 0.1); // Ensure non-zero
-        const distanceFactor = 2.0; // How far to place camera relative to model size
+        const maxDim = Math.max(modelSize.x, modelSize.y, modelSize.z, 0.1); 
+        const distanceFactor = 1.9; // Slightly closer
         let distance = maxDim * distanceFactor;
-        distance = Math.max(distance, 0.2); // Minimum distance
+        distance = Math.max(distance, 0.15); 
     
         let newCamPos = new THREE.Vector3();
-        camera.up.set(0, 1, 0); // Default UP vector
+        camera.up.set(0, 1, 0); 
     
         switch (presetName) {
-          case "Front": // User: "dari kiri" -> camera on negative X
+          case "Front": 
             newCamPos.set(center.x - distance, center.y, center.z);
             break;
-          case "Back": // User: "dari kanan" -> camera on positive X
+          case "Back": 
             newCamPos.set(center.x + distance, center.y, center.z);
             break;
-          case "Left": // User: "dari depan" -> camera on positive Z
+          case "Left": 
             newCamPos.set(center.x, center.y, center.z + distance);
             break;
-          case "Right": // User: "dari belakang" -> camera on negative Z
+          case "Right": 
             newCamPos.set(center.x, center.y, center.z - distance);
             break;
           case "Top":
-            newCamPos.set(center.x, center.y + distance, center.z + 0.0001); // Slight Z offset for lookAt
-            camera.up.set(0, 0, -1); // When looking from top, Z is "up" on screen if model is Y-up
+            newCamPos.set(center.x, center.y + distance, center.z + 0.0001); 
+            camera.up.set(0, 0, -1); 
             break;
           case "Bottom":
             newCamPos.set(center.x, center.y - distance, center.z + 0.0001);
-            camera.up.set(0, 0, 1); // When looking from bottom
+            camera.up.set(0, 0, 1); 
             break;
           case "Default":
           default:
-            // Frame the object with a slight offset and angle
-            frameArea(modelContainerGroup, camera, controls, instant, 1.8); // Use frameArea for default
+            frameArea(modelContainerGroup, camera, controls, instant, 1.7); 
             params.selectedViewPreset = "Default";
             if (gui) {
               const presetController = gui.controllersRecursive().find((c) => c.property === "selectedViewPreset");
@@ -1138,63 +1199,68 @@
                 presetController.updateDisplay();
               }
             }
+            updateActiveViewButton("Default");
             isUpdatingViewPresetGUI = false;
             return;
         }
     
-        // Apply new camera position and update controls
         if (instant) {
           camera.position.copy(newCamPos);
           controls.target.copy(center);
-          camera.lookAt(center); // Ensure camera looks at the center
-          controls.update(); // Crucial for orbit controls to sync
+          camera.lookAt(center); 
+          controls.update(); 
         } else {
-          // For smooth transition (not implemented here, would need GSAP or similar tweening)
-          // For now, "non-instant" is also instant.
           camera.position.copy(newCamPos);
           controls.target.copy(center);
           camera.lookAt(center);
           controls.update();
         }
     
-        params.selectedViewPreset = presetName; // Update current preset param
-        if (gui) { // Update GUI dropdown
+        params.selectedViewPreset = presetName; 
+        if (gui) { 
           const presetController = gui.controllersRecursive().find((c) => c.property === "selectedViewPreset");
           if (presetController && presetController.getValue() !== presetName) {
             presetController.setValue(presetName).updateDisplay();
           } else if (presetController) {
-            presetController.updateDisplay(); // Just refresh if value is already correct
+            presetController.updateDisplay(); 
           }
         }
+        updateActiveViewButton(presetName);
         isUpdatingViewPresetGUI = false;
       }
+
+      function updateActiveViewButton(activePreset) {
+        document.querySelectorAll(".view-btn").forEach(btn => {
+            if (btn.getAttribute('data-view') === activePreset) {
+                btn.classList.add('view-btn-active');
+            } else {
+                btn.classList.remove('view-btn-active');
+            }
+        });
+      }
     
-      // Utility to frame an object in camera view
       function frameArea(objectToFrame, cam, ctrl, instant = false, fitOffset = 1.5) {
-        if (!objectToFrame || !model) { // Check if model exists within objectToFrame
-          logToScreen("frameArea: Objek model tidak valid atau belum dimuat.", "warn");
-          if (instant) { // Fallback camera position
+        if (!objectToFrame || !model) { 
+          logToScreen("frameArea: Objek model tidak valid.", "warn");
+          if (instant) { 
             ctrl.target.set(0, 0, 0);
-            cam.position.set(0, 0.5, 3); // Default fallback
+            cam.position.set(0, 0.5, 2.5); 
             ctrl.update();
           }
           return;
         }
     
         const box = new THREE.Box3();
-        // Important: get bounding box of the *model itself*, not necessarily the container group if it's empty or has other things.
-        // However, the container group IS what we want to frame if it's correctly centered.
-        // Let's assume objectToFrame (modelContainerGroup) is what needs to be framed and is centered.
         box.setFromObject(objectToFrame); 
     
         const sizeVec = box.getSize(new THREE.Vector3());
-        const centerVec = box.getCenter(new THREE.Vector3()); // Center of the object to frame
+        const centerVec = box.getCenter(new THREE.Vector3()); 
     
-        if (sizeVec.lengthSq() === 0) { // Handle empty or zero-size objects
-          logToScreen("frameArea: Ukuran objek adalah nol.", "warn");
+        if (sizeVec.lengthSq() === 0) { 
+          logToScreen("frameArea: Ukuran objek nol.", "warn");
           if (instant) {
-            ctrl.target.copy(centerVec); // Target the (potentially non-origin) center
-            cam.position.set(centerVec.x, centerVec.y + 0.5, centerVec.z + 3);
+            ctrl.target.copy(centerVec); 
+            cam.position.set(centerVec.x, centerVec.y + 0.5, centerVec.z + 2.5);
             ctrl.update();
           }
           return;
@@ -1204,32 +1270,28 @@
         const fitHeightDistance = maxSize / (2 * Math.atan((Math.PI * cam.fov) / 360));
         const fitWidthDistance = fitHeightDistance / cam.aspect;
         let distance = fitOffset * Math.max(fitHeightDistance, fitWidthDistance);
-        distance = Math.max(distance, 0.1); // Ensure minimum distance
+        distance = Math.max(distance, 0.1); 
     
-        // Position camera slightly offset and looking at the object's center
         const direction = cam.position.clone().sub(centerVec).normalize().multiplyScalar(distance);
         const targetCamPos = centerVec.clone().add(direction);
     
-        // If camera is already at center (e.g. (0,0,0)), set a default direction
         if (direction.lengthSq() < 0.001) {
-            targetCamPos.set(centerVec.x, centerVec.y + sizeVec.y * 0.5, centerVec.z + distance); // Default view slightly above and back
+            targetCamPos.set(centerVec.x, centerVec.y + sizeVec.y * 0.3, centerVec.z + distance); // Adjusted default view
         }
     
-        // Adjust near/far planes based on new distance for better depth precision
         cam.near = Math.max(0.01, distance / 100);
         cam.far = distance * 100;
         cam.updateProjectionMatrix();
     
-        // Update OrbitControls limits
         ctrl.maxDistance = distance * 10;
-        ctrl.minDistance = Math.min(0.01, distance * 0.1); // Allow closer zoom
+        ctrl.minDistance = Math.min(0.01, distance * 0.05); // Allow even closer zoom
     
         if (instant) {
           ctrl.target.copy(centerVec);
           cam.position.copy(targetCamPos);
-          cam.lookAt(centerVec); // Ensure it looks at the center
+          cam.lookAt(centerVec); 
           ctrl.update();
-        } else { // Smooth transition (currently also instant)
+        } else { 
           ctrl.target.copy(centerVec);
           cam.position.copy(targetCamPos);
           cam.lookAt(centerVec);
@@ -1237,95 +1299,90 @@
         }
       }
     
-      // Sets up event listeners for the preset view buttons
       function setupPresetButtons() {
         const buttons = document.querySelectorAll(".view-btn");
         buttons.forEach((button) => {
           button.addEventListener("click", () => {
             const view = button.getAttribute("data-view");
-            goToViewPreset(view, false); // Use non-instant for button clicks if smooth transition is ever added
+            goToViewPreset(view, false); 
           });
         });
+        updateActiveViewButton(params.selectedViewPreset); // Set initial active button
       }
     
-      // Sets up the lil-gui panel for controlling parameters
       function setupGUI() {
-        if (gui) gui.destroy(); // Destroy old GUI if exists
+        if (gui) gui.destroy(); 
         gui = new GUI();
-        gui.title("Kontrol Model 3D");
+        // gui.title("Kontrol Model"); // Title is now less prominent as it's a toggle panel
+        gui.domElement.style.display = 'none'; // Hidden by default
     
         const modelFolder = gui.addFolder("Model");
-        modelFolder.add(params, "modelPath").name("Path Model (.glb)").onFinishChange((value) => {
+        modelFolder.add(params, "modelPath").name("Path (.glb)").onFinishChange((value) => {
           params.modelPath = value; loadMainModel();
         });
-        modelFolder.add(params, "modelScale", 0.01, 10, 0.01).name("Skala (Non-AR)").onChange(applyModelScale);
-        modelFolder.add(params, "arModelScale", 0.01, 5.0, 0.005).name("Skala Model AR")
+        modelFolder.add(params, "modelScale", 0.01, 10, 0.01).name("Skala Non-AR").onChange(applyModelScale);
+        modelFolder.add(params, "arModelScale", 0.01, 5.0, 0.005).name("Skala AR")
           .onChange((value) => {
             params.arModelScale = value;
-            if (xrSession && modelPlaced && modelContainerGroup) { // If AR model is already placed
+            if (xrSession && modelPlaced && modelContainerGroup) { 
               modelContainerGroup.scale.set(value, value, value);
-              logToScreen(`Skala AR diupdate via GUI menjadi: ${value.toFixed(3)}`);
-            } else if (xrSession && !modelPlaced && modelContainerGroup) { // If AR active but model not yet placed
-              modelContainerGroup.scale.set(value, value, value); // This will be its initial placed scale
-              logToScreen(`Skala AR pre-placement diupdate via GUI menjadi: ${value.toFixed(3)}`);
+              logToScreen(`Skala AR GUI: ${value.toFixed(3)}`);
+            } else if (xrSession && !modelPlaced && modelContainerGroup) { 
+              modelContainerGroup.scale.set(value, value, value); 
+              logToScreen(`Skala AR pre-place GUI: ${value.toFixed(3)}`);
             }
           });
-        modelFolder.add(params, "initialRotationX_deg", -360, 360, 1).name("Rotasi Awal X").onChange(applyInitialRotation);
-        modelFolder.add(params, "initialRotationY_deg", -360, 360, 1).name("Rotasi Awal Y").onChange(applyInitialRotation);
-        modelFolder.add(params, "initialRotationZ_deg", -360, 360, 1).name("Rotasi Awal Z").onChange(applyInitialRotation);
-        modelFolder.add(params, "animateModel").name("Animasi Putar (Non-AR)");
-        modelFolder.add(params, "rotationSpeed", 0, 1, 0.01).name("Kecepatan Putar");
-        modelFolder.open();
+        const rotFolder = modelFolder.addFolder("Rotasi Awal");
+        rotFolder.add(params, "initialRotationX_deg", -360, 360, 1).name("X").onChange(applyInitialRotation);
+        rotFolder.add(params, "initialRotationY_deg", -360, 360, 1).name("Y").onChange(applyInitialRotation);
+        rotFolder.add(params, "initialRotationZ_deg", -360, 360, 1).name("Z").onChange(applyInitialRotation);
+        modelFolder.add(params, "animateModel").name("Animasi Putar");
+        modelFolder.add(params, "rotationSpeed", 0, 0.5, 0.005).name("Kecep. Putar");
+        // modelFolder.open(); // Folders closed by default now
     
-        const backgroundFolder = gui.addFolder("Latar Belakang (Non-AR)");
-        backgroundFolder.add(params, "showSkybox").name("Tampilkan Skybox").onChange(updateBackgroundVisibility);
-        backgroundFolder.add(params, "skyboxGlbUrl").name("URL Skybox (.glb)").onFinishChange(loadSkyboxFromGLB);
-        backgroundFolder.add(params, "skyboxBrightness", 0, 5, 0.05).name("Kecerahan Skybox")
-          .onChange(() => { if (skyboxObject) loadSkyboxFromGLB(); }); // Reload skybox to apply brightness
-        backgroundFolder.addColor(params, "backgroundColor").name("Warna Background").onChange((value) => {
+        const bgFolder = gui.addFolder("Latar (Non-AR)");
+        bgFolder.add(params, "showSkybox").name("Skybox").onChange(updateBackgroundVisibility);
+        bgFolder.add(params, "skyboxGlbUrl").name("URL Skybox (.glb)").onFinishChange(loadSkyboxFromGLB);
+        bgFolder.add(params, "skyboxBrightness", 0, 3, 0.05).name("Kecerahan Skybox")
+          .onChange(() => { if (skyboxObject) loadSkyboxFromGLB(); }); 
+        bgFolder.addColor(params, "backgroundColor").name("Warna BG").onChange((value) => {
           params.backgroundColor = value; updateBackgroundVisibility();
         });
-        backgroundFolder.open();
     
-        const cameraFolder = gui.addFolder("Kamera & Tampilan (Non-AR)");
-        cameraFolder.add(params, "cameraFOV", 10, 120, 1).name("Field of View (FOV)").onChange((value) => {
+        const camFolder = gui.addFolder("Kamera (Non-AR)");
+        camFolder.add(params, "cameraFOV", 10, 120, 1).name("FOV").onChange((value) => {
           camera.fov = value;
           camera.updateProjectionMatrix();
-          if (!xrSession) goToViewPreset(params.selectedViewPreset, true); // Re-frame with new FOV
+          if (!xrSession) goToViewPreset(params.selectedViewPreset, true); 
         });
-        cameraFolder.add(params, "selectedViewPreset", ["Default", "Front", "Back", "Top", "Bottom", "Left", "Right"])
-          .name("Preset Pandangan").onChange((value) => {
-            if (!isUpdatingViewPresetGUI) goToViewPreset(value, false); // Call if not already being updated
+        camFolder.add(params, "selectedViewPreset", ["Default", "Front", "Back", "Top", "Bottom", "Left", "Right"])
+          .name("Preset View").onChange((value) => {
+            if (!isUpdatingViewPresetGUI) goToViewPreset(value, false); 
           });
-        cameraFolder.open();
     
-        const lightingFolder = gui.addFolder("Pencahayaan");
-        lightingFolder.add(params, "ambientLightIntensity", 0, 5, 0.05).name("Intensitas Ambient")
+        const lightFolder = gui.addFolder("Pencahayaan");
+        lightFolder.add(params, "ambientLightIntensity", 0, 5, 0.05).name("Ambient")
           .onChange((value) => { if (ambientLight) ambientLight.intensity = value; });
-        lightingFolder.add(params, "directionalLightIntensity", 0, 5, 0.05).name("Intensitas Directional")
+        lightFolder.add(params, "directionalLightIntensity", 0, 5, 0.05).name("Directional")
           .onChange((value) => { if (directionalLight) directionalLight.intensity = value; });
-        lightingFolder.addColor(params, "directionalLightColor").name("Warna Directional")
+        lightFolder.addColor(params, "directionalLightColor").name("Warna Dir.")
           .onChange((value) => { if (directionalLight) directionalLight.color.setHex(value); });
-        lightingFolder.open();
     
-        const renderingFolder = gui.addFolder("Rendering");
-        renderingFolder.add(params, "toneMappingExposure", 0, 2, 0.01).name("Exposure")
+        const renderFolder = gui.addFolder("Rendering");
+        renderFolder.add(params, "toneMappingExposure", 0, 2, 0.01).name("Exposure")
           .onChange((value) => { renderer.toneMappingExposure = value; });
-        renderingFolder.open();
         
-        const utilitiesFolder = gui.addFolder("Utilitas");
-        utilitiesFolder.add({ takeScreenshot: takeScreenshot }, "takeScreenshot").name("Ambil Screenshot (Non-AR)");
-        utilitiesFolder.open();
+        const utilFolder = gui.addFolder("Utilitas");
+        utilFolder.add({ takeScreenshot: takeScreenshot }, "takeScreenshot").name("Screenshot");
       }
     
-      // Takes a screenshot of the current view (non-AR mode)
       function takeScreenshot() {
         try {
           if (xrSession) {
-            logToScreen("Screenshot tidak didukung dalam mode AR.", "warn");
+            logToScreen("Screenshot tidak di AR.", "warn");
             return;
           }
-          composer.render(); // Ensure scene is rendered with post-processing if any
+          composer.render(); 
           const dataURL = renderer.domElement.toDataURL("image/png");
           const a = document.createElement("a");
           a.href = dataURL;
@@ -1335,68 +1392,62 @@
           document.body.removeChild(a);
           logToScreen("Screenshot diambil!");
         } catch (e) {
-          logToScreen(`Gagal mengambil screenshot: ${e.message}`, "error");
+          logToScreen(`Gagal screenshot: ${e.message}`, "error");
         }
       }
     
-      // Handles window resize events to update camera and renderer
       function onWindowResize() {
         camera.aspect = window.innerWidth / window.innerHeight;
         camera.updateProjectionMatrix();
         renderer.setSize(window.innerWidth, window.innerHeight);
-        composer.setSize(window.innerWidth, window.innerHeight); // Update composer size
-        if (model && !xrSession) goToViewPreset(params.selectedViewPreset, true); // Re-frame on resize
+        composer.setSize(window.innerWidth, window.innerHeight); 
+        if (model && !xrSession) goToViewPreset(params.selectedViewPreset, true); 
       }
     
-      // Main animation loop, called every frame by the renderer
-      function animate(timestamp, frame) { // timestamp and frame are provided by WebXR
-        const deltaTime = clock.getDelta(); // Time since last frame
+      function animate(timestamp, frame) { 
+        const deltaTime = clock.getDelta(); 
     
-        if (!xrSession) { // Non-AR mode
-          controls.update(); // Update orbit controls
-          if (modelContainerGroup && params.animateModel) { // Auto-rotate model if enabled
+        if (!xrSession) { 
+          controls.update(); 
+          if (modelContainerGroup && params.animateModel) { 
             modelContainerGroup.rotation.y += params.rotationSpeed * deltaTime;
           }
-          if (skyboxObject && skyboxObject.visible) { // Keep skybox centered on camera
+          if (skyboxObject && skyboxObject.visible) { 
             skyboxObject.position.copy(camera.position);
           }
-          composer.render(); // Render scene via composer
-        } else { // AR mode
-          if (frame) { // If an XRFrame is available
-            const currentRefSpace = renderer.xr.getReferenceSpace(); // Get current reference space
+          composer.render(); 
+        } else { 
+          if (frame) { 
+            const currentRefSpace = renderer.xr.getReferenceSpace(); 
             if (xrHitTestSource && !modelPlaced && reticleMesh && currentRefSpace) {
-              const hitTestResults = frame.getHitTestResults(xrHitTestSource); // Perform hit-test
+              const hitTestResults = frame.getHitTestResults(xrHitTestSource); 
               if (hitTestResults.length > 0) {
                 const hit = hitTestResults[0];
-                const pose = hit.getPose(currentRefSpace); // Get pose of the hit in current ref space
+                const pose = hit.getPose(currentRefSpace); 
                 if (pose) {
-                  reticleMesh.matrix.fromArray(pose.transform.matrix); // Update reticle pose
+                  reticleMesh.matrix.fromArray(pose.transform.matrix); 
                   reticleMesh.visible = true;
                 } else { reticleMesh.visible = false; }
-              } else { reticleMesh.visible = false; } // No hits, hide reticle
+              } else { reticleMesh.visible = false; } 
             } else if (!modelPlaced && !xrHitTestSource && arInstructionsPanel.style.display === "none" && reticleMesh) {
-              // Fallback reticle positioning if hit-test isn't active (e.g., before scanning starts but instructions are hidden)
-              // This might not be ideal UX, usually reticle appears only with active hit-test.
-              // For now, keeping original logic for this case.
               reticleMesh.visible = true; 
               const camWorldPos = new THREE.Vector3();
               const camWorldDir = new THREE.Vector3();
               camera.getWorldPosition(camWorldPos);
               camera.getWorldDirection(camWorldDir);
-              reticleMesh.position.copy(camWorldPos).add(camWorldDir.multiplyScalar(0.7)); // Place 0.7m in front of camera
-              reticleMesh.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), new THREE.Vector3(0, 1, 0)); // Align Y up
-              reticleMesh.lookAt(camWorldPos); // Look towards camera (makes it flat)
-              reticleMesh.rotation.x = -Math.PI / 2; // Rotate to be flat on ground
+              reticleMesh.position.copy(camWorldPos).add(camWorldDir.multiplyScalar(0.7)); 
+              reticleMesh.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), new THREE.Vector3(0, 1, 0)); 
+              reticleMesh.lookAt(camWorldPos); 
+              reticleMesh.rotation.x = -Math.PI / 2; 
               reticleMesh.updateMatrix();
-            } else if (modelPlaced) { // If model is placed, reticle should be hidden
+            } else if (modelPlaced) { 
               if (reticleMesh) reticleMesh.visible = false;
             }
           }
-          renderer.render(scene, camera); // Render AR scene directly (composer might not be used in AR)
+          renderer.render(scene, camera); 
         }
       }
     
-      // Start the application
       init();
     </script>
   </body>
