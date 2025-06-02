@@ -107,10 +107,11 @@
 
         #reticle { 
             position: absolute;
-            width: 30px;
-            height: 30px;
+            width: 35px; /* Sedikit lebih besar */
+            height: 35px; /* Sedikit lebih besar */
             border-radius: 50%;
-            border: 2px solid white;
+            border: 3px solid rgba(255, 255, 255, 0.75); /* Lebih tebal dan sedikit transparan */
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.5); /* Tambahkan glow */
             box-sizing: border-box;
             display: none; 
             top: 50%;
@@ -118,6 +119,62 @@
             transform: translate(-50%, -50%);
             z-index: 99;
         }
+
+        #ar-instructions {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(0,0,0,0.85);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            z-index: 1002; /* Di atas segalanya kecuali loading */
+            display: none; /* Sembunyikan awal */
+            font-size: 1.1em;
+        }
+        #ar-instructions button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 15px;
+            font-size: 1em;
+        }
+        #ar-instructions button:hover {
+            background-color: #45a049;
+        }
+
+        #on-screen-log-container {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            width: calc(50% - 20px); /* Setengah layar kiri */
+            max-width: 400px;
+            height: 100px; /* Tinggi tetap */
+            background-color: rgba(0,0,0,0.6);
+            color: #0f0; /* Warna teks hijau seperti konsol */
+            font-family: monospace;
+            font-size: 0.75em;
+            padding: 8px;
+            border-radius: 5px;
+            overflow-y: scroll; /* Scroll jika log panjang */
+            z-index: 1000;
+            display: none; /* Sembunyikan awal, tampilkan saat AR */
+        }
+        #app-version {
+            position: absolute;
+            bottom: 10px;
+            left: 10px; /* Di bawah log container */
+            font-size: 0.7em;
+            color: rgba(255,255,255,0.5);
+            z-index: 1001;
+             display: none; /* Sembunyikan awal, tampilkan saat AR */
+        }
+
 
     </style>
     <script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
@@ -145,7 +202,14 @@
     <div id="ar-button-container">
         <button id="arButton">AR</button> 
     </div>
+    <div id="ar-instructions">
+        <p>Arahkan kamera ke permukaan datar (lantai/meja).</p>
+        <button id="start-scan-button">Mulai Pindai Permukaan</button>
+    </div>
     <div id="reticle"></div> 
+    <div id="on-screen-log-container"></div>
+    <div id="app-version">APP VERSI 0.0.4</div>
+
     <script type="module">
         import * as THREE from 'three';
         import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
@@ -159,6 +223,10 @@
         let model, modelContainerGroup, ambientLight, directionalLight;
         let clock;
         const loadingIndicator = document.getElementById('loading-indicator');
+        const arInstructionsPanel = document.getElementById('ar-instructions');
+        const startScanButton = document.getElementById('start-scan-button');
+        const onScreenLogContainer = document.getElementById('on-screen-log-container');
+        const appVersionDisplay = document.getElementById('app-version');
         
         let skyboxObject = null;
         const modelCenter = new THREE.Vector3(); 
@@ -172,12 +240,14 @@
 
         let isUpdatingViewPresetGUI = false;
 
+        const APP_VERSION = "0.0.4";
+
         const params = {
             modelPath: 'Cupang.glb', 
             skyboxGlbUrl: 'inside_galaxy_skybox_hdri_360_panorama.glb', 
             toneMappingExposure: 1.0,
-            ambientLightIntensity: 2.8, 
-            directionalLightIntensity: 3.5, 
+            ambientLightIntensity: 3.0, // Lebih terang lagi
+            directionalLightIntensity: 4.0, // Lebih terang lagi
             directionalLightColor: 0xffffff,
             initialRotationX_deg: 0.0,
             initialRotationY_deg: 0.0,
@@ -187,11 +257,32 @@
             selectedViewPreset: 'Default',
             cameraFOV: 50, 
             modelScale: 1.0, 
-            arModelScale: 0.15, 
+            arModelScale: 0.5, // Default skala AR dinaikkan signifikan
             skyboxBrightness: 1.0,
             backgroundColor: '#4682B4', 
             showSkybox: true,
         };
+
+        function logToScreen(message, type = 'info') {
+            if (onScreenLogContainer) {
+                const logEntry = document.createElement('div');
+                const timestamp = new Date().toLocaleTimeString();
+                logEntry.textContent = `[${timestamp}] ${message}`;
+                if (type === 'error') {
+                    logEntry.style.color = '#ff6666'; // Merah untuk error
+                } else if (type === 'warn') {
+                    logEntry.style.color = '#ffcc66'; // Kuning untuk warning
+                } else {
+                    logEntry.style.color = '#99ff99'; // Hijau muda untuk info
+                }
+                onScreenLogContainer.appendChild(logEntry);
+                onScreenLogContainer.scrollTop = onScreenLogContainer.scrollHeight; // Auto-scroll
+            }
+            if (type === 'error') console.error(message);
+            else if (type === 'warn') console.warn(message);
+            else console.log(message);
+        }
+
 
         function init() {
             if (loadingIndicator) loadingIndicator.style.display = 'block';
@@ -200,7 +291,7 @@
             scene.background = new THREE.Color(params.backgroundColor);
             
             camera = new THREE.PerspectiveCamera(params.cameraFOV, window.innerWidth / window.innerHeight, 0.01, 10000); 
-            camera.position.set(0, 1.6, 3); // Sedikit naikkan posisi kamera awal untuk tampilan desktop
+            camera.position.set(0, 1.6, 3); 
 
             renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
             renderer.setSize(window.innerWidth, window.innerHeight);
@@ -237,15 +328,15 @@
                             arButtonElement.addEventListener('click', onARButtonClick);
                             arButtonElement.disabled = false;
                             arButtonElement.textContent = "AR"; 
-                            console.log("AR didukung oleh perangkat/browser ini.");
+                            logToScreen("AR didukung oleh perangkat/browser ini.");
                         } else {
                             arButtonElement.textContent = "No AR"; 
                             arButtonElement.disabled = true;       
-                            console.warn("AR tidak didukung oleh perangkat/browser ini.");
+                            logToScreen("AR tidak didukung oleh perangkat/browser ini.", "warn");
                         }
                     })
                     .catch((err) => { 
-                         console.error("Error saat memeriksa dukungan AR:", err);
+                         logToScreen(`Error saat memeriksa dukungan AR: ${err.message}`, "error");
                          arButtonElement.style.display = 'flex';
                          arButtonElement.textContent = "Err AR"; 
                          arButtonElement.disabled = true;
@@ -254,22 +345,22 @@
                  arButtonElement.style.display = 'flex';
                  arButtonElement.textContent = "No XR";
                  arButtonElement.disabled = true;       
-                 console.warn("WebXR API tidak tersedia di browser ini.");
+                 logToScreen("WebXR API tidak tersedia di browser ini.", "warn");
             }
 
             reticleMesh = new THREE.Mesh(
                 new THREE.RingGeometry(0.04, 0.055, 32).rotateX(-Math.PI / 2), 
-                new THREE.MeshBasicMaterial({ color: 0x00ff00, opacity:0.8, transparent:true, depthTest: false }) // depthTest false agar selalu terlihat
+                new THREE.MeshBasicMaterial({ color: 0x00ff00, opacity:0.8, transparent:true, depthTest: false }) 
             );
             reticleMesh.matrixAutoUpdate = false;
             reticleMesh.visible = false;
-            reticleMesh.renderOrder = 10; // Pastikan reticle dirender di atas
+            reticleMesh.renderOrder = 10; 
             scene.add(reticleMesh);
 
             if (params.skyboxGlbUrl && params.skyboxGlbUrl !== 'SKYBOX_ANDA.glb' && !params.skyboxGlbUrl.includes('placehold.co')) {
                 loadSkyboxFromGLB();
             } else {
-                console.warn("Path Skybox GLB tidak valid atau menggunakan placeholder, skybox tidak akan dimuat secara otomatis.");
+                logToScreen("Path Skybox GLB tidak valid atau placeholder, skybox tidak akan dimuat secara otomatis.", "warn");
             }
             updateBackgroundVisibility();
 
@@ -283,6 +374,7 @@
 
             setupGUI();
             setupPresetButtons(); 
+            startScanButton.addEventListener('click', onStartScanButtonClick);
             window.addEventListener('resize', onWindowResize, false);
             
             renderer.domElement.addEventListener('click', onSelectAR);
@@ -292,24 +384,24 @@
         function onARButtonClick() {
             const arButtonElement = document.getElementById('arButton');
             if (!xrSession) {
-                console.log("Mencoba memulai sesi AR...");
+                logToScreen("Mencoba memulai sesi AR...");
                 navigator.xr.requestSession('immersive-ar', { 
-                    requiredFeatures: ['hit-test', 'dom-overlay'], // dom-overlay untuk UI di atas AR
-                    domOverlay: { root: document.body } // Tentukan root untuk DOM overlay
+                    requiredFeatures: ['hit-test', 'dom-overlay'], 
+                    domOverlay: { root: document.body } 
                 }).then(onSessionStarted)
                   .catch(err => {
-                      console.error("Gagal memulai sesi AR:", err);
+                      logToScreen(`Gagal memulai sesi AR: ${err.message}`, "error");
                       alert("Gagal memulai sesi AR. Pastikan perangkat & browser mendukung, dan izin kamera diberikan. Cek konsol untuk detail.");
                       arButtonElement.textContent = "AR Fail"; 
                   });
             } else {
-                console.log("Mengakhiri sesi AR...");
+                logToScreen("Mengakhiri sesi AR...");
                 xrSession.end();
             }
         }
 
         function onSessionStarted(session) {
-            console.log("Sesi AR dimulai.", session);
+            logToScreen(`Sesi AR dimulai. ID Sesi: ${session}`);
             xrSession = session;
             const arButtonElement = document.getElementById('arButton');
             arButtonElement.textContent = 'Stop'; 
@@ -327,36 +419,61 @@
                 modelContainerGroup.visible = false; 
                 modelContainerGroup.userData.originalScale = modelContainerGroup.scale.clone();
                 modelContainerGroup.scale.set(params.arModelScale, params.arModelScale, params.arModelScale);
-                console.log("Model disembunyikan, skala AR diatur ke:", params.arModelScale);
+                logToScreen(`Model disembunyikan, skala AR diatur ke: ${params.arModelScale}`);
             }
-            reticleMesh.visible = true; 
-            console.log("Reticle ditampilkan.");
+            // Jangan tampilkan reticle dulu, tunggu tombol "Mulai Pindai"
+            reticleMesh.visible = false; 
+            arInstructionsPanel.style.display = 'block'; // Tampilkan instruksi
+            onScreenLogContainer.style.display = 'block'; // Tampilkan log di layar
+            appVersionDisplay.style.display = 'block'; // Tampilkan versi app
+            appVersionDisplay.textContent = `APP VERSI ${APP_VERSION}`;
+
 
             session.addEventListener('end', onSessionEnded);
             
             renderer.xr.setReferenceSpaceType('local'); 
             renderer.xr.setSession(session)
                 .then(() => {
-                    console.log("Sesi XR berhasil diset ke renderer.");
-                    return session.requestReferenceSpace('viewer');
-                })
-                .then((refSpaceViewer) => {
-                    console.log("Viewer reference space didapatkan:", refSpaceViewer);
-                    return session.requestHitTestSource({ space: refSpaceViewer });
-                })
-                .then((source) => {
-                    xrHitTestSource = source;
-                    console.log("Hit test source berhasil didapatkan:", source);
+                    logToScreen("Sesi XR berhasil diset ke renderer.");
+                    // Hit test source akan diminta setelah tombol "Mulai Pindai" ditekan
                 })
                 .catch(err => {
-                    console.error("Error selama setup sesi AR (ref space atau hit test):", err);
-                    session.end().catch(e => console.error("Error mengakhiri sesi setelah setup gagal:", e));
-                    alert("Terjadi masalah saat menyiapkan AR. Silakan coba lagi.");
+                    logToScreen(`Error saat set session ke renderer: ${err.message}`, "error");
+                    session.end().catch(e => logToScreen(`Error mengakhiri sesi setelah setSession gagal: ${e.message}`, "error"));
                 });
         }
 
+        function onStartScanButtonClick() {
+            logToScreen("Tombol 'Mulai Pindai Permukaan' ditekan.");
+            arInstructionsPanel.style.display = 'none'; // Sembunyikan instruksi
+            
+            if (xrSession && !xrHitTestSource) {
+                xrSession.requestReferenceSpace('viewer')
+                    .then((refSpaceViewer) => {
+                        logToScreen("Viewer reference space didapatkan untuk hit-test.");
+                        return xrSession.requestHitTestSource({ space: refSpaceViewer });
+                    })
+                    .then((source) => {
+                        xrHitTestSource = source;
+                        reticleMesh.visible = true; // Tampilkan reticle sekarang
+                        logToScreen("Hit test source berhasil didapatkan. Reticle aktif.");
+                    })
+                    .catch(err => {
+                        logToScreen(`Error mendapatkan hit test source: ${err.message}`, "error");
+                        alert("Tidak bisa memulai pemindaian permukaan. Coba lagi atau restart sesi AR.");
+                        reticleMesh.visible = false;
+                    });
+            } else if (xrHitTestSource) {
+                logToScreen("Hit test source sudah ada. Reticle seharusnya sudah aktif.");
+                reticleMesh.visible = true;
+            } else if (!xrSession) {
+                logToScreen("Sesi AR tidak aktif saat mencoba memulai pemindaian.", "warn");
+            }
+        }
+
+
         function onSessionEnded() {
-            console.log("Sesi AR berakhir.");
+            logToScreen("Sesi AR berakhir.");
             xrSession = null;
             const arButtonElement = document.getElementById('arButton');
             arButtonElement.textContent = 'AR';
@@ -364,13 +481,17 @@
 
             document.getElementById('preset-buttons-container').style.display = 'flex'; 
             if(gui) gui.show(); 
+            arInstructionsPanel.style.display = 'none'; // Pastikan instruksi tersembunyi
+            onScreenLogContainer.style.display = 'none'; // Sembunyikan log
+            appVersionDisplay.style.display = 'none'; // Sembunyikan versi app
+
             reticleMesh.visible = false;
 
             if(modelContainerGroup) {
                 modelContainerGroup.visible = true; 
                 if (modelContainerGroup.userData.originalScale) {
                     modelContainerGroup.scale.copy(modelContainerGroup.userData.originalScale);
-                    console.log("Skala model dikembalikan ke non-AR:", modelContainerGroup.scale);
+                    logToScreen(`Skala model dikembalikan ke non-AR: ${modelContainerGroup.scale.x.toFixed(2)}`);
                 } else { 
                     modelContainerGroup.scale.set(params.modelScale, params.modelScale, params.modelScale);
                 }
@@ -380,34 +501,31 @@
         }
         
         function onSelectAR(event) {
-            console.log("onSelectAR dipanggil. xrSession:", !!xrSession, "reticleMesh.visible:", reticleMesh.visible, "modelPlaced:", modelPlaced);
+            logToScreen(`onSelectAR. Sesi AR: ${!!xrSession}, Reticle: ${reticleMesh.visible}, Model Ditempatkan: ${modelPlaced}`);
             if (xrSession && reticleMesh.visible && !modelPlaced) {
                 if (modelContainerGroup && model) { 
-                    console.log("Mencoba menempatkan model. Matriks reticle:", reticleMesh.matrix.elements);
+                    logToScreen("Mencoba menempatkan model. Matriks reticle:", reticleMesh.matrix.elements.map(n => n.toFixed(2)).join(', '));
                     
-                    // Atur posisi dan orientasi model berdasarkan reticle
                     modelContainerGroup.matrix.copy(reticleMesh.matrix);
-                    modelContainerGroup.matrix.decompose(modelContainerGroup.position, modelContainerGroup.quaternion, modelContainerGroup.scale); // Decompose untuk mendapatkan pos, rot, scale
+                    modelContainerGroup.matrix.decompose(modelContainerGroup.position, modelContainerGroup.quaternion, modelContainerGroup.scale); 
                     
-                    // Terapkan skala AR yang diinginkan
                     modelContainerGroup.scale.set(params.arModelScale, params.arModelScale, params.arModelScale); 
                     
                     modelContainerGroup.visible = true;
                     modelPlaced = true;
                     reticleMesh.visible = false; 
 
-                    console.log("Model AR SEHARUSNYA ditempatkan di Posisi:", modelContainerGroup.position, "Rotasi (Quaternion):", modelContainerGroup.quaternion, "Skala:", modelContainerGroup.scale);
+                    logToScreen(`Model AR ditempatkan. Pos: ${modelContainerGroup.position.toArray().map(n=>n.toFixed(2))}, Skala: ${params.arModelScale}`);
 
                     if (xrHitTestSource) {
-                        // xrHitTestSource.cancel(); // Tidak semua implementasi mendukung cancel(), bisa menyebabkan error
                         xrHitTestSource = null; 
-                        console.log("Hit test source dihentikan setelah penempatan.");
+                        logToScreen("Hit test source dihentikan setelah penempatan.");
                     }
                 } else {
-                    console.warn("Model atau modelContainerGroup tidak siap untuk ditempatkan di AR.");
+                    logToScreen("Model atau modelContainerGroup tidak siap untuk ditempatkan di AR.", "warn");
                 }
             } else {
-                 console.log("Kondisi untuk menempatkan model AR tidak terpenuhi. Kemungkinan model sudah ditempatkan atau reticle tidak terlihat.");
+                 logToScreen("Kondisi untuk menempatkan model AR tidak terpenuhi.");
             }
         }
 
@@ -417,6 +535,7 @@
                 loadingIndicator.textContent = 'Memuat Model...';
                 loadingIndicator.style.color = '#fff';
             }
+            logToScreen(`Mulai memuat model dari: ${params.modelPath}`);
 
             if (model) {
                 modelContainerGroup.remove(model);
@@ -428,6 +547,7 @@
                     }
                 });
                 model = null;
+                logToScreen("Model lama dibersihkan.");
             }
             modelCenter.set(0,0,0);
             modelSize.set(0,0,0);
@@ -438,32 +558,31 @@
             mainModelLoader.load(params.modelPath, function (gltf) {
                 model = gltf.scene;
                 if (!model) {
-                    console.error("GLTFLoader berhasil, tetapi gltf.scene kosong atau tidak valid.");
+                    logToScreen(`GLTFLoader berhasil, tetapi gltf.scene kosong atau tidak valid untuk path: ${params.modelPath}`, "error");
                     if (loadingIndicator) {
                         loadingIndicator.innerHTML = `Gagal memproses model.<br>File "${params.modelPath}" mungkin tidak valid.`;
                         loadingIndicator.style.color = 'red';
                     }
                     return;
                 }
-                console.log("Model GLTF berhasil di-parse, objek scene:", model);
+                logToScreen("Model GLTF berhasil di-parse.");
 
                 modelContainerGroup.add(model);
                 
                 const box = new THREE.Box3().setFromObject(modelContainerGroup);
                 box.getCenter(modelCenter);
                 box.getSize(modelSize);
-                console.log("Ukuran model awal:", modelSize, "Pusat model awal:", modelCenter);
+                logToScreen(`Ukuran model awal: X:${modelSize.x.toFixed(2)}, Y:${modelSize.y.toFixed(2)}, Z:${modelSize.z.toFixed(2)}`);
                 
                 modelContainerGroup.position.sub(modelCenter); 
                 modelCenter.set(0,0,0); 
-                console.log("ModelContainerGroup dipusatkan, posisi baru:", modelContainerGroup.position);
-
+                logToScreen("ModelContainerGroup dipusatkan.");
 
                 applyInitialRotation();
                 applyModelScale(); 
                 updateMaterialProperties(); 
                 
-                console.log("Model GLB utama berhasil dimuat dan disiapkan.");
+                logToScreen("Model GLB utama berhasil dimuat dan disiapkan.");
                 if (loadingIndicator) loadingIndicator.style.display = 'none';
                 
             }, 
@@ -476,7 +595,7 @@
                 }
             },
             function (error) { 
-                console.error(`Gagal memuat model GLB utama dari path: ${params.modelPath}`, error);
+                logToScreen(`Gagal memuat model GLB utama dari path: ${params.modelPath}. Error: ${error.message || error}`, "error");
                 if (loadingIndicator) {
                     loadingIndicator.innerHTML = `Gagal memuat model.<br>Pastikan file "${params.modelPath}" ada di direktori yang sama atau path URL benar. Cek konsol untuk detail error.`;
                     loadingIndicator.style.color = 'red';
@@ -485,24 +604,24 @@
         }
 
         function applyModelScale() {
-            if (modelContainerGroup && model) { // Pastikan model sudah ada
+            if (modelContainerGroup && model) { 
                 const scaleValue = xrSession ? params.arModelScale : params.modelScale;
                 modelContainerGroup.scale.set(scaleValue, scaleValue, scaleValue);
-                console.log("Skala model diatur ke:", scaleValue, "(AR Session:", !!xrSession, ")");
+                logToScreen(`Skala model diatur ke: ${scaleValue.toFixed(3)} (Sesi AR: ${!!xrSession})`);
                 
-                if (!xrSession) { // Hanya panggil goToViewPreset jika tidak dalam mode AR
+                if (!xrSession) { 
                     const box = new THREE.Box3().setFromObject(modelContainerGroup);
                     box.getSize(modelSize); 
                     goToViewPreset(params.selectedViewPreset, true); 
                 }
             } else if (!model) {
-                console.warn("applyModelScale dipanggil tetapi model belum dimuat.");
+                logToScreen("applyModelScale dipanggil tetapi model belum dimuat.", "warn");
             }
         }
         
         function loadSkyboxFromGLB() {
              if (!params.skyboxGlbUrl || params.skyboxGlbUrl === 'SKYBOX_ANDA.glb' || params.skyboxGlbUrl.includes('placehold.co')) {
-                console.warn("URL Skybox GLB tidak valid atau placeholder. Skybox tidak akan dimuat.");
+                logToScreen("URL Skybox GLB tidak valid atau placeholder. Skybox tidak akan dimuat.", "warn");
                 if (skyboxObject) {
                     scene.remove(skyboxObject);
                     skyboxObject.traverse(node => {
@@ -517,7 +636,7 @@
                 updateBackgroundVisibility();
                 return;
             }
-
+            logToScreen(`Mulai memuat skybox dari: ${params.skyboxGlbUrl}`);
             const loader = new GLTFLoader();
             loader.load(params.skyboxGlbUrl,
                 (gltf) => {
@@ -564,11 +683,11 @@
                     skyboxObject.renderOrder = -10; 
                     scene.add(skyboxObject);
                     updateBackgroundVisibility();
-                    console.log("Skybox GLB berhasil dimuat.");
+                    logToScreen("Skybox GLB berhasil dimuat.");
                 },
                 undefined, 
                 (error) => {
-                    console.error(`Gagal memuat Skybox GLB dari path: ${params.skyboxGlbUrl}`, error);
+                    logToScreen(`Gagal memuat Skybox GLB dari path: ${params.skyboxGlbUrl}. Error: ${error.message || error}`, "error");
                     if (skyboxObject) {
                         scene.remove(skyboxObject);
                         skyboxObject = null;
@@ -615,7 +734,7 @@
 
         function frameArea(objectToFrame, cam, ctrl, instant = false, fitOffset = 1.5) {
              if (!objectToFrame || !model) { 
-                console.warn("frameArea: Objek model tidak valid atau belum dimuat.");
+                logToScreen("frameArea: Objek model tidak valid atau belum dimuat.", "warn");
                 if (instant) {
                     ctrl.target.set(0,0,0);
                     cam.position.set(0,0.5,3); 
@@ -629,7 +748,7 @@
             const centerVec = new THREE.Vector3(0,0,0); 
 
             if (sizeVec.lengthSq() === 0) { 
-                 console.warn("frameArea: Ukuran objek adalah nol.");
+                 logToScreen("frameArea: Ukuran objek adalah nol.", "warn");
                 if (instant) {
                     ctrl.target.copy(centerVec); 
                     cam.position.set(centerVec.x, centerVec.y + 0.5, centerVec.z + 3); 
@@ -672,7 +791,7 @@
             if (isUpdatingViewPresetGUI) return; 
             
             if (!modelContainerGroup || !camera || !controls || !model ) { 
-                console.warn("goToViewPreset: Komponen belum siap.");
+                logToScreen("goToViewPreset: Komponen belum siap.", "warn");
                 return;
             }
             
@@ -758,14 +877,14 @@
                 loadMainModel(); 
             });
             modelFolder.add(params, 'modelScale', 0.01, 10, 0.01).name('Skala (Non-AR)').onChange(applyModelScale);
-            modelFolder.add(params, 'arModelScale', 0.01, 1.0, 0.005).name('Skala Model AR').onChange(value => {
+            modelFolder.add(params, 'arModelScale', 0.01, 2.0, 0.005).name('Skala Model AR').onChange(value => { // Max skala AR dinaikkan
                 params.arModelScale = value;
                 if (xrSession && modelPlaced && modelContainerGroup) { 
                     modelContainerGroup.scale.set(value, value, value);
-                    console.log("Skala AR diupdate via GUI menjadi:", value);
+                    logToScreen(`Skala AR diupdate via GUI menjadi: ${value.toFixed(3)}`);
                 } else if (xrSession && !modelPlaced && modelContainerGroup) {
-                    modelContainerGroup.scale.set(value, value, value);
-                    console.log("Skala AR pre-placement diupdate via GUI menjadi:", value);
+                    modelContainerGroup.scale.set(value, value, value); // Update skala pre-placement
+                    logToScreen(`Skala AR pre-placement diupdate via GUI menjadi: ${value.toFixed(3)}`);
                 }
             });
             modelFolder.add(params, 'initialRotationX_deg', -360, 360, 1).name('Rotasi Awal X').onChange(applyInitialRotation);
@@ -825,7 +944,7 @@
         function takeScreenshot() {
              try {
                 if (xrSession) {
-                    console.warn("Screenshot tidak didukung dalam mode AR.");
+                    logToScreen("Screenshot tidak didukung dalam mode AR.", "warn");
                     return;
                 }
                 composer.render(); 
@@ -837,22 +956,9 @@
                 document.body.appendChild(a);
                 a.click();
                 document.body.removeChild(a);
-                console.log("Screenshot diambil!");
+                logToScreen("Screenshot diambil!");
             } catch (e) {
-                console.error("Gagal mengambil screenshot:", e);
-                const tempErrorMsg = document.createElement('div');
-                tempErrorMsg.textContent = "Gagal screenshot. Lihat konsol.";
-                tempErrorMsg.style.position = 'absolute';
-                tempErrorMsg.style.bottom = '70px'; 
-                tempErrorMsg.style.left = '50%';
-                tempErrorMsg.style.transform = 'translateX(-50%)';
-                tempErrorMsg.style.padding = '10px';
-                tempErrorMsg.style.backgroundColor = 'rgba(255,0,0,0.8)';
-                tempErrorMsg.style.color = 'white';
-                tempErrorMsg.style.borderRadius = '5px';
-                tempErrorMsg.style.zIndex = '1002';
-                document.body.appendChild(tempErrorMsg);
-                setTimeout(() => { if(document.body.contains(tempErrorMsg)) document.body.removeChild(tempErrorMsg);}, 3000);
+                logToScreen(`Gagal mengambil screenshot: ${e.message}`, "error");
             }
         }
 
@@ -878,39 +984,47 @@
                     skyboxObject.position.copy(camera.position);
                 }
                 composer.render();
-            } else { 
-                if (frame && xrHitTestSource) { 
-                    const hitTestResults = frame.getHitTestResults(xrHitTestSource);
-                    if (hitTestResults.length > 0) {
-                        const hit = hitTestResults[0];
-                        const currentRefSpace = renderer.xr.getReferenceSpace(); 
-                        if (currentRefSpace) {
-                            const pose = hit.getPose(currentRefSpace);
-                            if (pose) { 
-                                reticleMesh.matrix.fromArray(pose.transform.matrix);
-                                reticleMesh.visible = !modelPlaced; 
+            } else { // Mode AR
+                if (frame) {
+                    if (xrHitTestSource && !modelPlaced) { // Hanya lakukan hit-test jika source ada DAN model belum ditempatkan
+                        const hitTestResults = frame.getHitTestResults(xrHitTestSource);
+                        if (hitTestResults.length > 0) {
+                            const hit = hitTestResults[0];
+                            const currentRefSpace = renderer.xr.getReferenceSpace(); 
+                            if (currentRefSpace) {
+                                const pose = hit.getPose(currentRefSpace);
+                                if (pose) { 
+                                    reticleMesh.matrix.fromArray(pose.transform.matrix);
+                                    reticleMesh.visible = true; 
+                                } else {
+                                    reticleMesh.visible = false;
+                                }
                             } else {
-                                reticleMesh.visible = false;
+                                 reticleMesh.visible = false;
                             }
                         } else {
-                             reticleMesh.visible = false;
+                            reticleMesh.visible = false;
                         }
-                    } else {
-                        reticleMesh.visible = false;
+                    } else if (!modelPlaced && !xrHitTestSource && arInstructionsPanel.style.display === 'none') { 
+                        // Jika hit test belum dimulai (setelah tombol "Mulai Pindai" ditekan)
+                        // atau jika hit test source hilang tapi model belum ditempatkan
+                        // dan instruksi sudah disembunyikan (artinya user sudah klik "Mulai Pindai")
+                        // Tampilkan reticle di tengah layar sebagai fallback atau indikasi
+                        reticleMesh.visible = true; 
+                        const camWorldPos = new THREE.Vector3();
+                        const camWorldDir = new THREE.Vector3();
+                        camera.getWorldPosition(camWorldPos);
+                        camera.getWorldDirection(camWorldDir);
+                        // Proyeksikan sedikit ke depan kamera
+                        reticleMesh.position.copy(camWorldPos).add(camWorldDir.multiplyScalar(0.7)); // Jarak 0.7m
+                        // Buat reticle menghadap ke atas (sejajar lantai asumsi) relatif terhadap kamera
+                        reticleMesh.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0), new THREE.Vector3(0,1,0)); // Default menghadap atas
+                        reticleMesh.lookAt(camWorldPos); // Arahkan ke kamera agar sisi depannya terlihat
+                        reticleMesh.rotation.x = -Math.PI / 2; // Putar agar flat
+                        reticleMesh.updateMatrix();
+                    } else if (modelPlaced) {
+                         reticleMesh.visible = false;
                     }
-                } else if (frame && !xrHitTestSource && !modelPlaced) { 
-                    reticleMesh.visible = true; 
-                    const camWorldPos = new THREE.Vector3();
-                    const camWorldDir = new THREE.Vector3();
-                    camera.getWorldPosition(camWorldPos);
-                    camera.getWorldDirection(camWorldDir);
-                    reticleMesh.position.copy(camWorldPos).add(camWorldDir.multiplyScalar(0.5)); 
-                    reticleMesh.quaternion.setFromRotationMatrix(camera.matrixWorld);
-                    reticleMesh.rotation.x = -Math.PI / 2; 
-                    reticleMesh.updateMatrix();
-
-                } else if (modelPlaced) { 
-                     reticleMesh.visible = false;
                 }
                 renderer.render(scene, camera); 
             }
