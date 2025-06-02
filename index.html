@@ -399,7 +399,7 @@
       import { OrbitControls } from "three/addons/controls/OrbitControls.js";
       import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
       import { EffectComposer } from "three/addons/postprocessing/EffectComposer.js";
-      import { RenderPass } from "three/addons/postprocessing/RenderPass.1js";
+      import { RenderPass } from "three/addons/postprocessing/RenderPass.js"; /* Corrected import */
       import { OutputPass } from "three/addons/postprocessing/OutputPass.js";
       import GUI from "lil-gui";
     
@@ -471,18 +471,21 @@
         else if (type === "warn") console.warn(message);
         else console.log(message);
       }
+
+      // New function to hide the loading overlay
+      function hideLoadingOverlay() {
+        const loadingOverlay = document.getElementById("loading-overlay");
+        if (loadingOverlay) {
+          document.body.classList.add("loaded");
+          setTimeout(() => {
+            loadingOverlay.remove();
+          }, 600); // Match CSS transition time
+        }
+      }
     
       // Initializes the 3D scene, camera, renderer, and loads initial assets
       function init() {
-        // Simulate a loading animation for 10 seconds before fading out.
-        setTimeout(() => {
-          document.body.classList.add("loaded");
-          setTimeout(() => {
-            const loadingOverlay = document.getElementById("loading-overlay");
-            if (loadingOverlay) loadingOverlay.remove();
-          }, 600); // Match CSS transition time + a bit
-        }, 10000); // Original 10-second delay
-    
+        // Removed the 10-second setTimeout here.
         clock = new THREE.Clock(); // For animation timing
         scene = new THREE.Scene();
         scene.background = new THREE.Color(params.backgroundColor);
@@ -587,7 +590,7 @@
           logToScreen("Path Skybox GLB tidak valid atau placeholder, skybox tidak akan dimuat secara otomatis.", "warn");
         }
         updateBackgroundVisibility(); // Set initial background/skybox state
-        loadMainModel();
+        loadMainModel(); // This will now control when the overlay hides.
     
         // Setup post-processing composer (e.g., for effects, though only basic passes here)
         composer = new EffectComposer(renderer);
@@ -907,6 +910,7 @@
             model = gltf.scene;
             if (!model) {
               logToScreen(`GLTFLoader berhasil, tetapi gltf.scene kosong untuk: ${params.modelPath}`, "error");
+              hideLoadingOverlay(); // Hide even if scene is empty but loaded
               return;
             }
             logToScreen("Model GLTF berhasil di-parse.");
@@ -931,6 +935,7 @@
             
             // After model is loaded, set to default view
             goToViewPreset(params.selectedViewPreset, true); 
+            hideLoadingOverlay(); // Hide overlay on successful load
           },
           function (xhr) { // Progress callback
             if (xhr.lengthComputable) {
@@ -942,6 +947,7 @@
           },
           function (error) { // Error callback
             logToScreen(`Gagal memuat model GLB utama dari: ${params.modelPath}. Error: ${error.message || error}`, "error");
+            hideLoadingOverlay(); // Hide overlay even on error, so user can interact
           }
         );
       }
@@ -985,7 +991,7 @@
           (gltf) => { // Success
             if (skyboxObject) { // Clean up previous skybox
               scene.remove(skyboxObject);
-              skyboxObject.traverse((node) => {
+              skyboxObject.traverse((node) => { 
                 if (node.geometry) node.geometry.dispose();
                 if (node.material) {
                   if (Array.isArray(node.material)) node.material.forEach((mat) => mat.dispose());
