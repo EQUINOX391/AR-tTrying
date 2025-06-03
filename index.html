@@ -160,7 +160,7 @@
       /* AR Button - Bottom Center Rounded Rectangle */
       #ar-button-container {
         position: fixed;
-        bottom: calc(var(--bottom-nav-height, 70px) + var(--safe-area-inset-bottom) + var(--spacing-unit) * 1.5); 
+        bottom: calc(var(--bottom-nav-height, 70px) + var(--safe-area-inset-bottom) + var(--spacing-unit) * 3); 
         left: 50%;
         transform: translateX(-50%);
         z-index: 1001; 
@@ -306,7 +306,7 @@
 
 
       #ar-interaction-info { 
-        bottom: calc(var(--bottom-nav-height, 70px) + var(--safe-area-inset-bottom) + var(--spacing-unit) * 2.5 + 50px + var(--spacing-unit) * 2); 
+        bottom: calc(var(--bottom-nav-height, 70px) + var(--safe-area-inset-bottom) + var(--spacing-unit) * 3 + 50px + var(--spacing-unit) * 3 ); 
         left: 50%;
         transform: translateX(-50%);
         flex-direction: column; 
@@ -385,7 +385,7 @@
         background: rgba(20, 20, 20, 0.3); 
         backdrop-filter: blur(var(--blur-intensity));
         -webkit-backdrop-filter: blur(var(--blur-intensity));
-        padding: calc(var(--spacing-unit) * 1.5) var(--spacing-unit) calc(var(--spacing-unit) + var(--safe-area-inset-bottom));  
+        padding: calc(var(--spacing-unit) * 1.5) 0 calc(var(--spacing-unit) + var(--safe-area-inset-bottom)) 0;  
         border-top-left-radius: var(--border-radius-medium);  
         border-top-right-radius: var(--border-radius-medium);  
         box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.25);
@@ -394,37 +394,34 @@
         text-align: center;
         font-size: 0.75rem;
         color: var(--text-secondary);
-        margin-bottom: calc(var(--spacing-unit) * 1);
+        margin-bottom: calc(var(--spacing-unit) * 2.5); /* Increased margin */
         font-weight: 500;
         text-transform: uppercase;
         letter-spacing: 0.5px;
       }
       .bottom-nav {
         display: flex;
-        /* justify-content: center; */ /* Changed for scrolling */
-        justify-content: flex-start; /* Align items to the start for scrolling */
+        justify-content: flex-start; 
         align-items: center; 
-        gap: calc(var(--spacing-unit) * 0.5); 
-        /* flex-wrap: wrap; */ /* Changed for scrolling */
-        flex-wrap: nowrap; /* Prevent wrapping to ensure single row */
-        overflow-x: auto; /* Enable horizontal scrolling */
-        padding-bottom: calc(var(--spacing-unit) * 0.5); /* Space for scrollbar if needed */
+        gap: var(--spacing-unit); 
+        flex-wrap: nowrap; 
+        overflow-x: auto; 
+        padding-left: 0; 
+        padding-right: 0; 
+        padding-bottom: calc(var(--spacing-unit) * 2.5); /* Increased padding for scrollbar */
       }
 
-      /* Minimalist Scrollbar for Bottom Nav */
       .bottom-nav::-webkit-scrollbar {
-        height: 6px; /* Thickness of the scrollbar */
+        height: 6px; 
       }
       .bottom-nav::-webkit-scrollbar-track {
-        background: rgba(255, 255, 255, 0.05); /* Very subtle track */
+        background: rgba(255, 255, 255, 0.05); 
         border-radius: 10px;
       }
       .bottom-nav::-webkit-scrollbar-thumb {
-        background-color: var(--primary-color); /* Yellow thumb */
+        background-color: var(--primary-color); 
         border-radius: 10px;
-        /* border: 1px solid rgba(0,0,0,0.1); */ /* Optional: subtle border for definition */
       }
-      /* For Firefox - basic color, full customization is harder */
       .bottom-nav {
         scrollbar-width: thin;
         scrollbar-color: var(--primary-color) rgba(255, 255, 255, 0.05);
@@ -451,7 +448,7 @@
         transition: all 0.2s ease;
         text-align: center;
         line-height: 1.1; 
-        flex-shrink: 0; /* Prevent buttons from shrinking */
+        flex-shrink: 0; 
       }
       .view-btn:hover {
         background: rgba(255, 255, 255, 0.2); 
@@ -473,7 +470,7 @@
       /* On-Screen Log */
       #on-screen-log-container {
         position: fixed;
-        bottom: calc(var(--bottom-nav-height, 70px) + var(--safe-area-inset-bottom) + var(--spacing-unit) * 2.5 + 50px + var(--spacing-unit) * 2 + 70px + var(--spacing-unit)); 
+        bottom: calc(var(--bottom-nav-height, 70px) + var(--safe-area-inset-bottom) + var(--spacing-unit) * 3 + 50px + var(--spacing-unit) * 3 + 70px + var(--spacing-unit) * 2);
         left: calc(var(--spacing-unit) * 1.5);
         right: calc(var(--spacing-unit) * 1.5);  
         width: auto;  
@@ -496,9 +493,9 @@
       /* Top Left App Version Styling */
       #app-version-container { 
         position: fixed;
-        top: var(--safe-area-inset-top); 
+        top: calc(var(--safe-area-inset-top) + var(--spacing-unit)); 
         padding-top: var(--spacing-unit); 
-        left: var(--safe-area-inset-left); 
+        left: calc(var(--safe-area-inset-left) + var(--spacing-unit)); 
         z-index: 1001;  
         display: flex;
         align-items: center; 
@@ -508,15 +505,16 @@
         color: var(--text-secondary);
         font-size: 0.75rem;  
         font-weight: 500;
-        background-color: rgba(0,0,0,0.4); /* Solid dark background */
-        padding: calc(var(--spacing-unit) * 0.75) var(--spacing-unit); /* Adjusted padding */
+        background-color: rgba(0,0,0,0.4); 
+        padding: calc(var(--spacing-unit) * 0.75) var(--spacing-unit); 
         border-radius: var(--border-radius-medium);
         line-height: 1.4;  
         display: flex;  
         flex-direction: column;  
         justify-content: center;  
         box-sizing: border-box;
-        height: 100%; /* Fill the container height */
+        height: 100%; 
+        gap: calc(var(--spacing-unit) * 0.5); 
       }
       #app-version-main {
         display: block;
@@ -527,12 +525,12 @@
         color: var(--text-placeholder);
       }
 
-      /* Top Right Controls Container (No shared background) */
+      /* Top Right Controls Container */
       #top-right-controls-container {
         position: fixed;
-        top: var(--safe-area-inset-top);
+        top: calc(var(--safe-area-inset-top) + var(--spacing-unit)); 
         padding-top: var(--spacing-unit); 
-        right: var(--safe-area-inset-right); 
+        right: calc(var(--safe-area-inset-right) + var(--spacing-unit)); 
         z-index: 1001;
         display: flex;  
         align-items: center;  
@@ -540,14 +538,13 @@
         height: var(--top-controls-height); 
       }
 
-      /* Individual buttons within top-right container (with blur) */
       .top-right-btn {
         display: flex;
         align-items: center;
         justify-content: center;
-        width: 48px; /* Original size */
+        width: 48px; 
         height: 48px;
-        background: var(--surface-medium); /* Gaussian blur base */
+        background: var(--surface-medium); 
         backdrop-filter: blur(var(--blur-intensity));
         -webkit-backdrop-filter: blur(var(--blur-intensity));
         border: none;
@@ -558,7 +555,7 @@
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
       }
       .top-right-btn:hover {
-        background: rgba(80, 80, 80, 0.6); /* Slightly lighter hover for blurred buttons */
+        background: rgba(80, 80, 80, 0.6); 
         transform: translateY(-1px);
       }
       .top-right-btn .material-icons-round {
@@ -569,10 +566,10 @@
       /* Custom Controls Panel */
       #custom-controls-panel {
         position: fixed;
-        top: calc(var(--safe-area-inset-top) + var(--spacing-unit) + var(--top-controls-height) + var(--spacing-unit)); /* Adjusted for new top bar height */
+        top: calc(var(--safe-area-inset-top) + var(--spacing-unit) + var(--top-controls-height) + var(--spacing-unit) * 2); 
         right: var(--safe-area-inset-right, 0px); 
         width: 300px;
-        max-height: calc(100vh - (var(--safe-area-inset-top) + var(--spacing-unit) + var(--top-controls-height) + var(--spacing-unit)) - var(--spacing-unit) - (var(--bottom-nav-height, 70px) + var(--safe-area-inset-bottom) + var(--spacing-unit) * 1.5)); 
+        max-height: calc(100vh - (var(--safe-area-inset-top) + var(--spacing-unit) + var(--top-controls-height) + var(--spacing-unit) * 2) - var(--spacing-unit) - (var(--bottom-nav-height, 70px) + var(--safe-area-inset-bottom) + var(--spacing-unit) * 1.5)); 
         background-color: var(--surface-darker);
         backdrop-filter: blur(var(--blur-intensity));
         -webkit-backdrop-filter: blur(var(--blur-intensity));
@@ -919,7 +916,7 @@
     <div id="ar-button-container">
       <button id="arButton">
         <span class="material-icons-round">view_in_ar</span>
-        <span id="arButtonText">AR Mode</span>  
+        <span id="arButtonText">Mulai AR</span>  
       </button>
     </div>
     
@@ -1396,33 +1393,38 @@
         
         // Setup AR Button
         const arButtonElement = document.getElementById("arButton");
-        const arButtonTextElement = document.getElementById("arButtonText");  
+        const arButtonTextElement = document.getElementById("arButtonText");
+        const arButtonIconElement = arButtonElement.querySelector(".material-icons-round");  
 
         if (navigator.xr) {
           navigator.xr
             .isSessionSupported("immersive-ar")
             .then((supported) => {
-              arButtonElement.style.display = "flex";  // Show the button regardless
+              arButtonElement.style.display = "flex";  
               if (supported) {
                 arButtonElement.addEventListener("click", onARButtonClick);
                 arButtonElement.disabled = false;
-                if (arButtonTextElement) arButtonTextElement.textContent = "AR Mode";  
+                if (arButtonTextElement) arButtonTextElement.textContent = "Mulai AR"; 
+                if (arButtonIconElement) arButtonIconElement.textContent = "view_in_ar"; 
                 logToScreen("AR didukung oleh perangkat/browser ini.");
               } else {
-                if (arButtonTextElement) arButtonTextElement.textContent = " No AR";
+                if (arButtonTextElement) arButtonTextElement.textContent = "AR Tidak Ada"; // More user-friendly
+                if (arButtonIconElement) arButtonIconElement.textContent = "view_in_ar_off"; // Suggestive icon
                 arButtonElement.disabled = true;
                 logToScreen("AR tidak didukung oleh perangkat/browser ini.", "warn");
               }
             })
             .catch((err) => {
               logToScreen(`Error saat memeriksa dukungan AR: ${err.message}`, "error");
-              if (arButtonTextElement) arButtonTextElement.textContent = " Err AR";
+              if (arButtonTextElement) arButtonTextElement.textContent = "Error AR";
+              if (arButtonIconElement) arButtonIconElement.textContent = "error_outline"; 
               arButtonElement.disabled = true;
               arButtonElement.style.display = "flex";
             });
         } else {
           arButtonElement.style.display = "flex";
-          if (arButtonTextElement) arButtonTextElement.textContent = " No XR";
+          if (arButtonTextElement) arButtonTextElement.textContent = "XR Tidak Ada";
+          if (arButtonIconElement) arButtonIconElement.textContent = "xr_off"; // Placeholder if no specific icon
           arButtonElement.disabled = true;
           logToScreen("WebXR API tidak tersedia di browser ini.", "warn");
         }
@@ -1495,6 +1497,7 @@
       function onARButtonClick() {
         const arButtonElement = document.getElementById("arButton");
         const arButtonTextElement = document.getElementById("arButtonText");
+        const arButtonIconElement = arButtonElement.querySelector(".material-icons-round");
         
         if (!xrSession) { // If no active session, request one
           logToScreen("Mencoba memulai sesi AR...");
@@ -1507,7 +1510,8 @@
             .catch((err) => {
               logToScreen(`Gagal memulai sesi AR: ${err.message}`, "error");
               logToScreen("Pastikan perangkat & browser mendukung AR, dan izin kamera diberikan.", "error");
-              if (arButtonTextElement) arButtonTextElement.textContent = " AR Fail";
+              if (arButtonTextElement) arButtonTextElement.textContent = "Gagal AR";
+              if (arButtonIconElement) arButtonIconElement.textContent = "error_outline";
               arButtonElement.classList.remove("ar-active");
             });
         } else { // If session active, end it
@@ -1525,8 +1529,10 @@
         xrSession = session;
         const arButtonElement = document.getElementById("arButton");
         const arButtonTextElement = document.getElementById("arButtonText");
+        const arButtonIconElement = arButtonElement.querySelector(".material-icons-round");
         
         if (arButtonTextElement) arButtonTextElement.textContent = "Hentikan AR"; 
+        if (arButtonIconElement) arButtonIconElement.textContent = "close";
         arButtonElement.classList.add("ar-active"); // Change button appearance
         
         // Hide non-AR UI elements
@@ -1634,8 +1640,10 @@
         
         const arButtonElement = document.getElementById("arButton");
         const arButtonTextElement = document.getElementById("arButtonText");
+        const arButtonIconElement = arButtonElement.querySelector(".material-icons-round");
         
-        if (arButtonTextElement) arButtonTextElement.textContent = "AR Mode";
+        if (arButtonTextElement) arButtonTextElement.textContent = "Mulai AR";
+        if (arButtonIconElement) arButtonIconElement.textContent = "view_in_ar";
         arButtonElement.classList.remove("ar-active"); // Reset button appearance
         
         // Restore non-AR UI
@@ -2484,4 +2492,4 @@
       init();
     </script>
   </body>
-</html>
+</ht
