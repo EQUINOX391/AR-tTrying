@@ -36,12 +36,12 @@
         --text-secondary: rgba(255, 255, 255, 0.8);
         --text-placeholder: rgba(255, 255, 255, 0.5);
         --spacing-unit: 8px;
-        --safe-area-inset-top: env(safe-area-inset-top, 16px); /* Adjusted default */
+        --safe-area-inset-top: env(safe-area-inset-top, 16px); 
         --safe-area-inset-bottom: env(safe-area-inset-bottom, 20px);
         --border-radius-small: 6px;
         --border-radius-medium: 12px;  
         --border-radius-button: 4px;  
-        --border-radius-capsule: 24px; /* For capsule shaped buttons */
+        --border-radius-capsule: 50px; /* For true capsule shape, adjust based on button height */
         --border-radius-large: 16px;
       }
       
@@ -73,7 +73,7 @@
         right: 0;
         bottom: 0;
         background: #111;  
-        z-index: 2000;  
+        z-index: 3000;  /* Highest z-index */
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -153,13 +153,13 @@
         pointer-events: none;  
       }
       
-      /* AR Button - Moved to Bottom Center */
+      /* AR Button - Bottom Center Capsule */
       #ar-button-container {
         position: fixed;
-        bottom: calc(80px + var(--safe-area-inset-bottom) + var(--spacing-unit) * 2); /* Above bottom-nav */
+        bottom: calc(var(--bottom-nav-height, 70px) + var(--safe-area-inset-bottom) + var(--spacing-unit) * 1.5); /* Above bottom-nav */
         left: 50%;
         transform: translateX(-50%);
-        z-index: 1001; /* Above bottom-nav but below other overlays if any */
+        z-index: 1001; 
         display: flex;  
         align-items: center;  
       }
@@ -167,52 +167,53 @@
         display: flex;
         align-items: center;
         gap: var(--spacing-unit);
-        padding: calc(var(--spacing-unit) * 1.5) calc(var(--spacing-unit) * 2.5); /* Slightly larger */
+        padding: 0 calc(var(--spacing-unit) * 3); /* Adjust padding for capsule */
         background: var(--primary-color);
         border: none;
-        border-radius: var(--border-radius-capsule);  
+        height: 50px; /* Fixed height for capsule radius */
+        border-radius: 25px; /* Half of height for capsule */
         color: #000; 
-        font-weight: 700; /* Bolder */
-        font-size: 1rem;  /* Slightly larger */
+        font-weight: 700; 
+        font-size: 1rem;  
         cursor: pointer;
-        transition: all 0.2s ease;
-        box-shadow: 0 0 15px 5px rgba(255, 215, 0, 0.5), 0 4px 12px rgba(0,0,0,0.3); /* Initial glow */
-        height: 56px; /* Larger height */
+        transition: all 0.2s ease, box-shadow 0.3s ease-in-out; /* Separate transition for shadow */
+        box-shadow: 0 0 12px 3px rgba(255, 215, 0, 0.4), 0 3px 8px rgba(0,0,0,0.25); 
         box-sizing: border-box;  
         animation: subtleGlow 2.5s infinite alternate ease-in-out;
       }
 
       @keyframes subtleGlow {
         0% {
-          box-shadow: 0 0 15px 5px rgba(255, 215, 0, 0.5), 0 4px 12px rgba(0,0,0,0.3);
+          box-shadow: 0 0 12px 3px rgba(255, 215, 0, 0.4), 0 3px 8px rgba(0,0,0,0.25);
           transform: scale(1);
         }
         50% {
-          box-shadow: 0 0 25px 10px rgba(255, 215, 0, 0.7), 0 6px 16px rgba(0,0,0,0.4);
-          transform: scale(1.05);
+          box-shadow: 0 0 20px 8px rgba(255, 215, 0, 0.6), 0 5px 12px rgba(0,0,0,0.35);
+          transform: scale(1.03);
         }
         100% {
-          box-shadow: 0 0 15px 5px rgba(255, 215, 0, 0.5), 0 4px 12px rgba(0,0,0,0.3);
+          box-shadow: 0 0 12px 3px rgba(255, 215, 0, 0.4), 0 3px 8px rgba(0,0,0,0.25);
           transform: scale(1);
         }
       }
 
       #arButton:hover {
         background: var(--primary-hover);
-        transform: translateX(-50%) translateY(-2px) scale(1.05); /* Adjust transform for hover when centered */
-        box-shadow: 0 0 25px 10px rgba(255, 215, 0, 0.7), 0 6px 16px rgba(0,0,0,0.4); 
+        /* transform: translateX(-50%) translateY(-2px) scale(1.03); // Keep original transform, only adjust scale if needed */
+        transform: scale(1.03); /* Simpler hover transform as it's already centered */
+        box-shadow: 0 0 20px 8px rgba(255, 215, 0, 0.6), 0 5px 12px rgba(0,0,0,0.35); 
       }
       #arButton.ar-active {  
         background: var(--error-color);
         box-shadow: 0 4px 12px rgba(244, 67, 54, 0.3);
         color: #fff; 
-        animation: none; /* Stop glow when active */
+        animation: none; 
       }
       #arButton.ar-active:hover {
-        transform: translateX(-50%) translateY(-2px) scale(1.02); /* Adjust hover for active AR button */
+         transform: scale(1.02); 
       }
       #arButton .material-icons-round {
-        font-size: 1.35rem;  /* Slightly larger icon */
+        font-size: 1.3rem;  
       }
       
       /* AR Instructions Panel (Scanning) */
@@ -293,13 +294,13 @@
       }
 
       @keyframes tapAnimation {
-        0%, 100% { transform: scale(1); opacity: 1;}
-        50% { transform: scale(1.2); opacity: 0.7;}
+        0%, 100% { transform: scale(1) translateY(0); opacity: 1;}
+        50% { transform: scale(1.15) translateY(-3px); opacity: 0.7;}
       }
 
 
       #ar-interaction-info { 
-        bottom: calc(var(--spacing-unit) * 22 + var(--safe-area-inset-bottom)); /* Adjusted to be above AR button */
+        bottom: calc(var(--bottom-nav-height, 70px) + var(--safe-area-inset-bottom) + var(--spacing-unit) * 2.5 + 50px + var(--spacing-unit) * 2); /* Above AR button */
         left: 50%;
         transform: translateX(-50%);
         flex-direction: column; 
@@ -308,34 +309,46 @@
       }
       .ar-interaction-gesture-hints {
         display: flex;
-        gap: calc(var(--spacing-unit) * 2);
+        gap: calc(var(--spacing-unit) * 2.5);
         align-items: center;
         justify-content: center;
+        margin-top: var(--spacing-unit);
       }
       .gesture-hint {
         display: flex;
+        flex-direction: column; /* Icon above text */
         align-items: center;
         gap: calc(var(--spacing-unit) * 0.5);
         font-size: 0.8rem;
+        color: var(--text-secondary);
       }
       .gesture-hint .material-icons-round {
-        font-size: 1.5rem; 
+        font-size: 2rem; /* Larger icons for gestures */
         color: var(--primary-color);
+        padding: var(--spacing-unit);
+        background-color: rgba(255,255,255,0.1);
+        border-radius: 50%;
       }
-      @keyframes pinchZoom {
+      
+      @keyframes pinchZoomInOut {
         0%, 100% { transform: scale(1); }
-        50% { transform: scale(0.8); }
+        25% { transform: scale(0.8); } /* Pinch in */
+        50% { transform: scale(0.8); } 
+        75% { transform: scale(1.2); } /* Pinch out */
       }
       .gesture-hint .icon-pinch {
-        animation: pinchZoom 1.5s infinite ease-in-out;
+        animation: pinchZoomInOut 2.5s infinite ease-in-out;
       }
-      @keyframes dragRotate {
-        0% { transform: translateX(-3px) rotate(-5deg); }
-        50% { transform: translateX(3px) rotate(5deg); }
-        100% { transform: translateX(-3px) rotate(-5deg); }
+      
+      @keyframes dragRotateArrows {
+        0% { transform: translateX(-4px) rotate(-10deg); }
+        25% { transform: translateX(4px) rotate(10deg); }
+        50% { transform: translateX(-4px) rotate(-10deg); }
+        75% { transform: translateX(4px) rotate(10deg); }
+        100% { transform: translateX(-4px) rotate(-10deg); }
       }
       .gesture-hint .icon-drag {
-         animation: dragRotate 2s infinite ease-in-out;
+         animation: dragRotateArrows 2.5s infinite ease-in-out;
       }
 
 
@@ -349,23 +362,34 @@
         font-size: 1.1rem;
       }
       
-      /* Bottom Navigation Bar */
-      .bottom-nav {
+      /* Bottom Navigation Bar Wrapper */
+      #bottom-nav-wrapper {
         position: fixed;
         bottom: 0;
         left: 0;
         right: 0;
-        background: rgba(255, 255, 255, 0.15);  
-        backdrop-filter: blur(10px);
-        padding: var(--spacing-unit) var(--spacing-unit) calc(var(--spacing-unit) + var(--safe-area-inset-bottom));  
+        z-index: 1000;
+        background: rgba(20, 20, 20, 0.2); /* Slightly darker, less transparent backdrop for label */
+        backdrop-filter: blur(12px);
+        padding: calc(var(--spacing-unit) * 1.5) var(--spacing-unit) calc(var(--spacing-unit) + var(--safe-area-inset-bottom));  
+        border-top-left-radius: var(--border-radius-medium);  
+        border-top-right-radius: var(--border-radius-medium);  
+        box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.25);
+      }
+      #bottom-nav-label {
+        text-align: center;
+        font-size: 0.75rem;
+        color: var(--text-secondary);
+        margin-bottom: calc(var(--spacing-unit) * 1);
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+      .bottom-nav {
         display: flex;
         justify-content: center;  
         align-items: center;  
         gap: calc(var(--spacing-unit) * 0.75);  
-        z-index: 1000;
-        border-top-left-radius: 0;  
-        border-top-right-radius: 0;  
-        box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.2);
         flex-wrap: wrap;  
       }
       .view-btn {
@@ -387,7 +411,7 @@
         text-align: center;
       }
       .view-btn:hover {
-        background: rgba(255, 255, 255, 0.15);
+        background: rgba(255, 255, 255, 0.2); /* Slightly more opaque hover */
         transform: translateY(-1px);
       }
       .view-btn .material-icons-round {
@@ -405,7 +429,8 @@
       /* On-Screen Log */
       #on-screen-log-container {
         position: fixed;
-        bottom: calc(80px + var(--safe-area-inset-bottom) + var(--spacing-unit) * 2 + 56px + var(--spacing-unit)); /* Adjusted for AR button and bottom nav */
+        /* Adjusted to be above AR interaction info, which is above AR button, which is above bottom nav */
+        bottom: calc(var(--bottom-nav-height, 70px) + var(--safe-area-inset-bottom) + var(--spacing-unit) * 2.5 + 50px + var(--spacing-unit) * 2 + 70px + var(--spacing-unit)); 
         left: calc(var(--spacing-unit) * 1.5);
         right: calc(var(--spacing-unit) * 1.5);  
         width: auto;  
@@ -413,7 +438,7 @@
         margin-left: auto;  
         margin-right: auto;  
         max-height: 90px;  
-        background: rgba(0, 0, 0, 0.7);  
+        background: rgba(0, 0, 0, 0.75);  
         color: #ADD8E6;  
         font-family: monospace;
         font-size: 0.7rem;  
@@ -426,11 +451,11 @@
       }
       
       /* App Version Display (Top-Left) */
-      #app-version-container { /* Renamed for clarity */
+      #app-version-container { 
         position: fixed;
         top: var(--safe-area-inset-top); 
-        padding-top: calc(var(--spacing-unit) * 2); /* Original padding */
-        left: calc(var(--spacing-unit) * 2);
+        padding-top: calc(var(--spacing-unit) * 2); 
+        left: calc(var(--spacing-unit) * 2 + var(--safe-area-inset-left, 0px)); /* Added safe-area-inset-left */
         z-index: 1001;  
         display: flex;
         align-items: center; 
@@ -466,12 +491,12 @@
       #top-right-controls-container {
         position: fixed;
         top: var(--safe-area-inset-top);
-        padding-top: calc(var(--spacing-unit) * 2); /* Original padding */
-        right: calc(var(--spacing-unit) * 2.5);  
+        padding-top: calc(var(--spacing-unit) * 2); 
+        right: calc(var(--spacing-unit) * 2.5 + var(--safe-area-inset-right, 0px)); /* Added safe-area-inset-right */
         z-index: 1001;
         display: flex;  
         align-items: center;  
-        gap: var(--spacing-unit); /* Space between buttons */
+        gap: var(--spacing-unit); 
         height: 48px; 
       }
 
@@ -502,10 +527,10 @@
       /* Custom Controls Panel */
       #custom-controls-panel {
         position: fixed;
-        top: calc(var(--safe-area-inset-top) + var(--spacing-unit) * 2 + 48px + var(--spacing-unit));  /* Adjusted for safe area */
-        right: 0;  
+        top: calc(var(--safe-area-inset-top) + var(--spacing-unit) * 2 + 48px + var(--spacing-unit));  
+        right: var(--safe-area-inset-right, 0px); /* Added safe-area-inset-right */
         width: 300px;
-        max-height: calc(100vh - (var(--safe-area-inset-top) + var(--spacing-unit) * 2 + 48px + var(--spacing-unit)) - var(--spacing-unit) - (80px + var(--safe-area-inset-bottom) + var(--spacing-unit))); 
+        max-height: calc(100vh - (var(--safe-area-inset-top) + var(--spacing-unit) * 2 + 48px + var(--spacing-unit)) - var(--spacing-unit) - (var(--bottom-nav-height, 70px) + var(--safe-area-inset-bottom) + var(--spacing-unit) * 1.5)); 
         background-color: var(--surface-darker);
         backdrop-filter: blur(5px);
         border-radius: var(--border-radius-medium) 0 0 var(--border-radius-medium);  
@@ -655,7 +680,7 @@
         left: 0;
         right: 0;
         bottom: 0;
-        background-color: rgba(0, 0, 0, 0.9);
+        background-color: rgba(0, 0, 0, 0.92); /* Slightly more opaque */
         z-index: 2500; 
         display: flex;
         align-items: center;
@@ -671,44 +696,45 @@
       }
       .instructions-content {
         background-color: var(--surface-darker);
-        padding: calc(var(--spacing-unit) * 3);
+        padding: calc(var(--spacing-unit) * 2.5) calc(var(--spacing-unit) * 3); /* Adjusted padding */
         border-radius: var(--border-radius-large);
-        max-width: 500px;
+        max-width: 550px; /* Slightly wider */
         width: 100%;
         max-height: 90vh;
         overflow-y: auto;
         box-shadow: 0 8px 32px rgba(0,0,0,0.3);
       }
       .instructions-content h2 {
-        font-size: 1.5rem;
+        font-size: 1.6rem; /* Slightly larger */
         font-weight: 700;
         color: var(--primary-color);
         text-align: center;
-        margin-bottom: calc(var(--spacing-unit) * 2);
+        margin-bottom: calc(var(--spacing-unit) * 2.5);
       }
       .instructions-content h3 {
-        font-size: 1.1rem;
+        font-size: 1.15rem; /* Slightly larger */
         font-weight: 600;
-        margin-top: calc(var(--spacing-unit) * 2);
-        margin-bottom: var(--spacing-unit);
+        margin-top: calc(var(--spacing-unit) * 2.5);
+        margin-bottom: calc(var(--spacing-unit) * 1.5);
         border-bottom: 1px solid rgba(255,255,255,0.1);
-        padding-bottom: calc(var(--spacing-unit) * 0.5);
+        padding-bottom: calc(var(--spacing-unit) * 0.75);
         display: flex;
         align-items: center;
       }
       .instructions-content h3 .material-icons-round {
-        margin-right: var(--spacing-unit);
+        margin-right: calc(var(--spacing-unit) * 1.25);
         color: var(--primary-color);
         animation: instructionIconPulse 2s infinite ease-in-out;
+        font-size: 1.8rem; /* Larger icons in headings */
       }
       @keyframes instructionIconPulse {
-        0%, 100% { transform: scale(1); }
-        50% { transform: scale(1.1); }
+        0%, 100% { transform: scale(1) rotate(0deg); }
+        50% { transform: scale(1.1) rotate(5deg); }
       }
       .instructions-content p, .instructions-content ul {
-        font-size: 0.9rem;
-        line-height: 1.6;
-        margin-bottom: var(--spacing-unit);
+        font-size: 0.95rem; /* Slightly larger text */
+        line-height: 1.65;
+        margin-bottom: calc(var(--spacing-unit) * 1.5);
         color: var(--text-secondary);
       }
       .instructions-content ul {
@@ -716,7 +742,7 @@
         padding-left: var(--spacing-unit);
       }
       .instructions-content li {
-        margin-bottom: calc(var(--spacing-unit) * 0.5);
+        margin-bottom: calc(var(--spacing-unit) * 0.75);
       }
       .instructions-content strong {
         color: var(--text-primary);
@@ -726,29 +752,38 @@
         color: var(--primary-color);
         font-weight: 600;
       }
-      .instructions-content p .material-icons-round {
-        vertical-align: bottom;
-        font-size: 1.1em;
-        margin-right: 4px;
+      .instructions-content .button-example {
+        background-color: var(--surface-light);
+        padding: 2px 6px;
+        border-radius: var(--border-radius-small);
+        font-family: monospace;
+        color: var(--primary-color);
+      }
+      .instructions-content p .material-icons-round, 
+      .instructions-content li .material-icons-round {
+        vertical-align: -5px; /* Better alignment */
+        font-size: 1.2em; /* Consistent size */
+        margin: 0 2px;
         color: var(--primary-color);
         animation: none; 
       }
       #close-initial-instructions {
         display: block;
         width: 100%;
-        padding: calc(var(--spacing-unit) * 1.5);
+        padding: calc(var(--spacing-unit) * 1.75); /* Larger padding */
         background: var(--primary-color);
         border: none;
-        border-radius: var(--border-radius-button);
+        border-radius: var(--border-radius-medium); /* More rounded */
         color: #000; 
-        font-weight: 600;
-        font-size: 1rem;
+        font-weight: 700; /* Bolder */
+        font-size: 1.05rem; /* Larger */
         cursor: pointer;
-        transition: background-color 0.2s ease;
+        transition: background-color 0.2s ease, transform 0.1s ease;
         margin-top: calc(var(--spacing-unit) * 3);
       }
       #close-initial-instructions:hover {
         background: var(--primary-hover);
+        transform: scale(1.02);
       }
       
     </style>
@@ -763,7 +798,7 @@
         </div>
       </div>
       <div class="spinner"></div>
-      <div class="version-loading">Version 2.8.3</div>  
+      <div class="version-loading">Version 2.8.4</div>  
     </div>
 
     <div id="initial-instructions-overlay">
@@ -771,39 +806,65 @@
         <h2>Selamat Datang di 3D Model Viewer!</h2>
         
         <div id="desktop-instructions-block" style="display: none;">
-          <h3><span class="material-icons-round">mouse</span> Kontrol Desktop:</h3>
+          <h3><span class="material-icons-round">mouse</span>Kontrol Desktop (Non-AR)</h3>
           <ul>
             <li><strong>Putar Model:</strong> Klik kiri & seret mouse.</li>
-            <li><strong>Zoom:</strong> Scroll mouse wheel.</li>
-            <li><strong>Geser (Pan):</strong> Klik kanan & seret mouse (atau Shift + Klik kiri & seret).</li>
+            <li><strong>Zoom Model:</strong> Scroll mouse wheel.</li>
+            <li><strong>Geser/Pan Model:</strong> Klik kanan & seret mouse (atau Shift + Klik kiri & seret).</li>
           </ul>
         </div>
 
         <div id="mobile-instructions-block" style="display: none;">
-          <h3><span class="material-icons-round">touch_app</span> Kontrol Mobile (3D View):</h3>
+          <h3><span class="material-icons-round">touch_app</span>Kontrol Mobile (Non-AR)</h3>
           <ul>
             <li><strong>Putar Model:</strong> Seret dengan satu jari.</li>
-            <li><strong>Zoom:</strong> Cubit dengan dua jari (pinch in/out).</li>
-            <li><strong>Geser (Pan):</strong> Seret dengan dua jari.</li>
+            <li><strong>Zoom Model:</strong> Cubit dengan dua jari (pinch in/out).</li>
+            <li><strong>Geser/Pan Model:</strong> Seret dengan dua jari.</li>
           </ul>
         </div>
 
-        <h3><span class="material-icons-round">tune</span> Menu Kontrol:</h3>
-        <p>Tekan tombol <span class="material-icons-round highlight" style="vertical-align: bottom;">menu</span> di pojok kanan atas untuk membuka panel kontrol. Di sana Anda dapat mengubah model, pencahayaan, latar belakang, dan lainnya.</p>
-
-        <h3><span class="material-icons-round">view_in_ar</span> Mode Augmented Reality (AR):</h3>
-        <p>Tekan tombol <strong class="highlight">AR Mode</strong> (di tengah bawah layar) untuk mencoba melihat model di lingkungan Anda.</p>
-        <p><strong>Saat di Mode AR:</strong></p>
+        <h3><span class="material-icons-round">menu_open</span>Menu Kontrol Model</h3>
+        <p>Tekan tombol <span class="material-icons-round highlight">menu</span> di pojok kanan atas untuk membuka panel kontrol. Di sana Anda dapat:</p>
         <ul>
-          <li>Arahkan kamera ke permukaan datar (lantai/meja) hingga muncul <strong class="highlight">lingkaran penempatan</strong> berwarna kuning.</li>
-          <li><strong class="highlight">Ketuk lingkaran</strong> tersebut untuk menempatkan model. Anda akan melihat ikon <span class="material-icons-round highlight" style="vertical-align: bottom;">ads_click</span>.</li>
-          <li>Setelah model ditempatkan, Anda akan melihat petunjuk interaksi di bagian bawah layar:
-            <ul>
-              <li><strong>Ubah Ukuran:</strong> Cubit dengan dua jari (ikon <span class="material-icons-round highlight" style="vertical-align: bottom;">open_in_full</span> / <span class="material-icons-round highlight" style="vertical-align: bottom;">close_fullscreen</span>).</li>
-              <li><strong>Putar Model:</strong> Seret dengan satu jari (ikon <span class="material-icons-round highlight" style="vertical-align: bottom;">drag_indicator</span>).</li>
-            </ul>
-          </li>
+            <li>Mengubah <strong>Path Model</strong> (.glb).</li>
+            <li>Mengatur <strong>Skala Model</strong> (untuk mode Non-AR dan AR secara terpisah).</li>
+            <li>Menyesuaikan <strong>Rotasi Awal</strong> model.</li>
+            <li>Mengaktifkan/menonaktifkan <strong>Animasi Putar Otomatis</strong> (Non-AR).</li>
+            <li>Mengubah <strong>Latar Belakang</strong>: tampilkan Skybox dari URL .glb atau pilih warna solid.</li>
+            <li>Menyesuaikan <strong>FOV Kamera</strong> dan memilih <strong>Preset Pandangan</strong> cepat.</li>
+            <li>Mengatur <strong>Intensitas & Warna Pencahayaan</strong> (Ambient & Directional).</li>
+            <li>Mengontrol <strong>Exposure</strong> rendering.</li>
+            <li>Mengambil <strong>Screenshot</strong> (Non-AR).</li>
         </ul>
+
+
+        <h3><span class="material-icons-round">view_in_ar</span>Mode Augmented Reality (AR)</h3>
+        <p>Tekan tombol besar <span class="button-example"><span class="material-icons-round">view_in_ar</span> AR Mode</span> di bagian tengah bawah layar untuk memproyeksikan model ke dunia nyata.</p>
+        
+        <h4>Langkah-langkah Menggunakan AR:</h4>
+        <ol>
+            <li><strong>Mulai Sesi AR:</strong> Setelah menekan tombol AR Mode, berikan izin jika diminta.</li>
+            <li><strong>Pindai Permukaan:</strong> Anda akan melihat pesan <span class="button-example">"Arahkan kamera ke permukaan datar..."</span>. Gerakkan perangkat Anda perlahan mengarah ke lantai atau meja yang cukup terang dan bertekstur.</li>
+            <li><strong>Tempatkan Model:</strong> Saat permukaan terdeteksi, sebuah <strong class="highlight">lingkaran kuning (reticle)</strong> akan muncul. Sebuah prompt <span class="button-example"><span class="material-icons-round">ads_click</span> Ketuk lingkaran...</span> akan muncul di dekat reticle. Ketuk layar pada posisi lingkaran tersebut untuk menempatkan model.</li>
+            <li><strong>Interaksi dengan Model AR:</strong> Setelah model muncul, Anda dapat:
+                <ul>
+                    <li><span class="material-icons-round highlight">open_in_full</span> <strong>Ubah Ukuran (Scale):</strong> Gunakan gestur mencubit (pinch) dengan dua jari.</li>
+                    <li><span class="material-icons-round highlight">drag_indicator</span> <strong>Putar Model (Rotate):</strong> Seret model dengan satu jari.</li>
+                </ul>
+                 Petunjuk gestur ini juga akan muncul sesaat di layar.
+            </li>
+            <li><strong>Akhiri Sesi AR:</strong> Tekan tombol <span class="button-example" style="background-color: var(--error-color); color: white;"><span class="material-icons-round">close</span> Stop AR</span> (tombol AR Mode yang berubah fungsi).</li>
+        </ol>
+
+        <h3><span class="material-icons-round">construction</span>Tombol Utilitas Lainnya</h3>
+        <p>Di pojok kanan atas, Anda juga akan menemukan:</p>
+        <ul>
+            <li><span class="material-icons-round highlight">help_outline</span> <strong>Tombol Bantuan (ini):</strong> Untuk menampilkan kembali panduan ini.</li>
+            <li><span class="material-icons-round highlight">visibility_off</span> / <span class="material-icons-round highlight">visibility</span> <strong>Toggle Log:</strong> Untuk menampilkan atau menyembunyikan log debug di bagian bawah layar (berguna untuk troubleshooting).</li>
+        </ul>
+        <p>Di bagian bawah layar (Non-AR), terdapat tombol-tombol <span class="button-example"><span class="material-icons-round">flip_to_front</span> Front</span>, <span class="button-example"><span class="material-icons-round">arrow_upward</span> Top</span>, dll., untuk mengubah perspektif model dengan cepat.</p>
+
+
         <button id="close-initial-instructions">Saya Mengerti!</button>
       </div>
     </div>
@@ -840,7 +901,7 @@
     </div>
 
     <div id="ar-interaction-info" class="ar-prompt">
-        <span>Model ditempatkan! Gunakan gestur untuk interaksi:</span>
+        <span>Model ditempatkan!</span>
         <div class="ar-interaction-gesture-hints">
             <div class="gesture-hint">
                 <span class="material-icons-round icon-pinch">open_in_full</span> Skala
@@ -855,7 +916,7 @@
     
     <div id="app-version-container">
         <div id="app-version">
-          <span id="app-version-main">APP VERSI 2.8.3</span>
+          <span id="app-version-main">APP VERSI 2.8.4</span>
           <span id="model-name-display">Model: N/A</span>
         </div>
     </div>
@@ -984,31 +1045,34 @@
       </details>
 
     </div>
-
-    <div class="bottom-nav">
-      <button class="view-btn" data-view="Default">
-        <span class="material-icons-round">restore</span> Default
-      </button>
-      <button class="view-btn" data-view="Front">
-        <span class="material-icons-round">flip_to_front</span> Front
-      </button>
-      <button class="view-btn" data-view="Back">
-        <span class="material-icons-round">flip_to_back</span> Back
-      </button>
-      <button class="view-btn" data-view="Top">
-        <span class="material-icons-round">arrow_upward</span>
-        Top
-      </button>
-      <button class="view-btn" data-view="Bottom">
-        <span class="material-icons-round">arrow_downward</span>
-        Bottom
-      </button>
-      <button class="view-btn" data-view="Left">
-        <span class="material-icons-round">arrow_back</span> Left
-      </button>
-      <button class="view-btn" data-view="Right">
-        <span class="material-icons-round">arrow_forward</span> Right
-      </button>
+    
+    <div id="bottom-nav-wrapper">
+        <div id="bottom-nav-label">Perspektif Model</div>
+        <div class="bottom-nav">
+            <button class="view-btn" data-view="Default">
+                <span class="material-icons-round">restore</span> Default
+            </button>
+            <button class="view-btn" data-view="Front">
+                <span class="material-icons-round">flip_to_front</span> Front
+            </button>
+            <button class="view-btn" data-view="Back">
+                <span class="material-icons-round">flip_to_back</span> Back
+            </button>
+            <button class="view-btn" data-view="Top">
+                <span class="material-icons-round">arrow_upward</span>
+                Top
+            </button>
+            <button class="view-btn" data-view="Bottom">
+                <span class="material-icons-round">arrow_downward</span>
+                Bottom
+            </button>
+            <button class="view-btn" data-view="Left">
+                <span class="material-icons-round">arrow_back</span> Left
+            </button>
+            <button class="view-btn" data-view="Right">
+                <span class="material-icons-round">arrow_forward</span> Right
+            </button>
+        </div>
     </div>
     
     <script type="module">
@@ -1025,12 +1089,11 @@
       const arInstructionsPanel = document.getElementById("ar-instructions");
       const startScanButton = document.getElementById("start-scan-button");
       const onScreenLogContainer = document.getElementById("on-screen-log-container");
-      // const appVersionDisplay = document.getElementById("app-version"); // Now part of app-version-container
       const appVersionMainText = document.getElementById("app-version-main");
       const modelNameDisplayText = document.getElementById("model-name-display");
       const logToggleButton = document.getElementById("log-toggle-button");
-      const helpButton = document.getElementById("help-button"); // New help button
-      const guiToggleButton = document.getElementById("guiToggleButton"); // Existing menu button for controls
+      const helpButton = document.getElementById("help-button"); 
+      const guiToggleButton = document.getElementById("guiToggleButton"); 
       
       const initialInstructionsOverlay = document.getElementById("initial-instructions-overlay");
       const closeInitialInstructionsButton = document.getElementById("close-initial-instructions");
@@ -1053,8 +1116,8 @@
       
       let isUpdatingViewPresetGUI = false;  
       
-      const APP_VERSION = "2.8.3"; // Updated version
-      const INSTRUCTIONS_STORAGE_KEY = `modelViewerInstructionsSeen_${APP_VERSION}`; // Version specific key
+      const APP_VERSION = "2.8.4"; // Updated version
+      const INSTRUCTIONS_STORAGE_KEY = `modelViewerInstructionsSeen_v${APP_VERSION}`; 
       
       let arIsPinching = false;
       let arInitialPinchDistance = 0;
@@ -1194,6 +1257,14 @@
         scene = new THREE.Scene();
         scene.background = new THREE.Color(params.backgroundColor);
         
+        // Calculate bottom nav height for other elements positioning
+        const bottomNavWrapper = document.getElementById('bottom-nav-wrapper');
+        if (bottomNavWrapper) {
+            const navHeight = bottomNavWrapper.offsetHeight;
+            document.documentElement.style.setProperty('--bottom-nav-height', `${navHeight}px`);
+        }
+
+
         camera = new THREE.PerspectiveCamera(
           params.cameraFOV,
           window.innerWidth / window.innerHeight,
@@ -1283,7 +1354,7 @@
         const outputPass = new OutputPass();  
         composer.addPass(outputPass);
         
-        setupCustomControls(); // This sets up the #guiToggleButton (menu for controls)
+        setupCustomControls(); 
         setupPresetButtons();
         if(closeInitialInstructionsButton) closeInitialInstructionsButton.addEventListener('click', hideInitialInstructions);
         startScanButton.addEventListener("click", onStartScanButtonClick);
@@ -1313,7 +1384,7 @@
         renderer.setAnimationLoop(animate);
         
         updateAppVersionAndModelName();  
-        checkAndShowInitialInstructions(); // Check localStorage and show if first time
+        checkAndShowInitialInstructions(); 
       }
       
       function onARButtonClick() {
@@ -1349,14 +1420,13 @@
         if (arButtonTextElement) arButtonTextElement.textContent = " Stop AR";
         arButtonElement.classList.add("ar-active");
         
-        document.querySelector(".bottom-nav").style.display = "none";
-        // Hide AR button container when AR session starts, as it's part of the DOM overlay
+        document.getElementById("bottom-nav-wrapper").style.display = "none";
         document.getElementById("ar-button-container").style.display = "none";
 
         
         const customPanel = document.getElementById('custom-controls-panel');
         if (customPanel) customPanel.classList.remove('visible');  
-        const guiToggleIcon = guiToggleButton.querySelector('.material-icons-round'); // guiToggleButton is the menu button
+        const guiToggleIcon = guiToggleButton.querySelector('.material-icons-round'); 
         if (guiToggleIcon) guiToggleIcon.textContent = 'menu';  
 
 
@@ -1386,7 +1456,6 @@
             onScreenLogContainer.style.display = "none"; 
         }
         
-        // Ensure top-left and top-right controls are visible as they are part of DOM overlay
         document.getElementById('app-version-container').style.display = "flex";  
         document.getElementById('top-right-controls-container').style.display = "flex";
         updateAppVersionAndModelName();  
@@ -1445,8 +1514,8 @@
         if (arButtonTextElement) arButtonTextElement.textContent = " AR Mode";
         arButtonElement.classList.remove("ar-active");
         
-        document.querySelector(".bottom-nav").style.display = "flex";
-        document.getElementById("ar-button-container").style.display = "flex"; // Show AR button again
+        document.getElementById("bottom-nav-wrapper").style.display = "block"; // Show wrapper
+        document.getElementById("ar-button-container").style.display = "flex"; 
 
         const customPanel = document.getElementById('custom-controls-panel');
         if (customPanel) customPanel.classList.remove('visible');  
@@ -1958,10 +2027,9 @@
       
       function setupCustomControls() {
         const panel = document.getElementById('custom-controls-panel');
-        // guiToggleButton is already defined globally for the menu button
         const toggleButtonIcon = guiToggleButton.querySelector('.material-icons-round');
 
-        guiToggleButton.addEventListener('click', () => { // This is the Menu button for the control panel
+        guiToggleButton.addEventListener('click', () => { 
             panel.classList.toggle('visible');
             if (panel.classList.contains('visible')) {
                 if(toggleButtonIcon) toggleButtonIcon.textContent = 'close';  
@@ -2106,6 +2174,13 @@
         renderer.setSize(window.innerWidth, window.innerHeight);
         composer.setSize(window.innerWidth, window.innerHeight);  
         if (model && !xrSession) goToViewPreset(params.selectedViewPreset, true);  
+
+        // Recalculate bottom nav height on resize for accuracy
+        const bottomNavWrapper = document.getElementById('bottom-nav-wrapper');
+        if (bottomNavWrapper) {
+            const navHeight = bottomNavWrapper.offsetHeight;
+            document.documentElement.style.setProperty('--bottom-nav-height', `${navHeight}px`);
+        }
       }
       
       function animate(timestamp, frame) {  
