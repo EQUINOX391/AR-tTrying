@@ -28,9 +28,9 @@
         --primary-hover: #E6B800; /* Darker Yellow for hover */
         --secondary-color: #34568B; /* Lapis Lazuli Blue for secondary elements */
         --error-color: #f44336; /* Red for errors or active AR stop */
-        --surface-dark: rgba(0, 0, 0, 0.8); /* Dark translucent surface */
+        --surface-dark: rgba(30, 30, 30, 0.6); /* Darker translucent surface for blurred elements */
         --surface-darker: rgba(0, 0, 0, 0.9); /* For custom controls panel */
-        --surface-medium: rgba(255, 255, 255, 0.08); /* For control inputs */
+        --surface-medium: rgba(50, 50, 50, 0.5); /* Slightly lighter translucent for blurred elements */
         --surface-light: rgba(255, 255, 255, 0.1); /* Light translucent surface for buttons */
         --text-primary: #ffffff;
         --text-secondary: rgba(255, 255, 255, 0.8);
@@ -38,11 +38,14 @@
         --spacing-unit: 8px;
         --safe-area-inset-top: env(safe-area-inset-top, 16px); 
         --safe-area-inset-bottom: env(safe-area-inset-bottom, 20px);
+        --safe-area-inset-left: env(safe-area-inset-left, 16px);
+        --safe-area-inset-right: env(safe-area-inset-right, 16px);
         --border-radius-small: 6px;
-        --border-radius-medium: 12px;  
+        --border-radius-medium: 10px;  /* Adjusted for "not too sharp nor too round" */
         --border-radius-button: 4px;  
-        --border-radius-large: 16px; /* For rounded rectangles */
+        --border-radius-large: 16px; 
         --border-radius-capsule: 50px; 
+        --blur-intensity: 8px;
       }
       
       /* Global Reset and Body Styling */
@@ -167,11 +170,11 @@
         display: flex;
         align-items: center;
         gap: var(--spacing-unit);
-        padding: 0 calc(var(--spacing-unit) * 2.5); /* Adjusted padding for content */
+        padding: 0 calc(var(--spacing-unit) * 2.5); 
         background: var(--primary-color);
         border: none;
         height: 50px; 
-        border-radius: var(--border-radius-large); /* Using large radius for rounded rectangle */
+        border-radius: var(--border-radius-large); 
         color: #000; 
         font-weight: 700; 
         font-size: 1rem;  
@@ -222,7 +225,8 @@
         left: 50%;
         transform: translate(-50%, -50%);
         background: var(--surface-dark);
-        backdrop-filter: blur(10px);  
+        backdrop-filter: blur(var(--blur-intensity));  
+        -webkit-backdrop-filter: blur(var(--blur-intensity));
         border-radius: var(--border-radius-large);  
         padding: calc(var(--spacing-unit) * 2.5);  
         width: calc(100% - var(--spacing-unit) * 5);  
@@ -267,10 +271,11 @@
       /* AR Placement & Interaction Prompts */
       .ar-prompt { 
         position: fixed; 
-        background-color: var(--surface-dark);
+        background-color: var(--surface-dark); /* Consistent with ar-instructions */
+        backdrop-filter: blur(var(--blur-intensity));
+        -webkit-backdrop-filter: blur(var(--blur-intensity));
         color: var(--text-primary);
         padding: var(--spacing-unit) calc(var(--spacing-unit) * 2);
-        border-radius: var(--border-radius-capsule);
         font-size: 0.9rem;
         font-weight: 500;
         z-index: 1100;
@@ -283,10 +288,11 @@
         gap: calc(var(--spacing-unit) * 0.75);
       }
 
-      #ar-placement-prompt {
+      #ar-placement-prompt { /* This one is small, capsule is fine */
         border: 2px solid var(--primary-color); 
         padding: calc(var(--spacing-unit)*1.25) calc(var(--spacing-unit) * 2.5);
         font-size: 0.95rem;
+        border-radius: var(--border-radius-capsule);
       }
        #ar-placement-prompt .material-icons-round { 
         animation: tapAnimation 1.5s infinite ease-in-out;
@@ -305,8 +311,9 @@
         flex-direction: column; 
         gap: var(--spacing-unit);
         padding: calc(var(--spacing-unit) * 1.5);
+        border-radius: var(--border-radius-large); /* Same as ar-instructions */
       }
-      #ar-interaction-info > span { /* Text "Model ditempatkan!" */
+      #ar-interaction-info > span { 
         font-weight: 600;
         margin-bottom: calc(var(--spacing-unit) * 0.5);
       }
@@ -331,7 +338,7 @@
       }
       .gesture-hint .gesture-text {
         font-size: 0.8rem;
-        color: var(--text-primary); /* Changed to primary for better visibility */
+        color: var(--text-primary); 
         font-weight: 500;
       }
       
@@ -374,8 +381,9 @@
         left: 0;
         right: 0;
         z-index: 1000;
-        background: rgba(20, 20, 20, 0.2); 
-        backdrop-filter: blur(12px);
+        background: rgba(20, 20, 20, 0.3); /* Slightly more transparent */
+        backdrop-filter: blur(var(--blur-intensity));
+        -webkit-backdrop-filter: blur(var(--blur-intensity));
         padding: calc(var(--spacing-unit) * 1.5) var(--spacing-unit) calc(var(--spacing-unit) + var(--safe-area-inset-bottom));  
         border-top-left-radius: var(--border-radius-medium);  
         border-top-right-radius: var(--border-radius-medium);  
@@ -401,26 +409,30 @@
         display: flex;
         flex-direction: column;
         align-items: center;
-        gap: 3px;  
-        padding: calc(var(--spacing-unit) * 0.75) calc(var(--spacing-unit));  
-        border-radius: var(--border-radius-button);  
+        justify-content: center; /* Center content */
+        gap: 2px;  /* Reduced gap */
+        width: 60px; /* Fixed width */
+        height: 50px; /* Fixed height */
+        padding: calc(var(--spacing-unit) * 0.5); /* Adjusted padding */
+        border-radius: var(--border-radius-medium); /* Consistent roundedness */
         border: none;
         background: var(--surface-light);
         color: var(--text-primary);
         font-family: inherit;
         font-weight: 500;
-        font-size: 0.65rem;  
+        font-size: 0.6rem;  /* Slightly smaller font for fixed size */
         cursor: pointer;
         transition: all 0.2s ease;
-        min-width: 45px;  
         text-align: center;
+        line-height: 1.2; /* Adjust line height */
       }
       .view-btn:hover {
         background: rgba(255, 255, 255, 0.2); 
         transform: translateY(-1px);
       }
       .view-btn .material-icons-round {
-        font-size: 1.1rem;  
+        font-size: 1.2rem;  /* Adjusted icon size */
+        margin-bottom: 2px; /* Space between icon and text */
       }
       .view-btn.active {
         background: var(--primary-color);
@@ -454,33 +466,46 @@
         border: 1px solid rgba(255,255,255,0.1);  
       }
       
-      /* App Version Display (Top-Left) */
-      #app-version-container { 
+      /* Top Controls Common Styling */
+      .top-control-container {
         position: fixed;
         top: var(--safe-area-inset-top); 
-        padding-top: calc(var(--spacing-unit) * 2); 
-        left: calc(var(--spacing-unit) * 2 + var(--safe-area-inset-left, 0px)); 
+        padding-top: var(--spacing-unit); /* Reduced from *2 */
         z-index: 1001;  
         display: flex;
         align-items: center; 
         gap: var(--spacing-unit); 
+        background-color: var(--surface-medium); /* Gaussian blur base */
+        backdrop-filter: blur(var(--blur-intensity));
+        -webkit-backdrop-filter: blur(var(--blur-intensity));
+        padding-left: var(--spacing-unit);
+        padding-right: var(--spacing-unit);
+        border-radius: var(--border-radius-medium);
+        height: calc(48px + var(--spacing-unit) * 1); /* Consistent height base + padding */
+        box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+      }
+
+      #app-version-container { 
+        left: var(--safe-area-inset-left); 
+      }
+
+      #top-right-controls-container {
+        right: var(--safe-area-inset-right); 
       }
 
       #app-version {
         color: var(--text-secondary);
         font-size: 0.75rem;  
         font-weight: 500;
-        background-color: rgba(0,0,0,0.4);  
+        background-color: transparent; /* Transparent as container has blur */
         padding: calc(var(--spacing-unit) * 0.5) var(--spacing-unit);
         border-radius: var(--border-radius-small);
         line-height: 1.4;  
         display: flex;  
         flex-direction: column;  
         justify-content: center;  
-        min-height: 48px;  
+        /* min-height: 48px; Removed to rely on container height */
         box-sizing: border-box;
-        padding-top: calc(var(--spacing-unit) * 1);
-        padding-bottom: calc(var(--spacing-unit) * 1);
       }
       #app-version-main {
         display: block;
@@ -491,52 +516,39 @@
         color: var(--text-placeholder);
       }
 
-      /* Top Right Controls Container */
-      #top-right-controls-container {
-        position: fixed;
-        top: var(--safe-area-inset-top);
-        padding-top: calc(var(--spacing-unit) * 2); 
-        right: calc(var(--spacing-unit) * 2.5 + var(--safe-area-inset-right, 0px)); 
-        z-index: 1001;
-        display: flex;  
-        align-items: center;  
-        gap: var(--spacing-unit); 
-        height: 48px; 
-      }
-
-      /* Individual buttons within top-right container */
       .top-right-btn {
         display: flex;
         align-items: center;
         justify-content: center;
-        width: 48px;  
-        height: 48px;
-        background: var(--surface-dark);
+        width: 40px;  /* Slightly smaller for fitting in blurred container */
+        height: 40px;
+        background: var(--surface-light); /* Button background */
         border: none;
         border-radius: 50%;  
         color: var(--text-primary);
         cursor: pointer;
         transition: all 0.2s ease;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
       }
       .top-right-btn:hover {
-        background: rgba(255, 255, 255, 0.15);
-        transform: translateY(-2px);
+        background: rgba(255, 255, 255, 0.2);
+        transform: translateY(-1px);
       }
       .top-right-btn .material-icons-round {
-        font-size: 1.5rem;
+        font-size: 1.4rem; /* Adjusted icon size */
       }
 
 
       /* Custom Controls Panel */
       #custom-controls-panel {
         position: fixed;
-        top: calc(var(--safe-area-inset-top) + var(--spacing-unit) * 2 + 48px + var(--spacing-unit));  
+        top: calc(var(--safe-area-inset-top) + var(--spacing-unit) + 48px + var(--spacing-unit) * 2);  /* Adjusted for new top bar height */
         right: var(--safe-area-inset-right, 0px); 
         width: 300px;
-        max-height: calc(100vh - (var(--safe-area-inset-top) + var(--spacing-unit) * 2 + 48px + var(--spacing-unit)) - var(--spacing-unit) - (var(--bottom-nav-height, 70px) + var(--safe-area-inset-bottom) + var(--spacing-unit) * 1.5)); 
+        max-height: calc(100vh - (var(--safe-area-inset-top) + var(--spacing-unit) + 48px + var(--spacing-unit)*2) - var(--spacing-unit) - (var(--bottom-nav-height, 70px) + var(--safe-area-inset-bottom) + var(--spacing-unit) * 1.5)); 
         background-color: var(--surface-darker);
-        backdrop-filter: blur(5px);
+        backdrop-filter: blur(var(--blur-intensity));
+        -webkit-backdrop-filter: blur(var(--blur-intensity));
         border-radius: var(--border-radius-medium) 0 0 var(--border-radius-medium);  
         box-shadow: -8px 0 24px rgba(0,0,0,0.3);  
         z-index: 1400;
@@ -805,12 +817,12 @@
         </div>
       </div>
       <div class="spinner"></div>
-      <div class="version-loading">Version 2.8.5</div>  
+      <div class="version-loading">Version 2.8.6</div>  
     </div>
 
     <div id="initial-instructions-overlay">
       <div class="instructions-content">
-        <h2>Selamat Datang di 3D Model Viewer!</h2>
+        <h2>Selamat Datang di Penampil Model 3D!</h2>
         
         <div id="desktop-instructions-block" style="display: none;">
           <h3><span class="material-icons-round">mouse</span>Kontrol Desktop (Non-AR)</h3>
@@ -841,7 +853,7 @@
             <li>Menyesuaikan <strong>FOV Kamera</strong> dan memilih <strong>Preset Pandangan</strong> cepat.</li>
             <li>Mengatur <strong>Intensitas & Warna Pencahayaan</strong> (Ambient & Directional).</li>
             <li>Mengontrol <strong>Exposure</strong> rendering.</li>
-            <li>Mengambil <strong>Screenshot</strong> (Non-AR).</li>
+            <li>Mengambil <strong>Tangkapan Layar</strong> (Non-AR).</li>
         </ul>
 
 
@@ -850,17 +862,17 @@
         
         <h4>Langkah-langkah Menggunakan AR:</h4>
         <ol>
-            <li><strong>Mulai Sesi AR:</strong> Setelah menekan tombol <span class="button-example"><span class="material-icons-round">view_in_ar</span> AR Mode</span>, berikan izin jika diminta.</li>
+            <li><strong>Mulai Sesi AR:</strong> Setelah menekan tombol <span class="button-example"><span class="material-icons-round">view_in_ar</span> AR Mode</span>, berikan izin jika diminta. Tombol akan berubah menjadi <span class="button-example" style="background-color: var(--error-color); color: white;"><span class="material-icons-round">close</span> Hentikan AR</span>.</li>
             <li><strong>Pindai Permukaan:</strong> Anda akan melihat pesan <span class="button-example">"Arahkan kamera ke permukaan datar..."</span>. Gerakkan perangkat Anda perlahan mengarah ke lantai atau meja yang cukup terang dan bertekstur.</li>
             <li><strong>Tempatkan Model:</strong> Saat permukaan terdeteksi, sebuah <strong class="highlight">lingkaran kuning (reticle)</strong> akan muncul. Sebuah prompt <span class="button-example"><span class="material-icons-round">ads_click</span> Ketuk lingkaran...</span> akan muncul di dekat reticle. Ketuk layar pada posisi lingkaran tersebut untuk menempatkan model.</li>
             <li><strong>Interaksi dengan Model AR:</strong> Setelah model muncul, Anda dapat:
                 <ul>
-                    <li><span class="material-icons-round highlight">open_in_full</span> <strong>Ubah Ukuran (Scale):</strong> Gunakan gestur mencubit (pinch) dengan dua jari.</li>
-                    <li><span class="material-icons-round highlight">drag_indicator</span> <strong>Putar Model (Rotate):</strong> Seret model dengan satu jari.</li>
+                    <li><span class="material-icons-round highlight">open_in_full</span> <strong>Ubah Ukuran (Skala):</strong> Gunakan gestur mencubit (pinch) dengan dua jari.</li>
+                    <li><span class="material-icons-round highlight">drag_indicator</span> <strong>Putar Model:</strong> Seret model dengan satu jari.</li>
                 </ul>
                  Petunjuk gestur ini juga akan muncul sesaat di layar.
             </li>
-            <li><strong>Akhiri Sesi AR:</strong> Tekan tombol <span class="button-example" style="background-color: var(--error-color); color: white;"><span class="material-icons-round">close</span> Stop AR</span> (tombol AR Mode yang berubah fungsi dan warna).</li>
+            <li><strong>Akhiri Sesi AR:</strong> Tekan tombol <span class="button-example" style="background-color: var(--error-color); color: white;"><span class="material-icons-round">close</span> Hentikan AR</span>.</li>
         </ol>
 
         <h3><span class="material-icons-round">construction</span>Tombol Utilitas Lainnya</h3>
@@ -870,7 +882,7 @@
             <li><span class="button-example"><span class="material-icons-round">visibility_off</span></span> / <span class="button-example"><span class="material-icons-round">visibility</span></span> <strong>Toggle Log:</strong> Untuk menampilkan atau menyembunyikan log debug.</li>
             <li><span class="button-example"><span class="material-icons-round">menu</span></span> <strong>Menu Kontrol Model:</strong> Untuk membuka panel kustomisasi model.</li>
         </ul>
-        <p>Di bagian bawah layar (Non-AR), terdapat tombol-tombol <span class="button-example"><span class="material-icons-round">flip_to_front</span> Front</span>, <span class="button-example"><span class="material-icons-round">arrow_upward</span> Top</span>, dll., untuk mengubah perspektif model dengan cepat.</p>
+        <p>Di bagian bawah layar (Non-AR), terdapat tombol-tombol <span class="button-example"><span class="material-icons-round">flip_to_front</span> Depan</span>, <span class="button-example"><span class="material-icons-round">arrow_upward</span> Atas</span>, dll., untuk mengubah perspektif model dengan cepat.</p>
 
 
         <button id="close-initial-instructions">Saya Mengerti!</button>
@@ -884,7 +896,7 @@
       </button>
     </div>
     
-    <div id="top-right-controls-container">
+    <div id="top-right-controls-container" class="top-control-container">
         <button id="help-button" class="top-right-btn" title="Bantuan">
             <span class="material-icons-round">help_outline</span>
         </button>
@@ -909,7 +921,7 @@
     </div>
 
     <div id="ar-interaction-info" class="ar-prompt">
-        <span>Model ditempatkan!</span>
+        <span>Model Ditempatkan!</span>
         <div class="ar-interaction-gesture-hints">
             <div class="gesture-hint">
                 <span class="material-icons-round icon-pinch">open_in_full</span>
@@ -924,9 +936,9 @@
     
     <div id="reticle"></div> 
     
-    <div id="app-version-container">
+    <div id="app-version-container" class="top-control-container">
         <div id="app-version">
-          <span id="app-version-main">APP VERSI 2.8.5</span>
+          <span id="app-version-main">APP VERSI 2.8.6</span>
           <span id="model-name-display">Model: N/A</span>
         </div>
     </div>
@@ -989,7 +1001,7 @@
             <input type="range" id="ctrlSkyboxBrightness" min="0" max="5" step="0.05">
           </div>
           <div class="control-item">
-            <label for="ctrlBackgroundColor">Warna Background</label>
+            <label for="ctrlBackgroundColor">Warna Latar</label>
             <input type="color" id="ctrlBackgroundColor">
           </div>
         </div>
@@ -1005,13 +1017,13 @@
           <div class="control-item">
             <label for="ctrlSelectedViewPreset">Preset Pandangan</label>
             <select id="ctrlSelectedViewPreset">
-              <option value="Default">Default</option>
-              <option value="Front">Front</option>
-              <option value="Back">Back</option>
-              <option value="Top">Top</option>
-              <option value="Bottom">Bottom</option>
-              <option value="Left">Left</option>
-              <option value="Right">Right</option>
+              <option value="Default">Standar</option>
+              <option value="Front">Depan</option>
+              <option value="Back">Belakang</option>
+              <option value="Top">Atas</option>
+              <option value="Bottom">Bawah</option>
+              <option value="Left">Kiri</option>
+              <option value="Right">Kanan</option>
             </select>
           </div>
         </div>
@@ -1049,7 +1061,7 @@
         <summary>Utilitas</summary>
         <div class="controls-content">
           <div class="control-item">
-            <button id="ctrlTakeScreenshot">Ambil Screenshot (Non-AR)</button>
+            <button id="ctrlTakeScreenshot">Ambil Tangkapan Layar (Non-AR)</button>
           </div>
         </div>
       </details>
@@ -1060,27 +1072,27 @@
         <div id="bottom-nav-label">Perspektif Model</div>
         <div class="bottom-nav">
             <button class="view-btn" data-view="Default">
-                <span class="material-icons-round">restore</span> Default
+                <span class="material-icons-round">restore</span> Standar
             </button>
             <button class="view-btn" data-view="Front">
-                <span class="material-icons-round">flip_to_front</span> Front
+                <span class="material-icons-round">flip_to_front</span> Depan
             </button>
             <button class="view-btn" data-view="Back">
-                <span class="material-icons-round">flip_to_back</span> Back
+                <span class="material-icons-round">flip_to_back</span> Belakang
             </button>
             <button class="view-btn" data-view="Top">
                 <span class="material-icons-round">arrow_upward</span>
-                Top
+                Atas
             </button>
             <button class="view-btn" data-view="Bottom">
                 <span class="material-icons-round">arrow_downward</span>
-                Bottom
+                Bawah
             </button>
             <button class="view-btn" data-view="Left">
-                <span class="material-icons-round">arrow_back</span> Left
+                <span class="material-icons-round">arrow_back</span> Kiri
             </button>
             <button class="view-btn" data-view="Right">
-                <span class="material-icons-round">arrow_forward</span> Right
+                <span class="material-icons-round">arrow_forward</span> Kanan
             </button>
         </div>
     </div>
@@ -1126,7 +1138,7 @@
       
       let isUpdatingViewPresetGUI = false;  
       
-      const APP_VERSION = "2.8.5"; // Updated version
+      const APP_VERSION = "2.8.6"; // Updated version
       const INSTRUCTIONS_STORAGE_KEY = `modelViewerInstructionsSeen_v${APP_VERSION}`; 
       
       let arIsPinching = false;
@@ -1148,7 +1160,7 @@
         initialRotationZ_deg: 0.0,
         animateModel: false,  
         rotationSpeed: 0.1,  
-        selectedViewPreset: "Default",
+        selectedViewPreset: "Default", // Corresponds to "Standar"
         cameraFOV: 50,
         modelScale: 1.0,  
         arModelScale: 0.5,  
@@ -1426,13 +1438,11 @@
         const arButtonElement = document.getElementById("arButton");
         const arButtonTextElement = document.getElementById("arButtonText");
         
-        if (arButtonTextElement) arButtonTextElement.textContent = " Stop AR";
+        if (arButtonTextElement) arButtonTextElement.textContent = "Hentikan AR"; // Indonesian
         arButtonElement.classList.add("ar-active");
         
         document.getElementById("bottom-nav-wrapper").style.display = "none";
-        // AR Button container should remain visible as it's part of the DOM overlay
-        // and contains the "Stop AR" button.
-        document.getElementById("ar-button-container").style.display = "flex"; 
+        document.getElementById("ar-button-container").style.display = "flex"; // Ensure AR button is visible
 
 
         const customPanel = document.getElementById('custom-controls-panel');
@@ -1522,7 +1532,7 @@
         const arButtonElement = document.getElementById("arButton");
         const arButtonTextElement = document.getElementById("arButtonText");
         
-        if (arButtonTextElement) arButtonTextElement.textContent = " AR Mode";
+        if (arButtonTextElement) arButtonTextElement.textContent = "AR Mode";
         arButtonElement.classList.remove("ar-active");
         
         document.getElementById("bottom-nav-wrapper").style.display = "block"; 
@@ -1910,7 +1920,7 @@
             newCamPos.set(center.x, center.y - distance, center.z + 0.0001);
             camera.up.set(0, 0, 1);  
             break;
-          case "Default":
+          case "Default": // "Standar" in UI
           default:
             modelContainerGroup.position.set(0, 0, 0);
             modelContainerGroup.rotation.set(
@@ -1930,7 +1940,7 @@
                 controlsPanel.selectedViewPreset.value = "Default";
             }
             isUpdatingViewPresetGUI = false;
-            updateActiveButton(presetName);
+            updateActiveButton(presetName); // Use "Default" for logic, UI shows "Standar"
             return;
         }
         
@@ -2162,7 +2172,7 @@
       function takeScreenshot() {
         try {
           if (xrSession) {
-            logToScreen("Screenshot tidak didukung dalam mode AR.", "warn");
+            logToScreen("Tangkapan layar tidak didukung dalam mode AR.", "warn");
             return;
           }
           composer.render();  
@@ -2173,9 +2183,9 @@
           document.body.appendChild(a);
           a.click();
           document.body.removeChild(a);
-          logToScreen("Screenshot diambil!");
+          logToScreen("Tangkapan layar diambil!");
         } catch (e) {
-          logToScreen(`Gagal mengambil screenshot: ${e.message}`, "error");
+          logToScreen(`Gagal mengambil tangkapan layar: ${e.message}`, "error");
         }
       }
       
