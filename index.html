@@ -2,7 +2,7 @@
 <html lang="id">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover" />
     <title>3D Model Viewer AR - OLEH FADHILLAH SUKMA ARINI</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -36,6 +36,7 @@
         --text-secondary: rgba(255, 255, 255, 0.8);
         --text-placeholder: rgba(255, 255, 255, 0.5);
         --spacing-unit: 8px;
+        --safe-area-inset-top: env(safe-area-inset-top, 16px); /* Adjusted default */
         --safe-area-inset-bottom: env(safe-area-inset-bottom, 20px);
         --border-radius-small: 6px;
         --border-radius-medium: 12px;  
@@ -152,12 +153,13 @@
         pointer-events: none;  
       }
       
-      /* AR Button */
+      /* AR Button - Moved to Bottom Center */
       #ar-button-container {
         position: fixed;
-        top: calc(var(--spacing-unit) * 2);  
-        right: calc(var(--spacing-unit) * 2.5 + 48px + var(--spacing-unit));  
-        z-index: 1000;
+        bottom: calc(80px + var(--safe-area-inset-bottom) + var(--spacing-unit) * 2); /* Above bottom-nav */
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 1001; /* Above bottom-nav but below other overlays if any */
         display: flex;  
         align-items: center;  
       }
@@ -165,31 +167,52 @@
         display: flex;
         align-items: center;
         gap: var(--spacing-unit);
-        padding: calc(var(--spacing-unit) * 1.25) calc(var(--spacing-unit) * 2);  
+        padding: calc(var(--spacing-unit) * 1.5) calc(var(--spacing-unit) * 2.5); /* Slightly larger */
         background: var(--primary-color);
         border: none;
         border-radius: var(--border-radius-capsule);  
-        color: #000; /* Changed for better contrast on yellow */
-        font-weight: 600;
-        font-size: 0.95rem;  
+        color: #000; 
+        font-weight: 700; /* Bolder */
+        font-size: 1rem;  /* Slightly larger */
         cursor: pointer;
         transition: all 0.2s ease;
-        box-shadow: 0 4px 12px rgba(255, 215, 0, 0.3);  
-        height: 48px;  
+        box-shadow: 0 0 15px 5px rgba(255, 215, 0, 0.5), 0 4px 12px rgba(0,0,0,0.3); /* Initial glow */
+        height: 56px; /* Larger height */
         box-sizing: border-box;  
+        animation: subtleGlow 2.5s infinite alternate ease-in-out;
       }
+
+      @keyframes subtleGlow {
+        0% {
+          box-shadow: 0 0 15px 5px rgba(255, 215, 0, 0.5), 0 4px 12px rgba(0,0,0,0.3);
+          transform: scale(1);
+        }
+        50% {
+          box-shadow: 0 0 25px 10px rgba(255, 215, 0, 0.7), 0 6px 16px rgba(0,0,0,0.4);
+          transform: scale(1.05);
+        }
+        100% {
+          box-shadow: 0 0 15px 5px rgba(255, 215, 0, 0.5), 0 4px 12px rgba(0,0,0,0.3);
+          transform: scale(1);
+        }
+      }
+
       #arButton:hover {
         background: var(--primary-hover);
-        transform: translateY(-2px);
-        box-shadow: 0 6px 16px rgba(255, 215, 0, 0.4);  
+        transform: translateX(-50%) translateY(-2px) scale(1.05); /* Adjust transform for hover when centered */
+        box-shadow: 0 0 25px 10px rgba(255, 215, 0, 0.7), 0 6px 16px rgba(0,0,0,0.4); 
       }
       #arButton.ar-active {  
         background: var(--error-color);
         box-shadow: 0 4px 12px rgba(244, 67, 54, 0.3);
-        color: #fff; /* Text color for active AR button */
+        color: #fff; 
+        animation: none; /* Stop glow when active */
+      }
+      #arButton.ar-active:hover {
+        transform: translateX(-50%) translateY(-2px) scale(1.02); /* Adjust hover for active AR button */
       }
       #arButton .material-icons-round {
-        font-size: 1.25rem;  
+        font-size: 1.35rem;  /* Slightly larger icon */
       }
       
       /* AR Instructions Panel (Scanning) */
@@ -220,7 +243,7 @@
         background: var(--primary-color);
         border: none;
         border-radius: var(--border-radius-medium);
-        color: #000; /* Changed for better contrast */
+        color: #000; 
         font-weight: 600;
         font-size: 0.95rem;
         cursor: pointer;
@@ -242,7 +265,7 @@
       }
 
       /* AR Placement & Interaction Prompts */
-      .ar-prompt { /* General styling for AR prompts */
+      .ar-prompt { 
         position: fixed; 
         background-color: var(--surface-dark);
         color: var(--text-primary);
@@ -256,17 +279,16 @@
         box-shadow: 0 4px 12px rgba(0,0,0,0.2);
         animation: fadeInPrompt 0.3s ease-out;
         white-space: nowrap; 
-        align-items: center; /* For icon + text alignment */
+        align-items: center; 
         gap: calc(var(--spacing-unit) * 0.75);
       }
 
       #ar-placement-prompt {
-        /* transform is set by JS */
-        border: 2px solid var(--primary-color); /* Highlight placement prompt */
+        border: 2px solid var(--primary-color); 
         padding: calc(var(--spacing-unit)*1.25) calc(var(--spacing-unit) * 2.5);
         font-size: 0.95rem;
       }
-       #ar-placement-prompt .material-icons-round { /* Tap icon */
+       #ar-placement-prompt .material-icons-round { 
         animation: tapAnimation 1.5s infinite ease-in-out;
       }
 
@@ -277,10 +299,10 @@
 
 
       #ar-interaction-info { 
-        bottom: calc(var(--spacing-unit) * 12 + var(--safe-area-inset-bottom));  
+        bottom: calc(var(--spacing-unit) * 22 + var(--safe-area-inset-bottom)); /* Adjusted to be above AR button */
         left: 50%;
         transform: translateX(-50%);
-        flex-direction: column; /* Stack text and gesture hints */
+        flex-direction: column; 
         gap: var(--spacing-unit);
         padding: calc(var(--spacing-unit) * 1.5);
       }
@@ -297,10 +319,9 @@
         font-size: 0.8rem;
       }
       .gesture-hint .material-icons-round {
-        font-size: 1.5rem; /* Larger icons for gestures */
+        font-size: 1.5rem; 
         color: var(--primary-color);
       }
-      /* Pinch animation */
       @keyframes pinchZoom {
         0%, 100% { transform: scale(1); }
         50% { transform: scale(0.8); }
@@ -308,7 +329,6 @@
       .gesture-hint .icon-pinch {
         animation: pinchZoom 1.5s infinite ease-in-out;
       }
-      /* Drag animation */
       @keyframes dragRotate {
         0% { transform: translateX(-3px) rotate(-5deg); }
         50% { transform: translateX(3px) rotate(5deg); }
@@ -385,7 +405,7 @@
       /* On-Screen Log */
       #on-screen-log-container {
         position: fixed;
-        bottom: calc(80px + var(--safe-area-inset-bottom) + var(--spacing-unit));  
+        bottom: calc(80px + var(--safe-area-inset-bottom) + var(--spacing-unit) * 2 + 56px + var(--spacing-unit)); /* Adjusted for AR button and bottom nav */
         left: calc(var(--spacing-unit) * 1.5);
         right: calc(var(--spacing-unit) * 1.5);  
         width: auto;  
@@ -401,19 +421,20 @@
         border-radius: var(--border-radius-small);
         overflow-y: auto;
         z-index: 999;  
-        display: none; /* Initially hidden */ 
+        display: none; 
         border: 1px solid rgba(255,255,255,0.1);  
       }
       
-      /* App Version Display & Log Toggle Container */
-      #top-left-controls {
+      /* App Version Display (Top-Left) */
+      #app-version-container { /* Renamed for clarity */
         position: fixed;
-        top: calc(var(--spacing-unit) * 2);  
+        top: var(--safe-area-inset-top); 
+        padding-top: calc(var(--spacing-unit) * 2); /* Original padding */
         left: calc(var(--spacing-unit) * 2);
         z-index: 1001;  
         display: flex;
-        align-items: center; /* Align items vertically */
-        gap: var(--spacing-unit); /* Space between version and toggle button */
+        align-items: center; 
+        gap: var(--spacing-unit); 
       }
 
       #app-version {
@@ -441,7 +462,21 @@
         color: var(--text-placeholder);
       }
 
-      #log-toggle-button {
+      /* Top Right Controls Container */
+      #top-right-controls-container {
+        position: fixed;
+        top: var(--safe-area-inset-top);
+        padding-top: calc(var(--spacing-unit) * 2); /* Original padding */
+        right: calc(var(--spacing-unit) * 2.5);  
+        z-index: 1001;
+        display: flex;  
+        align-items: center;  
+        gap: var(--spacing-unit); /* Space between buttons */
+        height: 48px; 
+      }
+
+      /* Individual buttons within top-right container */
+      .top-right-btn {
         display: flex;
         align-items: center;
         justify-content: center;
@@ -455,55 +490,22 @@
         transition: all 0.2s ease;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
       }
-      #log-toggle-button:hover {
+      .top-right-btn:hover {
         background: rgba(255, 255, 255, 0.15);
         transform: translateY(-2px);
       }
-      #log-toggle-button .material-icons-round {
+      .top-right-btn .material-icons-round {
         font-size: 1.5rem;
       }
 
 
-      /* GUI toggle button */
-      #gui-toggle-container {
-          position: fixed;
-          top: calc(var(--spacing-unit) * 2);  
-          right: calc(var(--spacing-unit) * 2.5);  
-          z-index: 1001;
-          display: flex;  
-          align-items: center;  
-          height: 48px;  
-      }
-      #guiToggleButton {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          width: 48px;  
-          height: 48px;
-          background: var(--surface-dark);
-          border: none;
-          border-radius: 50%;  
-          color: var(--text-primary);
-          cursor: pointer;
-          transition: all 0.2s ease;
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-      }
-      #guiToggleButton:hover {
-          background: rgba(255, 255, 255, 0.15);
-          transform: translateY(-2px);
-          box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
-      }
-      #guiToggleButton .material-icons-round {
-          font-size: 1.5rem;
-      }
-
       /* Custom Controls Panel */
       #custom-controls-panel {
         position: fixed;
-        top: calc(var(--spacing-unit) * 2 + 48px + var(--spacing-unit));  
+        top: calc(var(--safe-area-inset-top) + var(--spacing-unit) * 2 + 48px + var(--spacing-unit));  /* Adjusted for safe area */
         right: 0;  
         width: 300px;
-        max-height: calc(100vh - (var(--spacing-unit) * 2 + 48px + var(--spacing-unit)) - var(--spacing-unit) - (80px + var(--safe-area-inset-bottom) + var(--spacing-unit))); /* Adjusted for bottom nav */
+        max-height: calc(100vh - (var(--safe-area-inset-top) + var(--spacing-unit) * 2 + 48px + var(--spacing-unit)) - var(--spacing-unit) - (80px + var(--safe-area-inset-bottom) + var(--spacing-unit))); 
         background-color: var(--surface-darker);
         backdrop-filter: blur(5px);
         border-radius: var(--border-radius-medium) 0 0 var(--border-radius-medium);  
@@ -654,7 +656,7 @@
         right: 0;
         bottom: 0;
         background-color: rgba(0, 0, 0, 0.9);
-        z-index: 2500; /* Above everything else */
+        z-index: 2500; 
         display: flex;
         align-items: center;
         justify-content: center;
@@ -697,7 +699,6 @@
       .instructions-content h3 .material-icons-round {
         margin-right: var(--spacing-unit);
         color: var(--primary-color);
-        /* Animation for instruction icons */
         animation: instructionIconPulse 2s infinite ease-in-out;
       }
       @keyframes instructionIconPulse {
@@ -730,7 +731,7 @@
         font-size: 1.1em;
         margin-right: 4px;
         color: var(--primary-color);
-        animation: none; /* Override general pulse for inline icons if needed */
+        animation: none; 
       }
       #close-initial-instructions {
         display: block;
@@ -739,7 +740,7 @@
         background: var(--primary-color);
         border: none;
         border-radius: var(--border-radius-button);
-        color: #000; /* Contrast */
+        color: #000; 
         font-weight: 600;
         font-size: 1rem;
         cursor: pointer;
@@ -762,7 +763,7 @@
         </div>
       </div>
       <div class="spinner"></div>
-      <div class="version-loading">Version 3.8.2</div>  
+      <div class="version-loading">Version 2.8.3</div>  
     </div>
 
     <div id="initial-instructions-overlay">
@@ -791,7 +792,7 @@
         <p>Tekan tombol <span class="material-icons-round highlight" style="vertical-align: bottom;">menu</span> di pojok kanan atas untuk membuka panel kontrol. Di sana Anda dapat mengubah model, pencahayaan, latar belakang, dan lainnya.</p>
 
         <h3><span class="material-icons-round">view_in_ar</span> Mode Augmented Reality (AR):</h3>
-        <p>Tekan tombol <strong class="highlight">AR Mode</strong> untuk mencoba melihat model di lingkungan Anda.</p>
+        <p>Tekan tombol <strong class="highlight">AR Mode</strong> (di tengah bawah layar) untuk mencoba melihat model di lingkungan Anda.</p>
         <p><strong>Saat di Mode AR:</strong></p>
         <ul>
           <li>Arahkan kamera ke permukaan datar (lantai/meja) hingga muncul <strong class="highlight">lingkaran penempatan</strong> berwarna kuning.</li>
@@ -814,11 +815,18 @@
       </button>
     </div>
     
-    <div id="gui-toggle-container">
-        <button id="guiToggleButton">
+    <div id="top-right-controls-container">
+        <button id="help-button" class="top-right-btn" title="Bantuan">
+            <span class="material-icons-round">help_outline</span>
+        </button>
+        <button id="log-toggle-button" class="top-right-btn" title="Toggle Log">
+            <span class="material-icons-round">visibility_off</span> 
+        </button>
+        <button id="guiToggleButton" class="top-right-btn" title="Kontrol Model">
             <span class="material-icons-round">menu</span>  
         </button>
     </div>
+
 
     <div id="ar-instructions"> <p>Arahkan kamera ke permukaan datar (lantai/meja) untuk memulai pemindaian.</p>
       <button id="start-scan-button">
@@ -845,13 +853,11 @@
     
     <div id="reticle"></div> 
     
-    <div id="top-left-controls">
+    <div id="app-version-container">
         <div id="app-version">
-          <span id="app-version-main">APP VERSI 2.8.2</span>
+          <span id="app-version-main">APP VERSI 2.8.3</span>
           <span id="model-name-display">Model: N/A</span>
         </div>
-        <button id="log-toggle-button">
-            <span class="material-icons-round">visibility_off</span> </button>
     </div>
     <div id="on-screen-log-container"></div>
     
@@ -1019,10 +1025,12 @@
       const arInstructionsPanel = document.getElementById("ar-instructions");
       const startScanButton = document.getElementById("start-scan-button");
       const onScreenLogContainer = document.getElementById("on-screen-log-container");
-      const appVersionDisplay = document.getElementById("app-version"); // This is the div containing both version and model name
+      // const appVersionDisplay = document.getElementById("app-version"); // Now part of app-version-container
       const appVersionMainText = document.getElementById("app-version-main");
       const modelNameDisplayText = document.getElementById("model-name-display");
       const logToggleButton = document.getElementById("log-toggle-button");
+      const helpButton = document.getElementById("help-button"); // New help button
+      const guiToggleButton = document.getElementById("guiToggleButton"); // Existing menu button for controls
       
       const initialInstructionsOverlay = document.getElementById("initial-instructions-overlay");
       const closeInitialInstructionsButton = document.getElementById("close-initial-instructions");
@@ -1045,7 +1053,8 @@
       
       let isUpdatingViewPresetGUI = false;  
       
-      const APP_VERSION = "2.8.2"; // Updated version
+      const APP_VERSION = "2.8.3"; // Updated version
+      const INSTRUCTIONS_STORAGE_KEY = `modelViewerInstructionsSeen_${APP_VERSION}`; // Version specific key
       
       let arIsPinching = false;
       let arInitialPinchDistance = 0;
@@ -1122,7 +1131,6 @@
       }
 
       function showInitialInstructions() {
-        // Removed localStorage check to show instructions every time
         const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
         if (isTouchDevice) {
             if(mobileInstructionsBlock) mobileInstructionsBlock.style.display = 'block';
@@ -1133,10 +1141,17 @@
         }
         if(initialInstructionsOverlay) initialInstructionsOverlay.classList.add('visible');
       }
+      
+      function checkAndShowInitialInstructions() {
+        if (!localStorage.getItem(INSTRUCTIONS_STORAGE_KEY)) {
+            showInitialInstructions();
+        }
+      }
+
 
       function hideInitialInstructions() {
         if(initialInstructionsOverlay) initialInstructionsOverlay.classList.remove('visible');
-        // localStorage.setItem('hasSeenModelViewerInstructions_v1', 'true'); // We can still set this if we want to re-introduce the "seen" logic later
+        localStorage.setItem(INSTRUCTIONS_STORAGE_KEY, 'true'); 
       }
 
       function updateElementPositionRelativeTo3DObject(element, object3D, offsetX = 0, offsetY = -60) {
@@ -1160,13 +1175,13 @@
         element.style.left = `${x + offsetX}px`;
         element.style.top = `${y + offsetY}px`;
         element.style.transform = `translate(-50%, -50%)`;  
-        element.style.display = 'flex'; // Changed to flex for better icon alignment
+        element.style.display = 'flex'; 
       }
 
 
       function showARInteractionInfo() {
         if (arInteractionInfo) {
-            arInteractionInfo.style.display = 'flex'; // Changed to flex
+            arInteractionInfo.style.display = 'flex'; 
             clearTimeout(arInteractionInfoTimeout);  
             arInteractionInfoTimeout = setTimeout(() => {
                 if(arInteractionInfo) arInteractionInfo.style.display = 'none';
@@ -1268,12 +1283,15 @@
         const outputPass = new OutputPass();  
         composer.addPass(outputPass);
         
-        setupCustomControls();  
+        setupCustomControls(); // This sets up the #guiToggleButton (menu for controls)
         setupPresetButtons();
         if(closeInitialInstructionsButton) closeInitialInstructionsButton.addEventListener('click', hideInitialInstructions);
         startScanButton.addEventListener("click", onStartScanButtonClick);
         
-        // Log Toggle Functionality
+        if (helpButton) {
+            helpButton.addEventListener('click', showInitialInstructions);
+        }
+
         if (logToggleButton) {
             logToggleButton.addEventListener('click', () => {
                 const logIcon = logToggleButton.querySelector('.material-icons-round');
@@ -1284,7 +1302,6 @@
                 } else {
                     onScreenLogContainer.style.display = 'none';
                     if(logIcon) logIcon.textContent = 'visibility_off';
-                    // No logToScreen here as it would be hidden
                     console.log("Log Sembunyi."); 
                 }
             });
@@ -1296,7 +1313,7 @@
         renderer.setAnimationLoop(animate);
         
         updateAppVersionAndModelName();  
-        showInitialInstructions();  
+        checkAndShowInitialInstructions(); // Check localStorage and show if first time
       }
       
       function onARButtonClick() {
@@ -1333,12 +1350,14 @@
         arButtonElement.classList.add("ar-active");
         
         document.querySelector(".bottom-nav").style.display = "none";
+        // Hide AR button container when AR session starts, as it's part of the DOM overlay
+        document.getElementById("ar-button-container").style.display = "none";
+
         
         const customPanel = document.getElementById('custom-controls-panel');
         if (customPanel) customPanel.classList.remove('visible');  
-        const guiToggleButton = document.getElementById('guiToggleButton');
-        const guiToggleButtonIcon = guiToggleButton.querySelector('.material-icons-round');
-        if (guiToggleButtonIcon) guiToggleButtonIcon.textContent = 'menu';  
+        const guiToggleIcon = guiToggleButton.querySelector('.material-icons-round'); // guiToggleButton is the menu button
+        if (guiToggleIcon) guiToggleIcon.textContent = 'menu';  
 
 
         if (skyboxObject) skyboxObject.visible = false;  
@@ -1359,19 +1378,19 @@
         }
         reticleMesh.visible = false;  
         arInstructionsPanel.style.display = "block";  
-        // Show log container if it was previously visible, or respect toggle state
-        // For simplicity, let's ensure it's visible if the toggle button implies it should be.
+        
         const logToggleIcon = logToggleButton.querySelector('.material-icons-round');
         if (logToggleIcon && logToggleIcon.textContent === 'visibility') {
             onScreenLogContainer.style.display = "block";  
         } else {
-            onScreenLogContainer.style.display = "none"; // Or keep current state
+            onScreenLogContainer.style.display = "none"; 
         }
         
-        if (appVersionDisplay) { // appVersionDisplay is the parent #top-left-controls
-            document.getElementById('top-left-controls').style.display = "flex";  
-            updateAppVersionAndModelName();  
-        }
+        // Ensure top-left and top-right controls are visible as they are part of DOM overlay
+        document.getElementById('app-version-container').style.display = "flex";  
+        document.getElementById('top-right-controls-container').style.display = "flex";
+        updateAppVersionAndModelName();  
+        
         
         session.addEventListener("end", onSessionEnded);  
         
@@ -1427,11 +1446,12 @@
         arButtonElement.classList.remove("ar-active");
         
         document.querySelector(".bottom-nav").style.display = "flex";
+        document.getElementById("ar-button-container").style.display = "flex"; // Show AR button again
+
         const customPanel = document.getElementById('custom-controls-panel');
         if (customPanel) customPanel.classList.remove('visible');  
-        const guiToggleButton = document.getElementById('guiToggleButton');
-        const guiToggleButtonIcon = guiToggleButton.querySelector('.material-icons-round');
-        if (guiToggleButtonIcon) guiToggleButtonIcon.textContent = 'menu';
+        const guiToggleIcon = guiToggleButton.querySelector('.material-icons-round');
+        if (guiToggleIcon) guiToggleIcon.textContent = 'menu';
 
         if (arPlacementPrompt) arPlacementPrompt.style.display = 'none';
         if (arInteractionInfo) arInteractionInfo.style.display = 'none';
@@ -1439,12 +1459,11 @@
 
 
         arInstructionsPanel.style.display = "none";
-        // Keep log visibility based on toggle button state
-        // onScreenLogContainer.style.display = "none"; 
-        if (appVersionDisplay) { // appVersionDisplay is the parent #top-left-controls
-            document.getElementById('top-left-controls').style.display = "flex"; 
-            updateAppVersionAndModelName();  
-        }
+        
+        document.getElementById('app-version-container').style.display = "flex"; 
+        document.getElementById('top-right-controls-container').style.display = "flex";
+        updateAppVersionAndModelName();  
+        
         
         reticleMesh.visible = false;  
         if (xrHitTestSource) {
@@ -1939,16 +1958,16 @@
       
       function setupCustomControls() {
         const panel = document.getElementById('custom-controls-panel');
-        const toggleButton = document.getElementById('guiToggleButton');
-        const toggleButtonIcon = toggleButton.querySelector('.material-icons-round');
+        // guiToggleButton is already defined globally for the menu button
+        const toggleButtonIcon = guiToggleButton.querySelector('.material-icons-round');
 
-        toggleButton.addEventListener('click', () => {
+        guiToggleButton.addEventListener('click', () => { // This is the Menu button for the control panel
             panel.classList.toggle('visible');
             if (panel.classList.contains('visible')) {
-                toggleButtonIcon.textContent = 'close';  
+                if(toggleButtonIcon) toggleButtonIcon.textContent = 'close';  
                 logToScreen("Panel Kontrol Model 3D dibuka.");
             } else {
-                toggleButtonIcon.textContent = 'menu';  
+                if(toggleButtonIcon) toggleButtonIcon.textContent = 'menu';  
                 logToScreen("Panel Kontrol Model 3D ditutup.");
             }
         });
