@@ -406,8 +406,8 @@
         gap: var(--spacing-unit);
         flex-wrap: nowrap;
         overflow-x: auto;
-        padding-left: 0;
-        padding-right: 0;
+        padding-left: calc(var(--spacing-unit) * 2); /* Added padding */
+        padding-right: calc(var(--spacing-unit) * 2); /* Added padding */
         padding-bottom: calc(var(--spacing-unit) * 2.5); /* Increased padding for scrollbar */
       }
 
@@ -1177,7 +1177,7 @@
       
       // --- Configuration Parameters ---
       const params = {
-        modelPath: "Cupang.glb", // Default model path
+        modelPath: "3D ikan dila/Cupang.glb", // Default model path updated for new structure
         skyboxGlbUrl: "inside_galaxy_skybox_hdri_360_panorama.glb", // Default skybox path
         toneMappingExposure: 1.0,
         ambientLightIntensity: 3.0,
@@ -1243,19 +1243,30 @@
        */
       function updateAppVersionAndModelName() {
         if (appVersionMainText) appVersionMainText.textContent = `APP VERSI ${APP_VERSION}`;
-        let modelName = "N/A";
+        let modelDisplayName = "N/A";
         if (params.modelPath && typeof params.modelPath === 'string') {
             const pathParts = params.modelPath.split('/');
-            const fileName = pathParts.pop(); // Get the last part (filename.ext)
-            if (fileName) {
-                modelName = fileName.split('.')[0]; // Remove extension
+            const fileNameWithExt = pathParts.pop(); // Get the last part (filename.ext)
+            if (fileNameWithExt) {
+                const fileNameWithoutExt = fileNameWithExt.split('.')[0]; // Remove extension
+
+                // Attempt to extract scientific name (e.g., "amandae_tetra" from "amandae_tetra_0604064849_texture")
+                // Format as *Genus species*
+                const scientificNameMatch = fileNameWithoutExt.match(/^([a-zA-Z]+)_([a-zA-Z]+)/);
+                if (scientificNameMatch && scientificNameMatch.length >= 3) {
+                    const genus = scientificNameMatch[1].charAt(0).toUpperCase() + scientificNameMatch[1].slice(1).toLowerCase();
+                    const species = scientificNameMatch[2].toLowerCase();
+                    modelDisplayName = `<i>${genus} ${species}</i>`; // Use <i> for italics
+                } else {
+                    // Fallback: Capitalize each word separated by underscore or space
+                    modelDisplayName = fileNameWithoutExt.replace(/_/g, ' ').split(' ')
+                                       .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+                                       .join(' ');
+                }
             }
         }
-        if (modelNameDisplayText) modelNameDisplayText.textContent = `Model: ${modelName || "N/A"}`;
-        // Also update version in loading screen if it's still somehow visible
-        if (document.querySelector("#loading-overlay .version-loading")) {
-            document.querySelector("#loading-overlay .version-loading").textContent = `Version ${APP_VERSION}`;
-        }
+        // Use innerHTML to render italics
+        if (modelNameDisplayText) modelNameDisplayText.innerHTML = `Model: ${modelDisplayName || "N/A"}`;
       }
 
       /**
@@ -1344,15 +1355,18 @@
         scene = new THREE.Scene();
         scene.background = new THREE.Color(params.backgroundColor);
         
-        // --- NEW: Parse URL for model path ---
+        // --- UPDATED: Parse URL for model path (reverted simplification) ---
         const urlParams = new URLSearchParams(window.location.search);
         const modelParam = urlParams.get('model');
         if (modelParam) {
-            // Decode the URL parameter to handle spaces or special characters
+            // Decode the URL parameter - now expects the full path
             params.modelPath = decodeURIComponent(modelParam);
             logToScreen(`Model path set from URL: ${params.modelPath}`);
+        } else {
+            // If no model param, use the default model path already set in params
+            logToScreen(`Menggunakan model default: ${params.modelPath}`);
         }
-        // --- END NEW ---
+        // --- END UPDATED ---
 
         // Dynamically get bottom nav height for AR button positioning
         const bottomNavWrapper = document.getElementById('bottom-nav-wrapper');
@@ -1547,7 +1561,7 @@
         
         // Hide non-AR UI elements
         document.getElementById("bottom-nav-wrapper").style.display = "none";
-        document.getElementById("ar-button-container").style.display = "flex"; // Ensure AR button is visible
+        document.getElementById("ar-button-container").style.display = "flex";
 
 
         // Close custom controls panel if open
@@ -2192,7 +2206,7 @@
           logToScreen("frameArea: Ukuran objek adalah nol.", "warn");
           if (instant) {
             ctrl.target.copy(centerVec); // Target the (potentially 0,0,0) center
-            cam.position.set(centerVec.x, centerVec.y + 0.5, centerVec.z + 3); // Default offset
+            cam.position.set(centerVec.x, centerC.y + 0.5, centerVec.z + 3); // Default offset
             ctrl.update();
           }
           return;
