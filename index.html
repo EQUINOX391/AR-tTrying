@@ -28,23 +28,23 @@
         --primary-hover: #E6B800; /* Darker Yellow for hover */
         --secondary-color: #34568B; /* Lapis Lazuli Blue for secondary elements */
         --error-color: #f44336; /* Red for errors or active AR stop */
-        --surface-dark: rgba(30, 30, 30, 0.6); 
+        --surface-dark: rgba(30, 30, 30, 0.6);
         --surface-darker: rgba(0, 0, 0, 0.9); /* For custom controls panel */
-        --surface-medium: rgba(50, 50, 50, 0.5); 
-        --surface-light: rgba(255, 255, 255, 0.1); 
+        --surface-medium: rgba(50, 50, 50, 0.5);
+        --surface-light: rgba(255, 255, 255, 0.1);
         --text-primary: #ffffff;
         --text-secondary: rgba(255, 255, 255, 0.8);
         --text-placeholder: rgba(255, 255, 255, 0.5);
         --spacing-unit: 8px;
-        --safe-area-inset-top: env(safe-area-inset-top, 16px); 
+        --safe-area-inset-top: env(safe-area-inset-top, 16px);
         --safe-area-inset-bottom: env(safe-area-inset-bottom, 20px);
         --safe-area-inset-left: env(safe-area-inset-left, 16px);
         --safe-area-inset-right: env(safe-area-inset-right, 16px);
         --border-radius-small: 6px;
-        --border-radius-medium: 10px;  
-        --border-radius-button: 4px;  
-        --border-radius-large: 16px; 
-        --border-radius-capsule: 50px; 
+        --border-radius-medium: 10px;
+        --border-radius-button: 4px;
+        --border-radius-large: 16px;
+        --border-radius-capsule: 50px;
         --blur-intensity: 8px;
         --top-controls-height: calc(48px + var(--spacing-unit) * 1); /* Consistent height for top bar elements */
       }
@@ -57,14 +57,14 @@
       }
       body {
         font-family: 'Plus Jakarta Sans', sans-serif;
-        background: linear-gradient(135deg, #1a1a1a, #2c2c2c);  
+        background: linear-gradient(135deg, #1a1a1a, #2c2c2c);
         color: var(--text-primary);
-        overflow: hidden;  
-        height: 100vh;  
-        position: relative;  
+        overflow: hidden;
+        height: 100vh;
+        position: relative;
       }
       canvas {
-        display: block;  
+        display: block;
         width: 100%;
         height: 100%;
       }
@@ -76,72 +76,72 @@
         left: 0;
         right: 0;
         bottom: 0;
-        background: #111;  
-        z-index: 3000;  
+        background: #111;
+        z-index: 3000;
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        gap: calc(var(--spacing-unit) * 2.5);  
+        gap: calc(var(--spacing-unit) * 2.5);
       }
-      #loading-overlay .loading-content {  
+      #loading-overlay .loading-content {
         display: flex;
         flex-direction: column;
         align-items: center;
-        gap: calc(var(--spacing-unit) * 1.5);  
+        gap: calc(var(--spacing-unit) * 1.5);
       }
-      #loading-overlay .logo-icon {  
-        font-size: 3.5rem;  
+      #loading-overlay .logo-icon {
+        font-size: 3.5rem;
         color: var(--primary-color);
         padding: var(--spacing-unit);
-        background-color: rgba(255,255,255,0.05);  
-        border-radius: 50%;  
+        background-color: rgba(255,255,255,0.05);
+        border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
-        width: 70px;  
+        width: 70px;
         height: 70px;
         box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-        animation: pulse 2s infinite alternate;  
+        animation: pulse 2s infinite alternate;
       }
       @keyframes pulse {
         0% { transform: scale(1); box-shadow: 0 4px 12px rgba(255, 215, 0, 0.2); }
         100% { transform: scale(1.05); box-shadow: 0 8px 20px rgba(255, 215, 0, 0.4); }
       }
-      #loading-overlay .logo-text {  
-        font-size: 1.4rem;  
+      #loading-overlay .logo-text {
+        font-size: 1.4rem;
         font-weight: 600;
         letter-spacing: 0.2px;
         padding: calc(var(--spacing-unit) * 1) calc(var(--spacing-unit) * 1.5);
-        background: transparent;  
+        background: transparent;
         border-radius: 12px;
         text-align: center;
         color: var(--text-primary);
         display: flex;
-        flex-direction: column;  
-        align-items: center;  
-        gap: 5px;  
+        flex-direction: column;
+        align-items: center;
+        gap: 5px;
       }
       #loading-overlay .logo-text .oleh-text {
-        font-size: 1.1rem;  
+        font-size: 1.1rem;
         font-weight: 500;
-        color: var(--text-secondary);  
+        color: var(--text-secondary);
       }
       #loading-overlay .logo-text .name-text {
-        font-size: 1.5rem;  
+        font-size: 1.5rem;
         font-weight: 700;
-        color: var(--primary-color);  
+        color: var(--primary-color);
       }
       #loading-overlay .spinner {
-        border: 6px solid rgba(255, 255, 255, 0.2);  
+        border: 6px solid rgba(255, 255, 255, 0.2);
         border-top: 6px solid var(--primary-color);
         border-radius: 50%;
-        width: 50px;  
+        width: 50px;
         height: 50px;
         animation: spin 1s linear infinite;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.3);  
+        box-shadow: 0 2px 8px rgba(0,0,0,0.3);
       }
-      #loading-overlay .version-loading {  
+      #loading-overlay .version-loading {
         font-size: 0.9rem;
         color: var(--text-secondary);
         font-weight: 500;
@@ -154,35 +154,35 @@
       body.loaded #loading-overlay {
         opacity: 0;
         transition: opacity 0.5s ease-out;
-        pointer-events: none;  
+        pointer-events: none;
       }
       
       /* AR Button - Bottom Center Rounded Rectangle */
       #ar-button-container {
         position: fixed;
-        bottom: calc(var(--bottom-nav-height, 70px) + var(--safe-area-inset-bottom) + var(--spacing-unit) * 3); 
+        bottom: calc(var(--bottom-nav-height, 70px) + var(--safe-area-inset-bottom) + var(--spacing-unit) * 3);
         left: 50%;
         transform: translateX(-50%);
-        z-index: 1001; 
-        display: flex;  
-        align-items: center;  
+        z-index: 1001;
+        display: flex;
+        align-items: center;
       }
       #arButton {
         display: flex;
         align-items: center;
         gap: var(--spacing-unit);
-        padding: 0 calc(var(--spacing-unit) * 2.5); 
+        padding: 0 calc(var(--spacing-unit) * 2.5);
         background: var(--primary-color);
         border: none;
-        height: 50px; 
-        border-radius: var(--border-radius-large); 
-        color: #000; 
-        font-weight: 700; 
-        font-size: 1rem;  
+        height: 50px;
+        border-radius: var(--border-radius-large);
+        color: #000;
+        font-weight: 700;
+        font-size: 1rem;
         cursor: pointer;
-        transition: all 0.2s ease, box-shadow 0.3s ease-in-out; 
-        box-shadow: 0 0 12px 3px rgba(255, 215, 0, 0.4), 0 3px 8px rgba(0,0,0,0.25); 
-        box-sizing: border-box;  
+        transition: all 0.2s ease, box-shadow 0.3s ease-in-out;
+        box-shadow: 0 0 12px 3px rgba(255, 215, 0, 0.4), 0 3px 8px rgba(0,0,0,0.25);
+        box-sizing: border-box;
         animation: subtleGlow 2.5s infinite alternate ease-in-out;
       }
 
@@ -203,20 +203,20 @@
 
       #arButton:hover {
         background: var(--primary-hover);
-        transform: scale(1.03); 
-        box-shadow: 0 0 20px 8px rgba(255, 215, 0, 0.6), 0 5px 12px rgba(0,0,0,0.35); 
+        transform: scale(1.03);
+        box-shadow: 0 0 20px 8px rgba(255, 215, 0, 0.6), 0 5px 12px rgba(0,0,0,0.35);
       }
-      #arButton.ar-active {  
+      #arButton.ar-active {
         background: var(--error-color);
         box-shadow: 0 4px 12px rgba(244, 67, 54, 0.3);
-        color: #fff; 
-        animation: none; 
+        color: #fff;
+        animation: none;
       }
       #arButton.ar-active:hover {
-         transform: scale(1.02); 
+        transform: scale(1.02);
       }
       #arButton .material-icons-round {
-        font-size: 1.3rem;  
+        font-size: 1.3rem;
       }
       
       /* AR Instructions Panel (Scanning) */
@@ -226,43 +226,43 @@
         left: 50%;
         transform: translate(-50%, -50%);
         background: var(--surface-dark);
-        backdrop-filter: blur(var(--blur-intensity));  
+        backdrop-filter: blur(var(--blur-intensity));
         -webkit-backdrop-filter: blur(var(--blur-intensity));
-        border-radius: var(--border-radius-large);  
-        padding: calc(var(--spacing-unit) * 2.5);  
-        width: calc(100% - var(--spacing-unit) * 5);  
-        max-width: 360px;  
+        border-radius: var(--border-radius-large);
+        padding: calc(var(--spacing-unit) * 2.5);
+        width: calc(100% - var(--spacing-unit) * 5);
+        max-width: 360px;
         box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-        z-index: 1200;  
-        display: none;  
+        z-index: 1200;
+        display: none;
         text-align: center;
       }
       #ar-instructions p {
-        font-size: 0.95rem;  
-        line-height: 1.6;  
+        font-size: 0.95rem;
+        line-height: 1.6;
         margin-bottom: calc(var(--spacing-unit) * 2.5);
       }
       #start-scan-button {
         width: 100%;
-        padding: calc(var(--spacing-unit) * 1.75);  
+        padding: calc(var(--spacing-unit) * 1.75);
         background: var(--primary-color);
         border: none;
         border-radius: var(--border-radius-medium);
-        color: #000; 
+        color: #000;
         font-weight: 600;
         font-size: 0.95rem;
         cursor: pointer;
         transition: all 0.2s ease;
-        display: flex;  
+        display: flex;
         align-items: center;
         justify-content: center;
         gap: var(--spacing-unit);
-        box-shadow: 0 4px 12px rgba(255, 215, 0, 0.3);  
+        box-shadow: 0 4px 12px rgba(255, 215, 0, 0.3);
       }
       #start-scan-button:hover {
         background: var(--primary-hover);
         transform: translateY(-2px);
-        box-shadow: 0 6px 16px rgba(255, 215, 0, 0.4);  
+        box-shadow: 0 6px 16px rgba(255, 215, 0, 0.4);
       }
       
       #start-scan-button .material-icons-round {
@@ -270,9 +270,9 @@
       }
 
       /* AR Placement & Interaction Prompts */
-      .ar-prompt { 
-        position: fixed; 
-        background-color: var(--surface-dark); 
+      .ar-prompt {
+        position: fixed;
+        background-color: var(--surface-dark);
         backdrop-filter: blur(var(--blur-intensity));
         -webkit-backdrop-filter: blur(var(--blur-intensity));
         color: var(--text-primary);
@@ -280,22 +280,22 @@
         font-size: 0.9rem;
         font-weight: 500;
         z-index: 1100;
-        display: none;  
+        display: none;
         text-align: center;
         box-shadow: 0 4px 12px rgba(0,0,0,0.2);
         animation: fadeInPrompt 0.3s ease-out;
-        white-space: nowrap; 
-        align-items: center; 
+        white-space: nowrap;
+        align-items: center;
         gap: calc(var(--spacing-unit) * 0.75);
       }
 
-      #ar-placement-prompt { 
-        border: 2px solid var(--primary-color); 
+      #ar-placement-prompt {
+        border: 2px solid var(--primary-color);
         padding: calc(var(--spacing-unit)*1.25) calc(var(--spacing-unit) * 2.5);
         font-size: 0.95rem;
         border-radius: var(--border-radius-capsule);
       }
-       #ar-placement-prompt .material-icons-round { 
+       #ar-placement-prompt .material-icons-round {
         animation: tapAnimation 1.5s infinite ease-in-out;
       }
 
@@ -305,16 +305,16 @@
       }
 
 
-      #ar-interaction-info { 
-        bottom: calc(var(--bottom-nav-height, 70px) + var(--safe-area-inset-bottom) + var(--spacing-unit) * 3 + 50px + var(--spacing-unit) * 3 ); 
+      #ar-interaction-info {
+        bottom: calc(var(--bottom-nav-height, 70px) + var(--safe-area-inset-bottom) + var(--spacing-unit) * 3 + 50px + var(--spacing-unit) * 3 );
         left: 50%;
         transform: translateX(-50%);
-        flex-direction: column; 
+        flex-direction: column;
         gap: var(--spacing-unit);
         padding: calc(var(--spacing-unit) * 1.5);
-        border-radius: var(--border-radius-large); 
+        border-radius: var(--border-radius-large);
       }
-      #ar-interaction-info > span { 
+      #ar-interaction-info > span {
         font-weight: 600;
         margin-bottom: calc(var(--spacing-unit) * 0.5);
       }
@@ -326,12 +326,12 @@
       }
       .gesture-hint {
         display: flex;
-        flex-direction: column; 
+        flex-direction: column;
         align-items: center;
         gap: calc(var(--spacing-unit) * 0.5);
       }
       .gesture-hint .material-icons-round {
-        font-size: 2rem; 
+        font-size: 2rem;
         color: var(--primary-color);
         padding: var(--spacing-unit);
         background-color: rgba(255,255,255,0.1);
@@ -339,15 +339,15 @@
       }
       .gesture-hint .gesture-text {
         font-size: 0.8rem;
-        color: var(--text-primary); 
+        color: var(--text-primary);
         font-weight: 500;
       }
       
       @keyframes pinchZoomInOut {
         0%, 100% { transform: scale(1); }
-        25% { transform: scale(0.8); } 
-        50% { transform: scale(0.8); } 
-        75% { transform: scale(1.2); } 
+        25% { transform: scale(0.8); }
+        50% { transform: scale(0.8); }
+        75% { transform: scale(1.2); }
       }
       .gesture-hint .icon-pinch {
         animation: pinchZoomInOut 2.5s infinite ease-in-out;
@@ -366,7 +366,7 @@
 
 
       @keyframes fadeInPrompt {
-        from { opacity: 0; transform: translate(-50%, calc(-50% + 10px)); } 
+        from { opacity: 0; transform: translate(-50%, calc(-50% + 10px)); }
         to { opacity: 1; transform: translate(-50%, -50%); }
       }
       .ar-prompt .material-icons-round {
@@ -382,12 +382,12 @@
         left: 0;
         right: 0;
         z-index: 1000;
-        background: rgba(20, 20, 20, 0.3); 
+        background: rgba(20, 20, 20, 0.3);
         backdrop-filter: blur(var(--blur-intensity));
         -webkit-backdrop-filter: blur(var(--blur-intensity));
-        padding: calc(var(--spacing-unit) * 1.5) 0 calc(var(--spacing-unit) + var(--safe-area-inset-bottom)) 0;  
-        border-top-left-radius: var(--border-radius-medium);  
-        border-top-right-radius: var(--border-radius-medium);  
+        padding: calc(var(--spacing-unit) * 1.5) 0 calc(var(--spacing-unit) + var(--safe-area-inset-bottom)) 0;
+        border-top-left-radius: var(--border-radius-medium);
+        border-top-right-radius: var(--border-radius-medium);
         box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.25);
       }
       #bottom-nav-label {
@@ -401,25 +401,25 @@
       }
       .bottom-nav {
         display: flex;
-        justify-content: flex-start; 
-        align-items: center; 
-        gap: var(--spacing-unit); 
-        flex-wrap: nowrap; 
-        overflow-x: auto; 
-        padding-left: 0; 
-        padding-right: 0; 
+        justify-content: flex-start;
+        align-items: center;
+        gap: var(--spacing-unit);
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        padding-left: 0;
+        padding-right: 0;
         padding-bottom: calc(var(--spacing-unit) * 2.5); /* Increased padding for scrollbar */
       }
 
       .bottom-nav::-webkit-scrollbar {
-        height: 6px; 
+        height: 6px;
       }
       .bottom-nav::-webkit-scrollbar-track {
-        background: rgba(255, 255, 255, 0.05); 
+        background: rgba(255, 255, 255, 0.05);
         border-radius: 10px;
       }
       .bottom-nav::-webkit-scrollbar-thumb {
-        background-color: var(--primary-color); 
+        background-color: var(--primary-color);
         border-radius: 10px;
       }
       .bottom-nav {
@@ -432,39 +432,39 @@
         display: flex;
         flex-direction: column;
         align-items: center;
-        justify-content: center; 
-        gap: 1px; 
-        width: 58px; 
-        height: 48px; 
-        padding: calc(var(--spacing-unit) * 0.4); 
-        border-radius: var(--border-radius-medium); 
+        justify-content: center;
+        gap: 1px;
+        width: 58px;
+        height: 48px;
+        padding: calc(var(--spacing-unit) * 0.4);
+        border-radius: var(--border-radius-medium);
         border: none;
         background: var(--surface-light);
         color: var(--text-primary);
         font-family: inherit;
         font-weight: 500;
-        font-size: 0.55rem; 
+        font-size: 0.55rem;
         cursor: pointer;
         transition: all 0.2s ease;
         text-align: center;
-        line-height: 1.1; 
-        flex-shrink: 0; 
+        line-height: 1.1;
+        flex-shrink: 0;
       }
       .view-btn:hover {
-        background: rgba(255, 255, 255, 0.2); 
+        background: rgba(255, 255, 255, 0.2);
         transform: translateY(-1px);
       }
       .view-btn .material-icons-round {
-        font-size: 1.1rem; 
-        margin-bottom: 1px; 
+        font-size: 1.1rem;
+        margin-bottom: 1px;
       }
       .view-btn.active {
         background: var(--primary-color);
-        color: #000;  
-        box-shadow: 0 4px 12px rgba(255, 215, 0, 0.5);  
+        color: #000;
+        box-shadow: 0 4px 12px rgba(255, 215, 0, 0.5);
       }
       .view-btn.active .material-icons-round {
-        color: #000;  
+        color: #000;
       }
       
       /* On-Screen Log */
@@ -472,129 +472,129 @@
         position: fixed;
         bottom: calc(var(--bottom-nav-height, 70px) + var(--safe-area-inset-bottom) + var(--spacing-unit) * 3 + 50px + var(--spacing-unit) * 3 + 70px + var(--spacing-unit) * 2);
         left: calc(var(--spacing-unit) * 1.5);
-        right: calc(var(--spacing-unit) * 1.5);  
-        width: auto;  
-        max-width: 400px;  
-        margin-left: auto;  
-        margin-right: auto;  
-        max-height: 90px;  
-        background: rgba(0, 0, 0, 0.75);  
-        color: #ADD8E6;  
+        right: calc(var(--spacing-unit) * 1.5);
+        width: auto;
+        max-width: 400px;
+        margin-left: auto;
+        margin-right: auto;
+        max-height: 90px;
+        background: rgba(0, 0, 0, 0.75);
+        color: #ADD8E6;
         font-family: monospace;
-        font-size: 0.7rem;  
+        font-size: 0.7rem;
         padding: var(--spacing-unit);
         border-radius: var(--border-radius-small);
         overflow-y: auto;
-        z-index: 999;  
-        display: none; 
-        border: 1px solid rgba(255,255,255,0.1);  
+        z-index: 999;
+        display: none;
+        border: 1px solid rgba(255,255,255,0.1);
       }
       
       /* Top Left App Version Styling */
-      #app-version-container { 
+      #app-version-container {
         position: fixed;
-        top: calc(var(--safe-area-inset-top) + var(--spacing-unit)); 
-        padding-top: var(--spacing-unit); 
-        left: calc(var(--safe-area-inset-left) + var(--spacing-unit)); 
-        z-index: 1001;  
+        top: calc(var(--safe-area-inset-top) + var(--spacing-unit));
+        padding-top: var(--spacing-unit);
+        left: calc(var(--safe-area-inset-left) + var(--spacing-unit));
+        z-index: 1001;
         display: flex;
-        align-items: center; 
+        align-items: center;
         height: var(--top-controls-height);
       }
       #app-version {
         color: var(--text-secondary);
-        font-size: 0.75rem;  
+        font-size: 0.75rem;
         font-weight: 500;
-        background-color: rgba(0,0,0,0.4); 
-        padding: calc(var(--spacing-unit) * 0.75) var(--spacing-unit); 
+        background-color: rgba(0,0,0,0.4);
+        padding: calc(var(--spacing-unit) * 0.75) var(--spacing-unit);
         border-radius: var(--border-radius-medium);
-        line-height: 1.4;  
-        display: flex;  
-        flex-direction: column;  
-        justify-content: center;  
+        line-height: 1.4;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
         box-sizing: border-box;
-        height: 100%; 
-        gap: calc(var(--spacing-unit) * 0.5); 
+        height: 100%;
+        gap: calc(var(--spacing-unit) * 0.5);
       }
       #app-version-main {
         display: block;
       }
       #model-name-display {
         display: block;
-        font-size: 0.7rem;  
+        font-size: 0.7rem;
         color: var(--text-placeholder);
       }
 
       /* Top Right Controls Container */
       #top-right-controls-container {
         position: fixed;
-        top: calc(var(--safe-area-inset-top) + var(--spacing-unit)); 
-        padding-top: var(--spacing-unit); 
-        right: calc(var(--safe-area-inset-right) + var(--spacing-unit)); 
+        top: calc(var(--safe-area-inset-top) + var(--spacing-unit));
+        padding-top: var(--spacing-unit);
+        right: calc(var(--safe-area-inset-right) + var(--spacing-unit));
         z-index: 1001;
-        display: flex;  
-        align-items: center;  
-        gap: var(--spacing-unit); 
-        height: var(--top-controls-height); 
+        display: flex;
+        align-items: center;
+        gap: var(--spacing-unit);
+        height: var(--top-controls-height);
       }
 
       .top-right-btn {
         display: flex;
         align-items: center;
         justify-content: center;
-        width: 48px; 
+        width: 48px;
         height: 48px;
-        background: var(--surface-medium); 
+        background: var(--surface-medium);
         backdrop-filter: blur(var(--blur-intensity));
         -webkit-backdrop-filter: blur(var(--blur-intensity));
         border: none;
-        border-radius: 50%;  
+        border-radius: 50%;
         color: var(--text-primary);
         cursor: pointer;
         transition: all 0.2s ease;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
       }
       .top-right-btn:hover {
-        background: rgba(80, 80, 80, 0.6); 
+        background: rgba(80, 80, 80, 0.6);
         transform: translateY(-1px);
       }
       .top-right-btn .material-icons-round {
-        font-size: 1.5rem; 
+        font-size: 1.5rem;
       }
 
 
       /* Custom Controls Panel */
       #custom-controls-panel {
         position: fixed;
-        top: calc(var(--safe-area-inset-top) + var(--spacing-unit) + var(--top-controls-height) + var(--spacing-unit) * 2); 
-        right: var(--safe-area-inset-right, 0px); 
+        top: calc(var(--safe-area-inset-top) + var(--spacing-unit) + var(--top-controls-height) + var(--spacing-unit) * 2);
+        right: var(--safe-area-inset-right, 0px);
         width: 300px;
-        max-height: calc(100vh - (var(--safe-area-inset-top) + var(--spacing-unit) + var(--top-controls-height) + var(--spacing-unit) * 2) - var(--spacing-unit) - (var(--bottom-nav-height, 70px) + var(--safe-area-inset-bottom) + var(--spacing-unit) * 1.5)); 
+        max-height: calc(100vh - (var(--safe-area-inset-top) + var(--spacing-unit) + var(--top-controls-height) + var(--spacing-unit) * 2) - var(--spacing-unit) - (var(--bottom-nav-height, 70px) + var(--safe-area-inset-bottom) + var(--spacing-unit) * 1.5));
         background-color: var(--surface-darker);
         backdrop-filter: blur(var(--blur-intensity));
         -webkit-backdrop-filter: blur(var(--blur-intensity));
-        border-radius: var(--border-radius-medium) 0 0 var(--border-radius-medium);  
-        box-shadow: -8px 0 24px rgba(0,0,0,0.3);  
+        border-radius: var(--border-radius-medium) 0 0 var(--border-radius-medium);
+        box-shadow: -8px 0 24px rgba(0,0,0,0.3);
         z-index: 1400;
         overflow-y: auto;
         padding: var(--spacing-unit);
-        display: none;  
+        display: none;
         color: var(--text-primary);
-        transition: transform 0.3s ease-in-out;  
-        transform: translateX(100%);  
+        transition: transform 0.3s ease-in-out;
+        transform: translateX(100%);
       }
       #custom-controls-panel.visible {
         display: block;
-        transform: translateX(0);  
+        transform: translateX(0);
       }
       #custom-controls-panel h3 {
         font-size: 1.1rem;
         font-weight: 600;
         padding: calc(var(--spacing-unit) * 1.5) var(--spacing-unit);
-        margin: 0 calc(var(--spacing-unit) * -1);  
+        margin: 0 calc(var(--spacing-unit) * -1);
         background-color: rgba(255,255,255,0.05);
         border-top-left-radius: var(--border-radius-medium);
-        border-top-right-radius: 0;  
+        border-top-right-radius: 0;
         margin-bottom: var(--spacing-unit);
       }
       .control-section {
@@ -608,14 +608,14 @@
         font-size: 0.9rem;
         padding: var(--spacing-unit);
         cursor: pointer;
-        list-style: none;  
+        list-style: none;
         display: flex;
         justify-content: space-between;
         align-items: center;
         border-bottom: 1px solid rgba(255,255,255,0.1);
         margin-bottom: var(--spacing-unit);
       }
-      .control-section summary::-webkit-details-marker { display: none; }  
+      .control-section summary::-webkit-details-marker { display: none; }
       .control-section summary::after {
         content: 'expand_more';
         font-family: 'Material Icons Round';
@@ -664,7 +664,7 @@
         color: var(--text-placeholder);
       }
       .control-item input[type="color"] {
-        height: 36px;  
+        height: 36px;
         padding: calc(var(--spacing-unit) * 0.5);
       }
       .control-item input[type="checkbox"] {
@@ -675,7 +675,7 @@
        .control-item .checkbox-label-group {
         display: flex;
         align-items: center;
-        font-size: 0.85rem;  
+        font-size: 0.85rem;
         color: var(--text-primary);
       }
       .control-item input[type="range"] {
@@ -720,8 +720,8 @@
         left: 0;
         right: 0;
         bottom: 0;
-        background-color: rgba(0, 0, 0, 0.92); 
-        z-index: 2500; 
+        background-color: rgba(0, 0, 0, 0.92);
+        z-index: 2500;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -736,23 +736,23 @@
       }
       .instructions-content {
         background-color: var(--surface-darker);
-        padding: calc(var(--spacing-unit) * 2.5) calc(var(--spacing-unit) * 3); 
+        padding: calc(var(--spacing-unit) * 2.5) calc(var(--spacing-unit) * 3);
         border-radius: var(--border-radius-large);
-        max-width: 550px; 
+        max-width: 550px;
         width: 100%;
         max-height: 90vh;
         overflow-y: auto;
         box-shadow: 0 8px 32px rgba(0,0,0,0.3);
       }
       .instructions-content h2 {
-        font-size: 1.6rem; 
+        font-size: 1.6rem;
         font-weight: 700;
         color: var(--primary-color);
         text-align: center;
         margin-bottom: calc(var(--spacing-unit) * 2.5);
       }
       .instructions-content h3 {
-        font-size: 1.15rem; 
+        font-size: 1.15rem;
         font-weight: 600;
         margin-top: calc(var(--spacing-unit) * 2.5);
         margin-bottom: calc(var(--spacing-unit) * 1.5);
@@ -765,14 +765,14 @@
         margin-right: calc(var(--spacing-unit) * 1.25);
         color: var(--primary-color);
         animation: instructionIconPulse 2s infinite ease-in-out;
-        font-size: 1.8rem; 
+        font-size: 1.8rem;
       }
       @keyframes instructionIconPulse {
         0%, 100% { transform: scale(1) rotate(0deg); }
         50% { transform: scale(1.1) rotate(5deg); }
       }
       .instructions-content p, .instructions-content ul {
-        font-size: 0.95rem; 
+        font-size: 0.95rem;
         line-height: 1.65;
         margin-bottom: calc(var(--spacing-unit) * 1.5);
         color: var(--text-secondary);
@@ -802,24 +802,24 @@
         align-items: center;
         gap: 4px;
       }
-      .instructions-content p .material-icons-round, 
+      .instructions-content p .material-icons-round,
       .instructions-content li .material-icons-round {
-        vertical-align: -5px; 
-        font-size: 1.2em; 
+        vertical-align: -5px;
+        font-size: 1.2em;
         margin: 0 2px;
         color: var(--primary-color);
-        animation: none; 
+        animation: none;
       }
       #close-initial-instructions {
         display: block;
         width: 100%;
-        padding: calc(var(--spacing-unit) * 1.75); 
+        padding: calc(var(--spacing-unit) * 1.75);
         background: var(--primary-color);
         border: none;
-        border-radius: var(--border-radius-medium); 
-        color: #000; 
-        font-weight: 700; 
-        font-size: 1.05rem; 
+        border-radius: var(--border-radius-medium);
+        color: #000;
+        font-weight: 700;
+        font-size: 1.05rem;
         cursor: pointer;
         transition: background-color 0.2s ease, transform 0.1s ease;
         margin-top: calc(var(--spacing-unit) * 3);
@@ -841,7 +841,7 @@
         </div>
       </div>
       <div class="spinner"></div>
-      <div class="version-loading">Version 2.8.7</div>  
+      <div class="version-loading">Version 2.8.7</div>
     </div>
 
     <div id="initial-instructions-overlay">
@@ -894,7 +894,7 @@
                     <li><span class="material-icons-round highlight">open_in_full</span> <strong>Ubah Ukuran (Skala):</strong> Gunakan gestur mencubit (pinch) dengan dua jari.</li>
                     <li><span class="material-icons-round highlight">drag_indicator</span> <strong>Putar Model:</strong> Seret model dengan satu jari.</li>
                 </ul>
-                 Petunjuk gestur ini juga akan muncul sesaat di layar.
+                Petunjuk gestur ini juga akan muncul sesaat di layar.
             </li>
             <li><strong>Akhiri Sesi AR:</strong> Tekan tombol <span class="button-example" style="background-color: var(--error-color); color: white;"><span class="material-icons-round">close</span> Hentikan AR</span>.</li>
         </ol>
@@ -916,7 +916,7 @@
     <div id="ar-button-container">
       <button id="arButton">
         <span class="material-icons-round">view_in_ar</span>
-        <span id="arButtonText">Mulai AR</span>  
+        <span id="arButtonText">Mulai AR</span>
       </button>
     </div>
     
@@ -925,10 +925,10 @@
             <span class="material-icons-round">help_outline</span>
         </button>
         <button id="log-toggle-button" class="top-right-btn" title="Toggle Log">
-            <span class="material-icons-round">visibility_off</span> 
+            <span class="material-icons-round">visibility_off</span>
         </button>
         <button id="guiToggleButton" class="top-right-btn" title="Kontrol Model">
-            <span class="material-icons-round">menu</span>  
+            <span class="material-icons-round">menu</span>
         </button>
     </div>
 
@@ -958,7 +958,7 @@
         </div>
     </div>
     
-    <div id="reticle"></div> 
+    <div id="reticle"></div>
     
     <div id="app-version-container">
         <div id="app-version">
@@ -1130,7 +1130,7 @@
       import { OutputPass } from "three/addons/postprocessing/OutputPass.js";
 
       // --- Global Variables ---
-      let scene, camera, renderer, controls, composer;  
+      let scene, camera, renderer, controls, composer;
       let model, modelContainerGroup, ambientLight, directionalLight;
       let clock; // For animations and delta time
       const arInstructionsPanel = document.getElementById("ar-instructions");
@@ -1139,8 +1139,8 @@
       const appVersionMainText = document.getElementById("app-version-main");
       const modelNameDisplayText = document.getElementById("model-name-display");
       const logToggleButton = document.getElementById("log-toggle-button");
-      const helpButton = document.getElementById("help-button"); 
-      const guiToggleButton = document.getElementById("guiToggleButton"); 
+      const helpButton = document.getElementById("help-button");
+      const guiToggleButton = document.getElementById("guiToggleButton");
       
       const initialInstructionsOverlay = document.getElementById("initial-instructions-overlay");
       const closeInitialInstructionsButton = document.getElementById("close-initial-instructions");
@@ -1157,15 +1157,15 @@
       
       // AR specific variables
       let xrSession = null;
-      let xrRefSpace = null;  // Reference space for AR
+      let xrRefSpace = null; // Reference space for AR
       let xrHitTestSource = null; // For detecting surfaces
-      let reticleMesh;  // Visual indicator for AR placement
-      let modelPlaced = false;  // Flag if model is placed in AR
+      let reticleMesh; // Visual indicator for AR placement
+      let modelPlaced = false; // Flag if model is placed in AR
       
-      let isUpdatingViewPresetGUI = false;  // Flag to prevent recursion in GUI updates
+      let isUpdatingViewPresetGUI = false; // Flag to prevent recursion in GUI updates
       
       const APP_VERSION = "2.8.7"; // Updated version
-      const INSTRUCTIONS_STORAGE_KEY = `modelViewerInstructionsSeen_v${APP_VERSION}`; 
+      const INSTRUCTIONS_STORAGE_KEY = `modelViewerInstructionsSeen_v${APP_VERSION}`;
       
       // AR Interaction State
       let arIsPinching = false;
@@ -1173,12 +1173,12 @@
       let arIsDragging = false;
       let arLastDragX = 0;
       let arLastDragY = 0;
-      const arDragSensitivity = 0.005;  // Adjust for faster/slower rotation in AR
+      const arDragSensitivity = 0.005; // Adjust for faster/slower rotation in AR
       
       // --- Configuration Parameters ---
       const params = {
-        modelPath: "Cupang.glb",  // Default model path
-        skyboxGlbUrl: "inside_galaxy_skybox_hdri_360_panorama.glb",  // Default skybox path
+        modelPath: "Cupang.glb", // Default model path
+        skyboxGlbUrl: "inside_galaxy_skybox_hdri_360_panorama.glb", // Default skybox path
         toneMappingExposure: 1.0,
         ambientLightIntensity: 3.0,
         directionalLightIntensity: 4.0,
@@ -1186,14 +1186,14 @@
         initialRotationX_deg: 0.0, // Initial rotation in degrees
         initialRotationY_deg: 0.0,
         initialRotationZ_deg: 0.0,
-        animateModel: false,  // Auto-rotate model in non-AR
-        rotationSpeed: 0.1,  // Speed of auto-rotation
+        animateModel: false, // Auto-rotate model in non-AR
+        rotationSpeed: 0.1, // Speed of auto-rotation
         selectedViewPreset: "Default", // Default camera view preset
         cameraFOV: 50, // Camera Field of View
-        modelScale: 1.0,  // Scale for non-AR mode
-        arModelScale: 0.5,  // Initial scale for AR mode
+        modelScale: 1.0, // Scale for non-AR mode
+        arModelScale: 0.5, // Initial scale for AR mode
         skyboxBrightness: 1.0, // Brightness multiplier for skybox
-        backgroundColor: "#1A2B3C",  // Default background color if no skybox
+        backgroundColor: "#1A2B3C", // Default background color if no skybox
         showSkybox: true, // Whether to show skybox or solid color
       };
       
@@ -1211,11 +1211,11 @@
           const logEntry = document.createElement("div");
           const timestamp = new Date().toLocaleTimeString();
           logEntry.textContent = `[${timestamp}] ${message}`;
-          if (type === "error") logEntry.style.color = "#ff9999";  // Light red for errors
-          else if (type === "warn") logEntry.style.color = "#ffd799";  // Light orange for warnings
-          else logEntry.style.color = "#ADD8E6";  // Light blue for info
+          if (type === "error") logEntry.style.color = "#ff9999"; // Light red for errors
+          else if (type === "warn") logEntry.style.color = "#ffd799"; // Light orange for warnings
+          else logEntry.style.color = "#ADD8E6"; // Light blue for info
           onScreenLogContainer.appendChild(logEntry);
-          onScreenLogContainer.scrollTop = onScreenLogContainer.scrollHeight;  // Auto-scroll
+          onScreenLogContainer.scrollTop = onScreenLogContainer.scrollHeight; // Auto-scroll
         }
         // Also log to browser console
         if (type === "error") console.error(message);
@@ -1231,10 +1231,10 @@
         if (loadingOverlay) {
           document.body.classList.add("loaded"); // Add class to trigger CSS transition
           setTimeout(() => {
-            if (loadingOverlay.parentNode) {  // Check if still in DOM
+            if (loadingOverlay.parentNode) { // Check if still in DOM
                 loadingOverlay.remove();
             }
-          }, 600);  // Match CSS transition duration
+          }, 600); // Match CSS transition duration
         }
       }
 
@@ -1246,9 +1246,9 @@
         let modelName = "N/A";
         if (params.modelPath && typeof params.modelPath === 'string') {
             const pathParts = params.modelPath.split('/');
-            const fileName = pathParts.pop();  // Get the last part (filename.ext)
+            const fileName = pathParts.pop(); // Get the last part (filename.ext)
             if (fileName) {
-                modelName = fileName.split('.')[0];  // Remove extension
+                modelName = fileName.split('.')[0]; // Remove extension
             }
         }
         if (modelNameDisplayText) modelNameDisplayText.textContent = `Model: ${modelName || "N/A"}`;
@@ -1288,7 +1288,7 @@
        */
       function hideInitialInstructions() {
         if(initialInstructionsOverlay) initialInstructionsOverlay.classList.remove('visible');
-        localStorage.setItem(INSTRUCTIONS_STORAGE_KEY, 'true'); 
+        localStorage.setItem(INSTRUCTIONS_STORAGE_KEY, 'true');
       }
 
       /**
@@ -1320,7 +1320,7 @@
 
         element.style.left = `${x + offsetX}px`;
         element.style.top = `${y + offsetY}px`;
-        element.style.transform = `translate(-50%, -50%)`;  // Center the element on the coords
+        element.style.transform = `translate(-50%, -50%)`; // Center the element on the coords
         element.style.display = 'flex'; // Make it visible and use flex for centering icon/text
       }
 
@@ -1330,20 +1330,30 @@
        */
       function showARInteractionInfo() {
         if (arInteractionInfo) {
-            arInteractionInfo.style.display = 'flex'; 
-            clearTimeout(arInteractionInfoTimeout);  // Clear any existing timeout
+            arInteractionInfo.style.display = 'flex';
+            clearTimeout(arInteractionInfoTimeout); // Clear any existing timeout
             arInteractionInfoTimeout = setTimeout(() => {
                 if(arInteractionInfo) arInteractionInfo.style.display = 'none';
-            }, 7000);  // Hide after 7 seconds
+            }, 7000); // Hide after 7 seconds
         }
       }
       
       // --- Initialization ---
       function init() {
-        clock = new THREE.Clock();  // For delta time in animation loop
+        clock = new THREE.Clock(); // For delta time in animation loop
         scene = new THREE.Scene();
         scene.background = new THREE.Color(params.backgroundColor);
         
+        // --- NEW: Parse URL for model path ---
+        const urlParams = new URLSearchParams(window.location.search);
+        const modelParam = urlParams.get('model');
+        if (modelParam) {
+            // Decode the URL parameter to handle spaces or special characters
+            params.modelPath = decodeURIComponent(modelParam);
+            logToScreen(`Model path set from URL: ${params.modelPath}`);
+        }
+        // --- END NEW ---
+
         // Dynamically get bottom nav height for AR button positioning
         const bottomNavWrapper = document.getElementById('bottom-nav-wrapper');
         if (bottomNavWrapper) {
@@ -1356,10 +1366,10 @@
         camera = new THREE.PerspectiveCamera(
           params.cameraFOV,
           window.innerWidth / window.innerHeight,
-          0.01,  // Near clipping plane (increased for AR stability if needed)
-          10000  // Far clipping plane
+          0.01, // Near clipping plane (increased for AR stability if needed)
+          10000 // Far clipping plane
         );
-        camera.position.set(0, 1.6, 3);  // Default camera position
+        camera.position.set(0, 1.6, 3); // Default camera position
         
         // Setup renderer
         renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true }); // Alpha for AR transparency
@@ -1368,16 +1378,16 @@
         renderer.toneMapping = THREE.ACESFilmicToneMapping; // For better HDR-like visuals
         renderer.toneMappingExposure = params.toneMappingExposure;
         renderer.outputColorSpace = THREE.SRGBColorSpace; // Correct color output
-        renderer.xr.enabled = true;  // Enable WebXR capabilities
+        renderer.xr.enabled = true; // Enable WebXR capabilities
         document.body.appendChild(renderer.domElement);
         
         // Setup OrbitControls for non-AR navigation
         controls = new OrbitControls(camera, renderer.domElement);
         controls.enableDamping = true; // Smooth camera movement
         controls.dampingFactor = 0.05;
-        controls.minDistance = 0.01;  // Allow zooming very close
+        controls.minDistance = 0.01; // Allow zooming very close
         controls.maxDistance = 5000; // Allow zooming out far
-        controls.target.set(0, 0, 0);  // Look at the origin initially
+        controls.target.set(0, 0, 0); // Look at the origin initially
         
         // Setup lighting
         ambientLight = new THREE.AmbientLight(0xffffff, params.ambientLightIntensity);
@@ -1394,18 +1404,18 @@
         // Setup AR Button
         const arButtonElement = document.getElementById("arButton");
         const arButtonTextElement = document.getElementById("arButtonText");
-        const arButtonIconElement = arButtonElement.querySelector(".material-icons-round");  
+        const arButtonIconElement = arButtonElement.querySelector(".material-icons-round");
 
         if (navigator.xr) {
           navigator.xr
             .isSessionSupported("immersive-ar")
             .then((supported) => {
-              arButtonElement.style.display = "flex";  
+              arButtonElement.style.display = "flex";
               if (supported) {
                 arButtonElement.addEventListener("click", onARButtonClick);
                 arButtonElement.disabled = false;
-                if (arButtonTextElement) arButtonTextElement.textContent = "Mulai AR"; 
-                if (arButtonIconElement) arButtonIconElement.textContent = "view_in_ar"; 
+                if (arButtonTextElement) arButtonTextElement.textContent = "Mulai AR";
+                if (arButtonIconElement) arButtonIconElement.textContent = "view_in_ar";
                 logToScreen("AR didukung oleh perangkat/browser ini.");
               } else {
                 if (arButtonTextElement) arButtonTextElement.textContent = "AR Tidak Ada"; // More user-friendly
@@ -1417,7 +1427,7 @@
             .catch((err) => {
               logToScreen(`Error saat memeriksa dukungan AR: ${err.message}`, "error");
               if (arButtonTextElement) arButtonTextElement.textContent = "Error AR";
-              if (arButtonIconElement) arButtonIconElement.textContent = "error_outline"; 
+              if (arButtonIconElement) arButtonIconElement.textContent = "error_outline";
               arButtonElement.disabled = true;
               arButtonElement.style.display = "flex";
             });
@@ -1431,12 +1441,12 @@
         
         // Setup AR Reticle (visual indicator for placement)
         reticleMesh = new THREE.Mesh(
-          new THREE.RingGeometry(0.04, 0.055, 32).rotateX(-Math.PI / 2),  // Flat ring on the floor
-          new THREE.MeshBasicMaterial({ color: 0xFFD700, opacity: 0.8, transparent: true, depthTest: false })  // Yellow, slightly transparent
+          new THREE.RingGeometry(0.04, 0.055, 32).rotateX(-Math.PI / 2), // Flat ring on the floor
+          new THREE.MeshBasicMaterial({ color: 0xFFD700, opacity: 0.8, transparent: true, depthTest: false }) // Yellow, slightly transparent
         );
-        reticleMesh.matrixAutoUpdate = false;  // Position will be updated manually from hit-test
-        reticleMesh.visible = false;  // Initially hidden
-        reticleMesh.renderOrder = 10;  // Render on top of most things
+        reticleMesh.matrixAutoUpdate = false; // Position will be updated manually from hit-test
+        reticleMesh.visible = false; // Initially hidden
+        reticleMesh.renderOrder = 10; // Render on top of most things
         scene.add(reticleMesh);
         
         // Load initial skybox and model
@@ -1445,18 +1455,18 @@
         } else {
           logToScreen("Path Skybox GLB tidak valid atau placeholder, skybox tidak akan dimuat secara otomatis.", "warn");
         }
-        updateBackgroundVisibility();  // Apply initial background settings
-        loadMainModel();  // Load the main 3D model
+        updateBackgroundVisibility(); // Apply initial background settings
+        loadMainModel(); // Load the main 3D model
         
         // Setup Post-processing (EffectComposer for potential future effects)
         composer = new EffectComposer(renderer);
         const renderPass = new RenderPass(scene, camera);
         composer.addPass(renderPass);
-        const outputPass = new OutputPass();  // Ensures correct output encoding
+        const outputPass = new OutputPass(); // Ensures correct output encoding
         composer.addPass(outputPass);
         
         // Setup UI controls and event listeners
-        setupCustomControls(); 
+        setupCustomControls();
         setupPresetButtons(); // For bottom navigation view presets
         if(closeInitialInstructionsButton) closeInitialInstructionsButton.addEventListener('click', hideInitialInstructions);
         startScanButton.addEventListener("click", onStartScanButtonClick);
@@ -1481,11 +1491,11 @@
         }
 
         window.addEventListener("resize", onWindowResize, false);
-        renderer.domElement.addEventListener("click", onSelectAR);  // For placing model in AR
+        renderer.domElement.addEventListener("click", onSelectAR); // For placing model in AR
         
         renderer.setAnimationLoop(animate); // Start the animation loop
         
-        updateAppVersionAndModelName();  // Display initial version and model name
+        updateAppVersionAndModelName(); // Display initial version and model name
         checkAndShowInitialInstructions(); // Show instructions if first time
       }
       
@@ -1503,8 +1513,8 @@
           logToScreen("Mencoba memulai sesi AR...");
           navigator.xr
             .requestSession("immersive-ar", {
-              requiredFeatures: ["hit-test", "dom-overlay"],  // Hit-testing for placement, dom-overlay for UI
-              domOverlay: { root: document.body },  // Allow HTML UI elements in AR
+              requiredFeatures: ["hit-test", "dom-overlay"], // Hit-testing for placement, dom-overlay for UI
+              domOverlay: { root: document.body }, // Allow HTML UI elements in AR
             })
             .then(onSessionStarted)
             .catch((err) => {
@@ -1516,7 +1526,7 @@
             });
         } else { // If session active, end it
           logToScreen("Mengakhiri sesi AR...");
-          xrSession.end();  
+          xrSession.end();
         }
       }
       
@@ -1531,7 +1541,7 @@
         const arButtonTextElement = document.getElementById("arButtonText");
         const arButtonIconElement = arButtonElement.querySelector(".material-icons-round");
         
-        if (arButtonTextElement) arButtonTextElement.textContent = "Hentikan AR"; 
+        if (arButtonTextElement) arButtonTextElement.textContent = "Hentikan AR";
         if (arButtonIconElement) arButtonIconElement.textContent = "close";
         arButtonElement.classList.add("ar-active"); // Change button appearance
         
@@ -1542,50 +1552,50 @@
 
         // Close custom controls panel if open
         const customPanel = document.getElementById('custom-controls-panel');
-        if (customPanel) customPanel.classList.remove('visible');  
-        const guiToggleIcon = guiToggleButton.querySelector('.material-icons-round'); 
-        if (guiToggleIcon) guiToggleIcon.textContent = 'menu';  // Reset icon
+        if (customPanel) customPanel.classList.remove('visible');
+        const guiToggleIcon = guiToggleButton.querySelector('.material-icons-round');
+        if (guiToggleIcon) guiToggleIcon.textContent = 'menu'; // Reset icon
 
 
-        if (skyboxObject) skyboxObject.visible = false;  // Hide skybox in AR
-        scene.background = null;  // Transparent background for AR
+        if (skyboxObject) skyboxObject.visible = false; // Hide skybox in AR
+        scene.background = null; // Transparent background for AR
         
         // Reset AR state
         xrRefSpace = null;
         xrHitTestSource = null;
         modelPlaced = false;
         if (arPlacementPrompt) arPlacementPrompt.style.display = 'none';
-        if (arInteractionInfo) arInteractionInfo.style.display = 'none';  
+        if (arInteractionInfo) arInteractionInfo.style.display = 'none';
 
         // Prepare model for AR: hide it, set AR scale
         if (modelContainerGroup) {
-          modelContainerGroup.visible = false;  // Hide model until placed
-          modelContainerGroup.userData.originalScale = modelContainerGroup.scale.clone();  // Store non-AR scale
+          modelContainerGroup.visible = false; // Hide model until placed
+          modelContainerGroup.userData.originalScale = modelContainerGroup.scale.clone(); // Store non-AR scale
           modelContainerGroup.scale.set(params.arModelScale, params.arModelScale, params.arModelScale);
-          modelContainerGroup.userData.initialArScale = params.arModelScale;  // Store initial AR scale for pinch reference
+          modelContainerGroup.userData.initialArScale = params.arModelScale; // Store initial AR scale for pinch reference
           logToScreen(`Model disembunyikan, skala AR diatur ke: ${params.arModelScale}`);
         }
-        reticleMesh.visible = false;  // Hide reticle until scanning starts
-        arInstructionsPanel.style.display = "block";  // Show AR scanning instructions
+        reticleMesh.visible = false; // Hide reticle until scanning starts
+        arInstructionsPanel.style.display = "block"; // Show AR scanning instructions
         
         // Ensure on-screen log visibility matches toggle button state
         const logToggleIcon = logToggleButton.querySelector('.material-icons-round');
         if (logToggleIcon && logToggleIcon.textContent === 'visibility') { // If log was visible
-            onScreenLogContainer.style.display = "block";  // Keep it visible in AR overlay
+            onScreenLogContainer.style.display = "block"; // Keep it visible in AR overlay
         } else {
             onScreenLogContainer.style.display = "none"; // Keep it hidden
         }
         
         // Ensure top UI elements are visible in AR overlay
-        document.getElementById('app-version-container').style.display = "flex";  
+        document.getElementById('app-version-container').style.display = "flex";
         document.getElementById('top-right-controls-container').style.display = "flex";
-        updateAppVersionAndModelName();  
+        updateAppVersionAndModelName();
         
         
-        session.addEventListener("end", onSessionEnded);  // Handle session end
+        session.addEventListener("end", onSessionEnded); // Handle session end
         
         // Set up reference space and renderer for AR
-        renderer.xr.setReferenceSpaceType("local");  // 'local' is often best for AR placement
+        renderer.xr.setReferenceSpaceType("local"); // 'local' is often best for AR placement
         renderer.xr
           .setSession(session)
           .then(() => { logToScreen("Sesi XR berhasil diset ke renderer."); })
@@ -1601,7 +1611,7 @@
        */
       function onStartScanButtonClick() {
         logToScreen("Tombol 'Mulai Pindai Permukaan' ditekan.");
-        arInstructionsPanel.style.display = "none";  // Hide instructions
+        arInstructionsPanel.style.display = "none"; // Hide instructions
         if (xrSession && !xrHitTestSource) { // If session active and no hit-test source yet
           xrSession.requestReferenceSpace("viewer") // 'viewer' space for hit-testing from camera's perspective
             .then((refSpaceViewer) => {
@@ -1609,8 +1619,8 @@
               return xrSession.requestHitTestSource({ space: refSpaceViewer });
             })
             .then((source) => {
-              xrHitTestSource = source;  // Store hit-test source
-              reticleMesh.visible = true;  // Show reticle
+              xrHitTestSource = source; // Store hit-test source
+              reticleMesh.visible = true; // Show reticle
               logToScreen("Hit test source berhasil didapatkan. Reticle aktif.");
             })
             .catch((err) => {
@@ -1633,8 +1643,8 @@
        */
       function onSessionEnded() {
         logToScreen("Sesi AR berakhir.");
-        if (xrSession) {  // Ensure cleanup only if session existed
-            xrSession.removeEventListener("end", onSessionEnded);  // Clean up listener
+        if (xrSession) { // Ensure cleanup only if session existed
+            xrSession.removeEventListener("end", onSessionEnded); // Clean up listener
             xrSession = null;
         }
         
@@ -1647,12 +1657,12 @@
         arButtonElement.classList.remove("ar-active"); // Reset button appearance
         
         // Restore non-AR UI
-        document.getElementById("bottom-nav-wrapper").style.display = "block"; 
-        document.getElementById("ar-button-container").style.display = "flex"; 
+        document.getElementById("bottom-nav-wrapper").style.display = "block";
+        document.getElementById("ar-button-container").style.display = "flex";
 
         // Ensure custom controls panel is hidden and icon reset
         const customPanel = document.getElementById('custom-controls-panel');
-        if (customPanel) customPanel.classList.remove('visible');  
+        if (customPanel) customPanel.classList.remove('visible');
         const guiToggleIcon = guiToggleButton.querySelector('.material-icons-round');
         if (guiToggleIcon) guiToggleIcon.textContent = 'menu';
 
@@ -1664,15 +1674,9 @@
 
         arInstructionsPanel.style.display = "none"; // Hide AR instructions
         
-        // Restore top UI elements if they were part of DOM overlay
-        document.getElementById('app-version-container').style.display = "flex"; 
-        document.getElementById('top-right-controls-container').style.display = "flex";
-        updateAppVersionAndModelName();  
-        
-        
-        reticleMesh.visible = false;  // Hide reticle
+        reticleMesh.visible = false; // Hide reticle
         if (xrHitTestSource) {
-            xrHitTestSource.cancel();  // Cancel hit-test source
+            xrHitTestSource.cancel(); // Cancel hit-test source
             xrHitTestSource = null;
         }
         
@@ -1694,8 +1698,8 @@
             modelContainerGroup.scale.set(params.modelScale, params.modelScale, params.modelScale);
           }
         }
-        if (model) goToViewPreset('Default', true);  // Reset camera to default view
-        updateBackgroundVisibility();  // Restore skybox/background color
+        if (model) goToViewPreset('Default', true); // Reset camera to default view
+        updateBackgroundVisibility(); // Restore skybox/background color
       }
       
       /**
@@ -1711,14 +1715,14 @@
             logToScreen("Mencoba menempatkan model. Matriks reticle:", reticleMesh.matrix.elements.map((n) => n.toFixed(2)).join(', '));
             // Place model at reticle's position and orientation
             modelContainerGroup.matrix.copy(reticleMesh.matrix);
-            modelContainerGroup.matrix.decompose(modelContainerGroup.position, modelContainerGroup.quaternion, modelContainerGroup.scale);  // Apply matrix to model's transform
-            modelContainerGroup.scale.set(params.arModelScale, params.arModelScale, params.arModelScale);  // Apply initial AR scale
-            modelContainerGroup.userData.initialArScale = params.arModelScale;  // Store for pinch reference
-            modelContainerGroup.visible = true;  // Make model visible
-            modelPlaced = true;  // Set flag
-            reticleMesh.visible = false;  // Hide reticle
+            modelContainerGroup.matrix.decompose(modelContainerGroup.position, modelContainerGroup.quaternion, modelContainerGroup.scale); // Apply matrix to model's transform
+            modelContainerGroup.scale.set(params.arModelScale, params.arModelScale, params.arModelScale); // Apply initial AR scale
+            modelContainerGroup.userData.initialArScale = params.arModelScale; // Store for pinch reference
+            modelContainerGroup.visible = true; // Make model visible
+            modelPlaced = true; // Set flag
+            reticleMesh.visible = false; // Hide reticle
             if (arPlacementPrompt) arPlacementPrompt.style.display = 'none'; // Hide placement prompt
-            showARInteractionInfo();  // Show interaction hints
+            showARInteractionInfo(); // Show interaction hints
 
             logToScreen(`Model AR ditempatkan. Pos: ${modelContainerGroup.position.toArray().map((n) => n.toFixed(2))}, Skala: ${params.arModelScale}`);
             
@@ -1732,9 +1736,9 @@
           }
         } else if (modelPlaced) {
              logToScreen("Model sudah ditempatkan. Tap dideteksi."); // Could be used for other interactions later
-        } else {
-          logToScreen("Kondisi untuk menempatkan model AR tidak terpenuhi (reticle tidak terlihat atau sesi AR tidak aktif).");
-        }
+          } else {
+            logToScreen("Kondisi untuk menempatkan model AR tidak terpenuhi (reticle tidak terlihat atau sesi AR tidak aktif).");
+          }
       }
       
       // --- AR Touch Interaction Handlers ---
@@ -1756,19 +1760,19 @@
        */
       function handleARtouchstart(event) {
         if (!xrSession || !modelPlaced || !modelContainerGroup) return;
-        event.preventDefault();  // Prevent default browser actions like scrolling
+        event.preventDefault(); // Prevent default browser actions like scrolling
         const touches = event.touches;
-        if (touches.length === 1) {  // Single finger: start drag
+        if (touches.length === 1) { // Single finger: start drag
           arIsDragging = true;
           arIsPinching = false;
           arLastDragX = touches[0].clientX;
           arLastDragY = touches[0].clientY;
           logToScreen("AR Drag Start");
-        } else if (touches.length === 2) {  // Two fingers: start pinch
+        } else if (touches.length === 2) { // Two fingers: start pinch
           arIsPinching = true;
           arIsDragging = false;
           arInitialPinchDistance = getDistanceBetweenTouches(touches);
-          modelContainerGroup.userData.currentPinchStartScale = modelContainerGroup.scale.x;  // Store scale at pinch start
+          modelContainerGroup.userData.currentPinchStartScale = modelContainerGroup.scale.x; // Store scale at pinch start
           logToScreen(`AR Pinch Start. Initial Distance: ${arInitialPinchDistance.toFixed(2)}, Start Scale: ${modelContainerGroup.userData.currentPinchStartScale.toFixed(3)}`);
         }
       }
@@ -1781,20 +1785,20 @@
         if (!xrSession || !modelPlaced || !modelContainerGroup) return;
         event.preventDefault();
         const touches = event.touches;
-        if (arIsDragging && touches.length === 1) {  // Dragging with one finger
+        if (arIsDragging && touches.length === 1) { // Dragging with one finger
           const deltaX = touches[0].clientX - arLastDragX;
           const deltaY = touches[0].clientY - arLastDragY;
-          modelContainerGroup.rotation.y += deltaX * arDragSensitivity;  // Rotate around Y axis (horizontal drag)
-          modelContainerGroup.rotation.x += deltaY * arDragSensitivity;  // Rotate around X axis (vertical drag) - can be limited if desired
+          modelContainerGroup.rotation.y += deltaX * arDragSensitivity; // Rotate around Y axis (horizontal drag)
+          modelContainerGroup.rotation.x += deltaY * arDragSensitivity; // Rotate around X axis (vertical drag) - can be limited if desired
           arLastDragX = touches[0].clientX;
           arLastDragY = touches[0].clientY;
-        } else if (arIsPinching && touches.length === 2) {  // Pinching with two fingers
+        } else if (arIsPinching && touches.length === 2) { // Pinching with two fingers
           const currentPinchDistance = getDistanceBetweenTouches(touches);
           if (arInitialPinchDistance > 0 && modelContainerGroup.userData.currentPinchStartScale !== undefined) {
             const scaleFactor = currentPinchDistance / arInitialPinchDistance;
             let newScale = modelContainerGroup.userData.currentPinchStartScale * scaleFactor;
             // Clamp scale to reasonable min/max based on initial AR scale
-            const minScale = modelContainerGroup.userData.initialArScale * 0.1;  // e.g., 10% of initial
+            const minScale = modelContainerGroup.userData.initialArScale * 0.1; // e.g., 10% of initial
             const maxScale = modelContainerGroup.userData.initialArScale * 10;   // e.g., 1000% of initial
             newScale = Math.max(minScale, Math.min(newScale, maxScale));
             modelContainerGroup.scale.set(newScale, newScale, newScale);
@@ -1812,10 +1816,10 @@
           arIsDragging = false;
           logToScreen("AR Drag End");
         }
-        if (arIsPinching && event.touches.length < 2) {  // Pinch ended
+        if (arIsPinching && event.touches.length < 2) { // Pinch ended
           arIsPinching = false;
           if (modelContainerGroup) { // Update params.arModelScale with the final pinch scale
-            params.arModelScale = modelContainerGroup.scale.x;  
+            params.arModelScale = modelContainerGroup.scale.x;
             // Update GUI if panel is open
             if (controlsPanel.arModelScale) {
                 controlsPanel.arModelScale.value = params.arModelScale;
@@ -1837,7 +1841,7 @@
         // Clean up previous model if it exists
         if (model) {
           modelContainerGroup.remove(model);
-          model.traverse((node) => {  // Dispose of geometries and materials
+          model.traverse((node) => { // Dispose of geometries and materials
             if (node.geometry) node.geometry.dispose();
             if (node.material) {
               if (Array.isArray(node.material)) node.material.forEach((mat) => mat.dispose());
@@ -1852,44 +1856,44 @@
         modelSize.set(0, 0, 0);
         modelContainerGroup.position.set(0, 0, 0); // Reset container position
         modelContainerGroup.rotation.set(0, 0, 0); // Reset container rotation
-        modelContainerGroup.quaternion.identity();  // Ensure quaternion is reset
+        modelContainerGroup.quaternion.identity(); // Ensure quaternion is reset
         
         const mainModelLoader = new GLTFLoader();
         mainModelLoader.load(
           params.modelPath,
-          function (gltf) {  // Success callback
+          function (gltf) { // Success callback
             model = gltf.scene;
             if (!model) { // Handle cases where GLTF loads but scene is empty
               logToScreen(`GLTFLoader berhasil, tetapi gltf.scene kosong untuk: ${params.modelPath}`, "error");
-              hideLoadingOverlay();  // Still hide loading
-              updateAppVersionAndModelName();  // Update display
+              hideLoadingOverlay(); // Still hide loading
+              updateAppVersionAndModelName(); // Update display
               return;
             }
             logToScreen("Model GLTF berhasil di-parse.");
             modelContainerGroup.add(model); // Add loaded model to the container group
             
             // Calculate bounding box and center the model within its container
-            const box = new THREE.Box3().setFromObject(modelContainerGroup);  // Use container for accurate centering if model itself is offset
-            box.getCenter(modelCenter);  // Get center of the bounding box
+            const box = new THREE.Box3().setFromObject(modelContainerGroup); // Use container for accurate centering if model itself is offset
+            box.getCenter(modelCenter); // Get center of the bounding box
             box.getSize(modelSize); // Get size of the bounding box
             logToScreen(`Ukuran model awal: X:${modelSize.x.toFixed(2)}, Y:${modelSize.y.toFixed(2)}, Z:${modelSize.z.toFixed(2)}`);
             
             // Offset the container group so the model's calculated center is at the group's origin (0,0,0)
-            modelContainerGroup.position.sub(modelCenter);  
+            modelContainerGroup.position.sub(modelCenter);
             modelCenter.set(0,0,0); // Now the logical center for controls is the group's origin
             logToScreen("ModelContainerGroup dipusatkan ke origin.");
             
             // Apply initial transformations and material updates
-            applyInitialRotation();  // Apply rotation from params
+            applyInitialRotation(); // Apply rotation from params
             applyModelScale();     // Apply scale from params
-            updateMaterialProperties();  // Apply any custom material adjustments
+            updateMaterialProperties(); // Apply any custom material adjustments
             logToScreen("Model GLB utama berhasil dimuat dan disiapkan.");
             
-            goToViewPreset(params.selectedViewPreset, true);  // Frame the model with the current preset
-            hideLoadingOverlay();  // Hide loading screen
-            updateAppVersionAndModelName();  // Update displayed model name
+            goToViewPreset(params.selectedViewPreset, true); // Frame the model with the current preset
+            hideLoadingOverlay(); // Hide loading screen
+            updateAppVersionAndModelName(); // Update displayed model name
           },
-          function (xhr) {  // Progress callback
+          function (xhr) { // Progress callback
             if (xhr.lengthComputable) {
               const percentComplete = (xhr.loaded / xhr.total) * 100;
               console.log(`Memuat Model: ${Math.round(percentComplete, 2)}%`);
@@ -1897,10 +1901,10 @@
               console.log(`Memuat Model... (${(xhr.loaded / 1024 / 1024).toFixed(2)} MB)`); // Show MB loaded if total unknown
             }
           },
-          function (error) {  // Error callback
+          function (error) { // Error callback
             logToScreen(`Gagal memuat model GLB utama dari: ${params.modelPath}. Error: ${error.message || error}`, "error");
-            hideLoadingOverlay();  // Hide loading screen on error too
-            updateAppVersionAndModelName();  // Update display (e.g., to show "N/A")
+            hideLoadingOverlay(); // Hide loading screen on error too
+            updateAppVersionAndModelName(); // Update display (e.g., to show "N/A")
           }
         );
       }
@@ -1915,13 +1919,13 @@
           modelContainerGroup.scale.set(scaleValue, scaleValue, scaleValue);
           logToScreen(`Skala model diatur ke: ${scaleValue.toFixed(3)} (Sesi AR: ${!!xrSession})`);
           
-          if (!xrSession) {  // If not in AR, re-calculate bounding box and re-frame
-            const box = new THREE.Box3().setFromObject(modelContainerGroup);  // Get new bounding box after scaling
-            box.getSize(modelSize);  // Update global modelSize
-            goToViewPreset(params.selectedViewPreset, true);  // Re-frame with current preset
+          if (!xrSession) { // If not in AR, re-calculate bounding box and re-frame
+            const box = new THREE.Box3().setFromObject(modelContainerGroup); // Get new bounding box after scaling
+            box.getSize(modelSize); // Update global modelSize
+            goToViewPreset(params.selectedViewPreset, true); // Re-frame with current preset
           } else {
             // In AR, initialArScale is used as a base for pinch-to-zoom calculations
-            modelContainerGroup.userData.initialArScale = scaleValue;  
+            modelContainerGroup.userData.initialArScale = scaleValue;
           }
         } else if (!model) {
           logToScreen("applyModelScale dipanggil tetapi model belum dimuat.", "warn");
@@ -1935,26 +1939,26 @@
       function loadSkyboxFromGLB() {
         if (!params.skyboxGlbUrl || params.skyboxGlbUrl === "SKYBOX_ANDA.glb" || params.skyboxGlbUrl.includes("placehold.co")) {
           logToScreen("URL Skybox GLB tidak valid. Skybox tidak akan dimuat.", "warn");
-          if (skyboxObject) {  // If an old skybox exists, remove it
+          if (skyboxObject) { // If an old skybox exists, remove it
             scene.remove(skyboxObject);
-            skyboxObject.traverse((node) => {  // Dispose of its resources
+            skyboxObject.traverse((node) => { // Dispose of its resources
                 if (node.geometry) node.geometry.dispose();
                 if (node.material) {
-                   if (Array.isArray(node.material)) node.material.forEach((mat) => mat.dispose());
-                   else node.material.dispose();
+                  if (Array.isArray(node.material)) node.material.forEach((mat) => mat.dispose());
+                  else node.material.dispose();
                 }
             });
             skyboxObject = null;
           }
-          updateBackgroundVisibility();  // Fallback to solid color
+          updateBackgroundVisibility(); // Fallback to solid color
           return;
         }
         logToScreen(`Mulai memuat skybox dari: ${params.skyboxGlbUrl}`);
         const loader = new GLTFLoader();
         loader.load(
           params.skyboxGlbUrl,
-          (gltf) => {  // Success callback
-            if (skyboxObject) {  // Clean up previous skybox
+          (gltf) => { // Success callback
+            if (skyboxObject) { // Clean up previous skybox
               scene.remove(skyboxObject);
               skyboxObject.traverse((node) => { // Dispose resources
                 if (node.geometry) node.geometry.dispose();
@@ -1965,24 +1969,24 @@
               });
             }
             skyboxObject = gltf.scene;
-            skyboxObject.traverse((node) => {  // Process materials for skybox effect
+            skyboxObject.traverse((node) => { // Process materials for skybox effect
               if (node.isMesh) {
                 const materials = Array.isArray(node.material) ? node.material : [node.material];
                 materials.forEach((material) => {
-                  material.side = THREE.BackSide;  // Render inside of the skybox
+                  material.side = THREE.BackSide; // Render inside of the skybox
                   // Adjust emissive/color based on brightness param, preserving original values
                   if (material.isMeshStandardMaterial || material.isMeshPhysicalMaterial) {
                     if (material.userData.initialEmissiveIntensityGLB === undefined) { // Store original if not already
-                        material.userData.initialEmissiveIntensityGLB = material.emissiveIntensity !== undefined ? material.emissiveIntensity : 1;  // Default to 1 if undefined
+                        material.userData.initialEmissiveIntensityGLB = material.emissiveIntensity !== undefined ? material.emissiveIntensity : 1; // Default to 1 if undefined
                     }
                     material.emissiveIntensity = material.userData.initialEmissiveIntensityGLB * params.skyboxBrightness;
-                    if (!material.emissiveMap) {  // If no emissive map, also scale emissive color
+                    if (!material.emissiveMap) { // If no emissive map, also scale emissive color
                         if (material.userData.initialEmissiveColorGLB === undefined) {
-                            material.userData.initialEmissiveColorGLB = material.emissive ? material.emissive.clone() : new THREE.Color(0xffffff);  // Default to white
+                            material.userData.initialEmissiveColorGLB = material.emissive ? material.emissive.clone() : new THREE.Color(0xffffff); // Default to white
                         }
                         material.emissive.copy(material.userData.initialEmissiveColorGLB).multiplyScalar(params.skyboxBrightness);
                     }
-                  } else if (material.isMeshBasicMaterial) {  // For basic materials, scale color
+                  } else if (material.isMeshBasicMaterial) { // For basic materials, scale color
                     if (material.userData.initialColorGLB === undefined) {
                         material.userData.initialColorGLB = material.color ? material.color.clone() : new THREE.Color(0xffffff);
                     }
@@ -1993,18 +1997,18 @@
               }
             });
             // Scale skybox to be very large, ensuring it encompasses the scene
-            const skyboxScale = Math.max(camera.far * 0.5, 1000);  // Ensure it's large enough but not excessively so
+            const skyboxScale = Math.max(camera.far * 0.5, 1000); // Ensure it's large enough but not excessively so
             skyboxObject.scale.set(skyboxScale, skyboxScale, skyboxScale);
-            skyboxObject.renderOrder = -10;  // Render behind everything else
+            skyboxObject.renderOrder = -10; // Render behind everything else
             scene.add(skyboxObject);
-            updateBackgroundVisibility();  // Apply visibility based on params
+            updateBackgroundVisibility(); // Apply visibility based on params
             logToScreen("Skybox GLB berhasil dimuat.");
           },
-          undefined,  // Progress callback (optional)
-          (error) => {  // Error callback
+          undefined, // Progress callback (optional)
+          (error) => { // Error callback
             logToScreen(`Gagal memuat Skybox GLB: ${params.skyboxGlbUrl}. Error: ${error.message || error}`, "error");
             if (skyboxObject) { scene.remove(skyboxObject); skyboxObject = null; } // Clean up on error
-            updateBackgroundVisibility();  // Fallback to solid color
+            updateBackgroundVisibility(); // Fallback to solid color
           }
         );
       }
@@ -2014,13 +2018,13 @@
        */
       function updateBackgroundVisibility() {
         if (skyboxObject) {
-          skyboxObject.visible = params.showSkybox && !xrSession;  // Skybox visible if toggled on AND not in AR
+          skyboxObject.visible = params.showSkybox && !xrSession; // Skybox visible if toggled on AND not in AR
         }
         if (params.showSkybox && skyboxObject && skyboxObject.children.length > 0 && !xrSession) {
-          scene.background = null;  // Let skybox be the background
-        } else if (!xrSession) {  // Not in AR, and skybox not shown/loaded
+          scene.background = null; // Let skybox be the background
+        } else if (!xrSession) { // Not in AR, and skybox not shown/loaded
           scene.background = new THREE.Color(params.backgroundColor); // Use solid color
-        } else {  // In AR mode
+        } else { // In AR mode
           scene.background = null; // Transparent background for camera feed
         }
       }
@@ -2060,49 +2064,49 @@
        * @param {boolean} instant - If true, snaps instantly; otherwise, can be animated (currently snaps).
        */
       function goToViewPreset(presetName, instant = false) {
-        if (isUpdatingViewPresetGUI) return;  // Prevent recursion if called from GUI change
+        if (isUpdatingViewPresetGUI) return; // Prevent recursion if called from GUI change
         if (!modelContainerGroup || !camera || !controls || !model) {
           logToScreen("goToViewPreset: Komponen belum siap (model, kamera, atau kontrol).", "warn");
           return;
         }
-        isUpdatingViewPresetGUI = true;  // Set flag
+        isUpdatingViewPresetGUI = true; // Set flag
         
         // Target the model's logical center (which is the origin of modelContainerGroup)
-        const center = new THREE.Vector3();  // modelContainerGroup is already centered at origin
+        const center = new THREE.Vector3(); // modelContainerGroup is already centered at origin
         
         // Get current scaled size of the model for distance calculation
         const currentBox = new THREE.Box3();
-        model.traverseVisible(obj => {  // Use model's local bounding box
+        model.traverseVisible(obj => { // Use model's local bounding box
             if(obj.isMesh) currentBox.expandByObject(obj);
         });
-        currentBox.getSize(modelSize);  // Get local size
+        currentBox.getSize(modelSize); // Get local size
         modelSize.multiply(modelContainerGroup.scale); // Apply current container scale to get world size
         
-        const maxDim = Math.max(modelSize.x, modelSize.y, modelSize.z, 0.1);  // Ensure non-zero max dimension
-        const distanceFactor = 2.0;  // How far to place camera relative to model size
+        const maxDim = Math.max(modelSize.x, modelSize.y, modelSize.z, 0.1); // Ensure non-zero max dimension
+        const distanceFactor = 2.0; // How far to place camera relative to model size
         let distance = maxDim * distanceFactor;
-        distance = Math.max(distance, 0.2);  // Minimum distance to prevent camera being inside small models
+        distance = Math.max(distance, 0.2); // Minimum distance to prevent camera being inside small models
         
         let newCamPos = new THREE.Vector3();
-        camera.up.set(0, 1, 0);  // Default camera up vector
+        camera.up.set(0, 1, 0); // Default camera up vector
         
         // Determine camera position based on preset
         switch (presetName) {
-          case "Front":  // View from +Z (Three.js default front)
+          case "Front": // View from +Z (Three.js default front)
             newCamPos.set(center.x, center.y, center.z + distance);
             break;
-          case "Back":   // View from -Z
+          case "Back":  // View from -Z
             newCamPos.set(center.x, center.y, center.z - distance);
             break;
-          case "Left":   // View from +X
+          case "Left":  // View from +X
             newCamPos.set(center.x + distance, center.y, center.z);
             break;
-          case "Right":  // View from -X
+          case "Right": // View from -X
             newCamPos.set(center.x - distance, center.y, center.z);
             break;
           case "Top":
             newCamPos.set(center.x, center.y + distance, center.z + 0.0001); // Slight Z offset to avoid gimbal lock issues with lookAt
-            camera.up.set(0, 0, -1);  // Look down, Z is "up" from camera's perspective
+            camera.up.set(0, 0, -1); // Look down, Z is "up" from camera's perspective
             break;
           case "Bottom":
             newCamPos.set(center.x, center.y - distance, center.z + 0.0001);
@@ -2121,9 +2125,9 @@
 
             // Standard camera position for default view
             camera.position.set(0, 1.6, 3); // A common viewing angle
-            controls.target.set(0, 0, 0);  // Look at origin
-            camera.up.set(0, 1, 0);  // Standard up
-            controls.update();  // Apply changes
+            controls.target.set(0, 0, 0); // Look at origin
+            camera.up.set(0, 1, 0); // Standard up
+            controls.update(); // Apply changes
             
             // Update GUI selection
             params.selectedViewPreset = "Default";
@@ -2139,8 +2143,8 @@
         if (instant) {
           camera.position.copy(newCamPos);
           controls.target.copy(center);
-          camera.lookAt(center);  // Ensure camera looks at the center after up vector change
-          controls.update();  // Crucial for OrbitControls to recognize changes
+          camera.lookAt(center); // Ensure camera looks at the center after up vector change
+          controls.update(); // Crucial for OrbitControls to recognize changes
         } else {
           // For smooth transition (not implemented, but structure is here)
           // Could use a library like TWEEN.js or GSAP
@@ -2151,7 +2155,7 @@
         }
         
         // Update GUI selection
-        params.selectedViewPreset = presetName;  
+        params.selectedViewPreset = presetName;
         if (controlsPanel.selectedViewPreset && controlsPanel.selectedViewPreset.value !== presetName) {
             controlsPanel.selectedViewPreset.value = presetName;
         }
@@ -2168,26 +2172,26 @@
        * @param {number} fitOffset - Multiplier for distance calculation.
        */
       function frameArea(objectToFrame, cam, ctrl, instant = false, fitOffset = 1.5) {
-        if (!objectToFrame || !model) {  // Ensure model is loaded
+        if (!objectToFrame || !model) { // Ensure model is loaded
           logToScreen("frameArea: Objek model tidak valid atau belum dimuat.", "warn");
-          if (instant) {  // Fallback position if no model
+          if (instant) { // Fallback position if no model
             ctrl.target.set(0, 0, 0);
-            cam.position.set(0, 0.5, 3);  // Default-ish view
+            cam.position.set(0, 0.5, 3); // Default-ish view
             ctrl.update();
           }
           return;
         }
         
         const box = new THREE.Box3();
-        box.setFromObject(objectToFrame);  // Calculate bounding box of the object
+        box.setFromObject(objectToFrame); // Calculate bounding box of the object
         
         const sizeVec = box.getSize(new THREE.Vector3());
-        const centerVec = box.getCenter(new THREE.Vector3());  // Center of the bounding box
+        const centerVec = box.getCenter(new THREE.Vector3()); // Center of the bounding box
         
-        if (sizeVec.lengthSq() === 0) {  // Handle zero-size objects (e.g., empty group)
+        if (sizeVec.lengthSq() === 0) { // Handle zero-size objects (e.g., empty group)
           logToScreen("frameArea: Ukuran objek adalah nol.", "warn");
           if (instant) {
-            ctrl.target.copy(centerVec);  // Target the (potentially 0,0,0) center
+            ctrl.target.copy(centerVec); // Target the (potentially 0,0,0) center
             cam.position.set(centerVec.x, centerVec.y + 0.5, centerVec.z + 3); // Default offset
             ctrl.update();
           }
@@ -2199,15 +2203,15 @@
         const fitHeightDistance = maxSize / (2 * Math.atan((Math.PI * cam.fov) / 360));
         const fitWidthDistance = fitHeightDistance / cam.aspect;
         let distance = fitOffset * Math.max(fitHeightDistance, fitWidthDistance);
-        distance = Math.max(distance, 0.1);  // Minimum distance
+        distance = Math.max(distance, 0.1); // Minimum distance
         
         // Position camera along its current direction from the object's center
         const direction = cam.position.clone().sub(centerVec).normalize().multiplyScalar(distance);
         const targetCamPos = centerVec.clone().add(direction);
         
         // Fallback if camera is already at the center (avoid NaN direction)
-        if (direction.lengthSq() < 0.001) { 
-            targetCamPos.set(centerVec.x, centerVec.y + sizeVec.y * 0.5, centerVec.z + distance);  // Default to view from front-ish
+        if (direction.lengthSq() < 0.001) {
+            targetCamPos.set(centerVec.x, centerVec.y + sizeVec.y * 0.5, centerVec.z + distance); // Default to view from front-ish
         }
         
         // Adjust camera clipping planes based on new distance
@@ -2217,15 +2221,15 @@
         
         // Adjust OrbitControls limits
         ctrl.maxDistance = distance * 10;
-        ctrl.minDistance = Math.min(0.01, distance * 0.1);  // Allow closer zoom
+        ctrl.minDistance = Math.min(0.01, distance * 0.1); // Allow closer zoom
         
         // Apply new camera position and target
         if (instant) {
           ctrl.target.copy(centerVec);
           cam.position.copy(targetCamPos);
-          cam.lookAt(centerVec);  // Ensure camera is looking at the center
+          cam.lookAt(centerVec); // Ensure camera is looking at the center
           ctrl.update();
-        } else {  // Smooth transition (not implemented)
+        } else { // Smooth transition (not implemented)
           ctrl.target.copy(centerVec);
           cam.position.copy(targetCamPos);
           cam.lookAt(centerVec);
@@ -2256,7 +2260,7 @@
         buttons.forEach((button) => {
           button.addEventListener("click", () => {
             const view = button.getAttribute("data-view");
-            goToViewPreset(view, false);  // Use non-instant transition (currently snaps)
+            goToViewPreset(view, false); // Use non-instant transition (currently snaps)
           });
         });
         updateActiveButton(params.selectedViewPreset); // Set initial active button
@@ -2268,10 +2272,10 @@
         const toggleButtonIcon = guiToggleButton.querySelector('.material-icons-round');
 
         // Toggle panel visibility
-        guiToggleButton.addEventListener('click', () => { 
+        guiToggleButton.addEventListener('click', () => {
             panel.classList.toggle('visible');
             if (panel.classList.contains('visible')) {
-                if(toggleButtonIcon) toggleButtonIcon.textContent = 'close';  // Change icon to close
+                if(toggleButtonIcon) toggleButtonIcon.textContent = 'close'; // Change icon to close
                 logToScreen("Panel Kontrol Model 3D dibuka.");
             } else {
                 if(toggleButtonIcon) toggleButtonIcon.textContent = 'menu';   // Change icon to menu
@@ -2297,9 +2301,9 @@
         // --- Model Controls ---
         controlsPanel.modelPath = document.getElementById('ctrlModelPath');
         controlsPanel.modelPath.value = params.modelPath;
-        controlsPanel.modelPath.addEventListener('change', (event) => {  // Use 'change' for text input to update on blur/enter
+        controlsPanel.modelPath.addEventListener('change', (event) => { // Use 'change' for text input to update on blur/enter
             params.modelPath = event.target.value;
-            loadMainModel();  // Reload model with new path
+            loadMainModel(); // Reload model with new path
         });
 
         setupRangeControl('modelScale', 'ctrlModelScale', 'ctrlModelScaleValue', '', 2, applyModelScale);
@@ -2346,12 +2350,12 @@
         });
 
         setupRangeControl('skyboxBrightness', 'ctrlSkyboxBrightness', 'ctrlSkyboxBrightnessValue', '', 2, () => {
-            if (skyboxObject) loadSkyboxFromGLB();  // Reload skybox to apply new brightness
+            if (skyboxObject) loadSkyboxFromGLB(); // Reload skybox to apply new brightness
         });
 
         controlsPanel.backgroundColor = document.getElementById('ctrlBackgroundColor');
         controlsPanel.backgroundColor.value = params.backgroundColor;
-        controlsPanel.backgroundColor.addEventListener('input', (event) => {  // 'input' for live color change
+        controlsPanel.backgroundColor.addEventListener('input', (event) => { // 'input' for live color change
             params.backgroundColor = event.target.value;
             updateBackgroundVisibility();
         });
@@ -2404,7 +2408,7 @@
             logToScreen("Tangkapan layar tidak didukung dalam mode AR.", "warn");
             return;
           }
-          composer.render();  // Ensure scene is rendered with post-processing if any
+          composer.render(); // Ensure scene is rendered with post-processing if any
           const dataURL = renderer.domElement.toDataURL("image/png");
           const a = document.createElement("a");
           a.href = dataURL;
@@ -2426,8 +2430,8 @@
         camera.aspect = window.innerWidth / window.innerHeight;
         camera.updateProjectionMatrix();
         renderer.setSize(window.innerWidth, window.innerHeight);
-        composer.setSize(window.innerWidth, window.innerHeight);  // Update composer size
-        if (model && !xrSession) goToViewPreset(params.selectedViewPreset, true);  // Re-frame model on resize in non-AR
+        composer.setSize(window.innerWidth, window.innerHeight); // Update composer size
+        if (model && !xrSession) goToViewPreset(params.selectedViewPreset, true); // Re-frame model on resize in non-AR
 
         // Recalculate bottom nav height on resize for accuracy if it changes (e.g. orientation change)
         const bottomNavWrapper = document.getElementById('bottom-nav-wrapper');
@@ -2444,39 +2448,39 @@
        * @param {DOMHighResTimeStamp} timestamp - Current time.
        * @param {XRFrame} frame - WebXR frame object (only in AR).
        */
-      function animate(timestamp, frame) {  // timestamp and frame are provided by WebXR when in AR session
-        const deltaTime = clock.getDelta();  // Time since last frame
+      function animate(timestamp, frame) { // timestamp and frame are provided by WebXR when in AR session
+        const deltaTime = clock.getDelta(); // Time since last frame
         
-        if (!xrSession) {  // Non-AR mode
-          controls.update();  // Update OrbitControls
-          if (modelContainerGroup && params.animateModel) {  // Auto-rotate model if enabled
+        if (!xrSession) { // Non-AR mode
+          controls.update(); // Update OrbitControls
+          if (modelContainerGroup && params.animateModel) { // Auto-rotate model if enabled
             modelContainerGroup.rotation.y += params.rotationSpeed * deltaTime;
           }
-          if (skyboxObject && skyboxObject.visible) {  // Keep skybox centered on camera
+          if (skyboxObject && skyboxObject.visible) { // Keep skybox centered on camera
             skyboxObject.position.copy(camera.position);
           }
-          composer.render();  // Render scene via composer
+          composer.render(); // Render scene via composer
         } else { // AR Mode
-          if (frame) {  // If XRFrame is available
-            const currentRefSpace = renderer.xr.getReferenceSpace();  // Get current reference space
+          if (frame) { // If XRFrame is available
+            const currentRefSpace = renderer.xr.getReferenceSpace(); // Get current reference space
             if (xrHitTestSource && !modelPlaced && reticleMesh && currentRefSpace) { // If hit-testing and model not placed
-              const hitTestResults = frame.getHitTestResults(xrHitTestSource);  // Perform hit-test
+              const hitTestResults = frame.getHitTestResults(xrHitTestSource); // Perform hit-test
               if (hitTestResults.length > 0) { // If a surface is found
                 const hit = hitTestResults[0];
-                const pose = hit.getPose(currentRefSpace);  // Get pose of the hit
+                const pose = hit.getPose(currentRefSpace); // Get pose of the hit
                 if (pose) {
-                  reticleMesh.matrix.fromArray(pose.transform.matrix);  // Update reticle position/orientation
+                  reticleMesh.matrix.fromArray(pose.transform.matrix); // Update reticle position/orientation
                   reticleMesh.visible = true;
                   // Update the 2D placement prompt to follow the 3D reticle
-                  updateElementPositionRelativeTo3DObject(arPlacementPrompt, reticleMesh, 0, -70); 
-                } else {  // No valid pose from hit
-                    reticleMesh.visible = false;  
+                  updateElementPositionRelativeTo3DObject(arPlacementPrompt, reticleMesh, 0, -70);
+                } else { // No valid pose from hit
+                    reticleMesh.visible = false;
                     if(arPlacementPrompt) arPlacementPrompt.style.display = 'none';
                 }
-              } else {  // No hit results
-                reticleMesh.visible = false;  
+              } else { // No hit results
+                reticleMesh.visible = false;
                 if(arPlacementPrompt) arPlacementPrompt.style.display = 'none';
-              }  
+              }
             } else if (modelPlaced) { // Model is placed, hide reticle and prompt
                 if (reticleMesh) reticleMesh.visible = false;
                 if (arPlacementPrompt) arPlacementPrompt.style.display = 'none';
@@ -2484,7 +2488,7 @@
                  if(arPlacementPrompt) arPlacementPrompt.style.display = 'none';
             }
           }
-          renderer.render(scene, camera);  // Render scene directly (composer not typically used in AR loop)
+          renderer.render(scene, camera); // Render scene directly (composer not typically used in AR loop)
         }
       }
       
@@ -2492,4 +2496,4 @@
       init();
     </script>
   </body>
-</ht
+</html>
